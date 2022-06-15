@@ -1,15 +1,15 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <JsonFormat />
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+
+import JsonFormat from './components/JsonFormat'
 
 export default {
   name: 'App',
   components: {
-    HelloWorld
+    JsonFormat
   }
 }
 </script>
