@@ -1,17 +1,12 @@
 <template>
-	<h1>云胡工具集合</h1>
-  <JsonFormat />
-  
+  <router-view/>
 </template>
 
 <script>
 
-import JsonFormat from './components/JsonFormat'
-
 export default {
   name: 'App',
   components: {
-    JsonFormat
   }
 }
 </script>
@@ -24,5 +19,15 @@ export default {
   text-align: center;
   color: #2c3e50;
   margin-top: 60px;
+  /*position:relative;*/
+
+}
+
+.box-card {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /*height: 100vh;*/
+
 }
 </style>

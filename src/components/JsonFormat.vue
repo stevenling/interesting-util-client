@@ -1,29 +1,31 @@
 <template>
-  <div class = "app">
+  <div id = "app">
   <el-card class = "box-card">
-    <template #header>
+<!--    <template #header>-->
       <div class="card-header">
         <span class = "header">JSON 格式化</span>
-        <el-button class="button"  type="primary">下载</el-button>
+        <el-button class="button"  type="primary" @click="clickDownload">下载</el-button>
+        <el-button class="button"  type="success" @click="clickCopy">复制到剪贴板</el-button>
+        <el-button class="button"  type="danger" @click="clickClear">清空</el-button>
       </div>
-    </template>
-    <el-row :gutter="40">
-        <el-col :span = "12">
+<!--    </template>-->
+    <el-row :gutter="120">
+        <el-col :span = "12" class = "el-input-content">
           <h3>待格式化 JSON</h3>
           <el-input
               v-model="oldJson"
-              :rows="15"
+              :rows="40"
               type="textarea"
               placeholder="请输入待格式化 JSON 字符串"
               class = "el-input-class"
           />
         </el-col>
 
-        <el-col :span = "12">
+        <el-col :span = "12" class = "el-input-content">
           <h3>格式化后的 JSON</h3>
           <el-input
               v-model="formatJson"
-              :rows="15"
+              :rows="40"
               type="textarea"
               class = "el-input-class"
           />
@@ -34,7 +36,11 @@
 </template>
 
 <script>
+import  moment  from "moment" // 引入 moment 处理时间
 import { ref, onMounted, watch } from "vue";
+import {ElMessage} from "element-plus";
+import useClipboard from "vue-clipboard3"; // 引入剪切板处理
+
 // import {beforeCreate, beforeDestroy } from "vue";
 export default {
   setup() {
@@ -44,19 +50,82 @@ export default {
     onMounted(() => {
       document.querySelector('body').setAttribute('style', 'background: #EBEDF0');
     })
+
     /**
      * 监听原来的 json 字符串
      */
     watch(oldJson, (newValue, oldValue) => {
       // 把 json 字符串转为 json 对象
-      let jsonObj = JSON.parse(newValue);
-      formatJson.value = JSON.stringify(jsonObj, null, 4);
+      if (typeof newValue == "string" && newValue != "" && newValue != null) {
+        console.log("newValue = " + newValue);
+        try {
+          let jsonObj = JSON.parse(newValue);
+          formatJson.value = JSON.stringify(jsonObj, null, 4).toString();
+          console.log("jsonObj = " + jsonObj);
+        } catch (e) {
+          ElMessage.error('待格式化的 json 有误，请检查');
+          console.log(e);
+          formatJson.value = '';
+        }
+
+        // formatJson 是一个对象
+      }
+
     });
+
+    /**
+     * 点击下载
+     */
+    function clickDownload() {
+      let eleLink = document.createElement("a");
+      const fileName = moment().format('YYYY-MM-DD-hh-mm-ss');
+
+      eleLink.download = fileName + '.json';
+      eleLink.style.display = "none";
+      // 字符内容转变成blob地址
+      let blob = new Blob([formatJson.value], {  type: "text/json" });
+      eleLink.href = URL.createObjectURL(blob);
+      // 触发点击
+      document.body.appendChild(eleLink);
+      eleLink.click();
+      // 然后移除
+      document.body.removeChild(eleLink);
+    }
+
+    /**
+     * 点击清空
+     */
+    function clickClear() {
+      formatJson.value = '';
+      oldJson.value = '';
+    }
+
+    /**
+     * 异步获取
+     */
+    async function clickCopy() {
+      console.log("clickCopy");
+      const {toClipboard} = useClipboard();
+      if (formatJson.value == null || formatJson.value === "") {
+        ElMessage.error("无法复制空的 json ");
+        return;
+      }
+      try {
+        await toClipboard(formatJson.value);  //实现复制
+        ElMessage.success("复制格式化后的 json 到剪切板成功")
+      } catch (e) {
+        console.error(e);
+        ElMessage.error("复制格式化后的 json 到剪切板失败");
+      }
+    }
 
     return  {
       oldJson,
       formatJson,
-      onMounted
+      onMounted,
+      clickDownload,
+      clickClear,
+      clickCopy
     }
   }
 }
@@ -67,13 +136,20 @@ export default {
 /*body::before{*/
 /*  background: #EBEDF0;*/
 /*}*/
-
+html, body {
+  width: 100%;
+  height: 100%;
+}
 .app{
   background: #EBEDF0;
+  height: 100%;
 }
 
 .box-card {
   /* 表示上下边界为 0，左右则根据宽度自适应相同值 */
+  /*display: flex;*/
+  /*position: absolute;*/
+
   margin: 0 auto;
   width: 50%;
   text-align: center;
@@ -98,7 +174,11 @@ export default {
   color: #fffdf2;
 }
 
-.el-input-class {
+.el-input-content {
   font-size: 18px;
+  width: 25rem;
 }
+
+/*el-col*/
+
 </style>
