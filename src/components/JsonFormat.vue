@@ -1,36 +1,33 @@
 <template>
-  <div id = "aaa">
+  <div id = "app">
   <el-card class = "box-card">
     <template #header>
       <div class="card-header">
-        <div class = "title">JSON 格式化</div>
+        <div class = "title">Json 格式化</div>
         <div class = "el-button-list">
           <el-button class="button"  type="primary" @click="clickDownload">下载</el-button>
-          <el-button class="button"  type="success" @click="clickCopy">复制到剪贴板</el-button>
-          <el-button class="button"  type="danger" @click="clickClear">清空</el-button>
         </div>
       </div>
     </template>
     <el-row :gutter="120">
         <el-col :span = "12" class = "el-input-content">
-          <div class = "json-title">待格式化 JSON</div>
-          <el-input
-              v-model="oldJson"
-              :rows="25"
-              type="textarea"
-              placeholder="请输入待格式化 JSON 字符串"
-              class = "el-input-class"
-          />
+          <div class = "json-title">待格式化 Json
+            <el-button class="clear-and-copy-button"  type="danger" @click="clickClear">清空</el-button>
+          </div>
+            <el-input
+                v-model="oldJson"
+                :rows="23"
+                type="textarea"
+                placeholder="请输入待格式化 JSON 字符串"
+                class = "el-input-class"
+            />
         </el-col>
 
         <el-col :span = "12" class = "el-input-content">
-          <div class = "json-title">格式化后的 JSON</div>
-          <el-input
-              v-model="formatJson"
-              :rows="25"
-              type="textarea"
-              class = "el-input-class"
-          />
+          <div class = "json-title">格式化后的 Json
+            <el-button class="clear-and-copy-button"  type="success" @click="clickCopy">复制到剪贴板</el-button>
+          </div>
+          <highlightjs language='json' :code= "formatJson" class = "highlight-json"/>
         </el-col>
     </el-row>
   </el-card>
@@ -46,9 +43,8 @@ import useClipboard from "vue-clipboard3"; // 引入剪切板处理
 // import {beforeCreate, beforeDestroy } from "vue";
 export default {
   setup() {
-    const oldJson = ref();
-    const formatJson = ref();
-
+    const oldJson = ref("");
+    const formatJson = ref("");
     onMounted(() => {
       document.querySelector('body').setAttribute('style', 'background: #EBEDF0');
     })
@@ -68,10 +64,13 @@ export default {
           // 将 json 对象通过 4 个缩进格式化，实现美化功能
           formatJson.value = JSON.stringify(newValueJsonObject, null, jsonFormatSpace);
         } catch (e) {
-          ElMessage.error('待格式化的 json 有误，请检查');
+          ElMessage.error('待格式化的 Json 有误，请检查');
           console.log(e);
           formatJson.value = '';
         }
+      }
+      if (newValue === "") {
+        formatJson.value = '';
       }
     });
 
@@ -79,6 +78,11 @@ export default {
      * 点击下载
      */
     function clickDownload() {
+      if (formatJson.value === "") {
+        ElMessage.error('下载空 Json 没有意义');
+        return;
+      }
+
       let eleLink = document.createElement("a");
       const fileName = moment().format('YYYY-MM-DD-hh-mm-ss');
 
@@ -98,6 +102,9 @@ export default {
      * 点击清空
      */
     function clickClear() {
+      if (oldJson.value === '') {
+        ElMessage.info('已经清空了，没必要再次清空');
+      }
       formatJson.value = '';
       oldJson.value = '';
     }
@@ -144,7 +151,6 @@ html, body {
 }
 .app{
   background: #EBEDF0;
-  //height: 100%;
 }
 
 .box-card {
@@ -152,14 +158,14 @@ html, body {
   /*display: flex;*/
   /*position: absolute;*/
 
-  margin: 0 auto;
+  margin: 1rem auto;
   width: 50%;
   text-align: center;
   /*background: honeydew;*/
 }
 
 .title {
-  font-size: 1.25rem;
+  font-size: 1.5rem;
   font-weight: bold;
   font-family: Arial, "Microsoft YaHei";
   margin: 2rem;
@@ -173,6 +179,11 @@ html, body {
 
 .button {
   color: #fffdf2;
+  margin-left: 1rem;
+}
+
+.clear-and-copy-button {
+  margin-left: 5rem;
 }
 
 .el-input-content {
@@ -182,7 +193,7 @@ html, body {
 
 .json-title {
   font-size: 1.125rem;
-  margin: 0.5rem;
+  margin: 1rem;
 }
 
 .el-input-class {
@@ -193,4 +204,11 @@ html, body {
   margin-left: 2rem;
 }
 
+.highlight-json {
+  text-align: left;
+  font-size: 1.125rem; /* 18px */
+  /*width: 25rem;*/
+  height: 100%;
+
+}
 </style>
