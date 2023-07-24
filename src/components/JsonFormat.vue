@@ -52,25 +52,25 @@ export default {
     })
 
     /**
-     * 监听原来的 json 字符串
+     * 监听原来的未格式化的 json 字符串，必须使用 try catch 异常处理，否则会报错
+     *
+     * @param oldJson 用户输入的未格式化的 json 字符串，最开始是空
+     * @param newValue 用户改变后的新的值
      */
     watch(oldJson, (newValue, oldValue) => {
-      // 把 json 字符串转为 json 对象
-      if (typeof newValue == "string" && newValue != "" && newValue != null) {
-        console.log("newValue = " + newValue);
+      const jsonFormatSpace = 4; // json 格式化的缩进
+      if (typeof newValue == "string" && newValue !== "" && newValue != null) {
         try {
-          let jsonObj = JSON.parse(newValue);
-          formatJson.value = JSON.stringify(jsonObj, null, 4).toString();
-          console.log("jsonObj = " + jsonObj);
+          // 把 json 字符串转为 json 对象
+          let newValueJsonObject = JSON.parse(newValue);
+          // 将 json 对象通过 4 个缩进格式化，实现美化功能
+          formatJson.value = JSON.stringify(newValueJsonObject, null, jsonFormatSpace);
         } catch (e) {
           ElMessage.error('待格式化的 json 有误，请检查');
           console.log(e);
           formatJson.value = '';
         }
-
-        // formatJson 是一个对象
       }
-
     });
 
     /**
@@ -82,8 +82,8 @@ export default {
 
       eleLink.download = fileName + '.json';
       eleLink.style.display = "none";
-      // 字符内容转变成blob地址
-      let blob = new Blob([formatJson.value], {  type: "text/json" });
+      // 字符内容转变成 blob 地址
+      let blob = new Blob([formatJson.value], {type: "text/json"});
       eleLink.href = URL.createObjectURL(blob);
       // 触发点击
       document.body.appendChild(eleLink);
@@ -101,7 +101,7 @@ export default {
     }
 
     /**
-     * 异步获取
+     * 点击复制 json 到剪切板
      */
     async function clickCopy() {
       console.log("clickCopy");
@@ -111,7 +111,7 @@ export default {
         return;
       }
       try {
-        await toClipboard(formatJson.value);  //实现复制
+        await toClipboard(formatJson.value);
         ElMessage.success("复制格式化后的 json 到剪切板成功")
       } catch (e) {
         console.error(e);
