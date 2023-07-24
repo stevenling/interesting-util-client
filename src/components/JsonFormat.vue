@@ -1,20 +1,22 @@
 <template>
-  <div id = "app">
+  <div id = "aaa">
   <el-card class = "box-card">
-<!--    <template #header>-->
+    <template #header>
       <div class="card-header">
-        <span class = "header">JSON 格式化</span>
-        <el-button class="button"  type="primary" @click="clickDownload">下载</el-button>
-        <el-button class="button"  type="success" @click="clickCopy">复制到剪贴板</el-button>
-        <el-button class="button"  type="danger" @click="clickClear">清空</el-button>
+        <div class = "title">JSON 格式化</div>
+        <div class = "el-button-list">
+          <el-button class="button"  type="primary" @click="clickDownload">下载</el-button>
+          <el-button class="button"  type="success" @click="clickCopy">复制到剪贴板</el-button>
+          <el-button class="button"  type="danger" @click="clickClear">清空</el-button>
+        </div>
       </div>
-<!--    </template>-->
+    </template>
     <el-row :gutter="120">
         <el-col :span = "12" class = "el-input-content">
-          <h3>待格式化 JSON</h3>
+          <div class = "json-title">待格式化 JSON</div>
           <el-input
               v-model="oldJson"
-              :rows="40"
+              :rows="25"
               type="textarea"
               placeholder="请输入待格式化 JSON 字符串"
               class = "el-input-class"
@@ -22,10 +24,10 @@
         </el-col>
 
         <el-col :span = "12" class = "el-input-content">
-          <h3>格式化后的 JSON</h3>
+          <div class = "json-title">格式化后的 JSON</div>
           <el-input
               v-model="formatJson"
-              :rows="40"
+              :rows="25"
               type="textarea"
               class = "el-input-class"
           />
@@ -142,7 +144,7 @@ html, body {
 }
 .app{
   background: #EBEDF0;
-  height: 100%;
+  //height: 100%;
 }
 
 .box-card {
@@ -156,18 +158,17 @@ html, body {
   /*background: honeydew;*/
 }
 
-.header {
-  font-size: 20px; /* 字体大小 */
-  font-weight: bold; /* 字体加粗 */
-  margin-right: 20px;
-  top: 50px;
-  /*width: 50%;*/
+.title {
+  font-size: 1.25rem;
+  font-weight: bold;
+  font-family: Arial, "Microsoft YaHei";
+  margin: 2rem;
 }
 
 .card-header {
-  color: black;
+  //color: black;
   /*background: steelblue;*/
-  height: 60px;
+  //height: 60px;
 }
 
 .button {
@@ -175,10 +176,21 @@ html, body {
 }
 
 .el-input-content {
-  font-size: 18px;
+  font-size: 1.125rem; /* 18px */
   width: 25rem;
 }
 
-/*el-col*/
+.json-title {
+  font-size: 1.125rem;
+  margin: 0.5rem;
+}
+
+.el-input-class {
+  font-size: 1.0rem;
+}
+
+.el-button-list {
+  margin-left: 2rem;
+}
 
 </style>

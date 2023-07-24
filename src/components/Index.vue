@@ -1,5 +1,5 @@
 <template>
-  <h1>云胡工具集合</h1>
+  <div class = "title">云胡工具集合</div>
   <el-row>
     <el-col :span="6"></el-col>
     <el-col :span="12">
@@ -8,7 +8,6 @@
         <template #header>
           <div class="card-header">
             <span>程序员工具</span>
-            <el-button class="button" text>Operation button</el-button>
           </div>
         </template>
         <div>
@@ -33,16 +32,24 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-align: center;
+  //text-align: center;
   color: #2c3e50;
   margin-top: 60px;
   /*position:relative;*/
 
+}
+
+.title {
+  text-align: center;
+  margin: 2rem;
+  font-size: 1.5rem;
+  font-family: "Monotype Corsiva";
+  font-weight: bold;
 }
 
 .box-card {
