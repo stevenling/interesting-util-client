@@ -15,7 +15,7 @@
             <el-button class="clear-and-copy-button"  type="danger" @click="clickClear">清空</el-button>
           </div>
             <el-input
-                v-model="oldJson"
+                v-model="currentJson.oldJson"
                 :rows="23"
                 type="textarea"
                 placeholder="请输入待格式化 JSON 字符串"
@@ -27,7 +27,7 @@
           <div class = "json-title">格式化后的 Json
             <el-button class="clear-and-copy-button"  type="success" @click="clickCopy">复制到剪贴板</el-button>
           </div>
-          <highlightjs language='json' :code= "formatJson" class = "highlight-json"/>
+          <highlightjs language='json' :code= "currentJson.formatJson" class = "highlight-json"/>
         </el-col>
     </el-row>
   </el-card>
@@ -36,41 +36,40 @@
 
 <script>
 import  moment  from "moment" // 引入 moment 处理时间
-import { ref, onMounted, watch } from "vue";
+import {onMounted, watch, reactive} from "vue";
 import {ElMessage} from "element-plus";
 import useClipboard from "vue-clipboard3"; // 引入剪切板处理
 
-// import {beforeCreate, beforeDestroy } from "vue";
 export default {
   setup() {
-    const oldJson = ref("");
-    const formatJson = ref("");
+    let currentJson = reactive({oldJson: "", formatJson: ""});
     onMounted(() => {
       document.querySelector('body').setAttribute('style', 'background: #EBEDF0');
     })
 
     /**
      * 监听原来的未格式化的 json 字符串，必须使用 try catch 异常处理，否则会报错
-     *
+     * 用箭头函数来监听 reactive 中的某个基本数据
      * @param oldJson 用户输入的未格式化的 json 字符串，最开始是空
      * @param newValue 用户改变后的新的值
      */
-    watch(oldJson, (newValue, oldValue) => {
+    watch(() => currentJson.oldJson, (newValue, oldValue) => {
+      console.log("newValue" + newValue);
       const jsonFormatSpace = 4; // json 格式化的缩进
       if (typeof newValue == "string" && newValue !== "" && newValue != null) {
         try {
           // 把 json 字符串转为 json 对象
           let newValueJsonObject = JSON.parse(newValue);
           // 将 json 对象通过 4 个缩进格式化，实现美化功能
-          formatJson.value = JSON.stringify(newValueJsonObject, null, jsonFormatSpace);
+          currentJson.formatJson = JSON.stringify(newValueJsonObject, null, jsonFormatSpace);
         } catch (e) {
           ElMessage.error('待格式化的 Json 有误，请检查');
           console.log(e);
-          formatJson.value = '';
+          currentJson.formatJson = '';
         }
       }
       if (newValue === "") {
-        formatJson.value = '';
+        currentJson.formatJson = '';
       }
     });
 
@@ -78,7 +77,7 @@ export default {
      * 点击下载
      */
     function clickDownload() {
-      if (formatJson.value === "") {
+      if (currentJson.formatJson === "") {
         ElMessage.error('下载空 Json 没有意义');
         return;
       }
@@ -89,7 +88,7 @@ export default {
       eleLink.download = fileName + '.json';
       eleLink.style.display = "none";
       // 字符内容转变成 blob 地址
-      let blob = new Blob([formatJson.value], {type: "text/json"});
+      let blob = new Blob([currentJson.formatJson], {type: "text/json"});
       eleLink.href = URL.createObjectURL(blob);
       // 触发点击
       document.body.appendChild(eleLink);
@@ -102,11 +101,11 @@ export default {
      * 点击清空
      */
     function clickClear() {
-      if (oldJson.value === '') {
+      if (currentJson.oldJson === '') {
         ElMessage.info('已经清空了，没必要再次清空');
       }
-      formatJson.value = '';
-      oldJson.value = '';
+      currentJson.formatJson = '';
+      currentJson.oldJson = '';
     }
 
     /**
@@ -115,12 +114,12 @@ export default {
     async function clickCopy() {
       console.log("clickCopy");
       const {toClipboard} = useClipboard();
-      if (formatJson.value == null || formatJson.value === "") {
+      if (currentJson.formatJson == null || currentJson.formatJson === "") {
         ElMessage.error("无法复制空的 json ");
         return;
       }
       try {
-        await toClipboard(formatJson.value);
+        await toClipboard(currentJson.formatJson);
         ElMessage.success("复制格式化后的 json 到剪切板成功")
       } catch (e) {
         console.error(e);
@@ -129,8 +128,7 @@ export default {
     }
 
     return  {
-      oldJson,
-      formatJson,
+      currentJson,
       onMounted,
       clickDownload,
       clickClear,
@@ -141,10 +139,6 @@ export default {
 </script>
 
 <style scoped>
-
-/*body::before{*/
-/*  background: #EBEDF0;*/
-/*}*/
 html, body {
   width: 100%;
   height: 100%;
@@ -161,7 +155,6 @@ html, body {
   margin: 1rem auto;
   width: 50%;
   text-align: center;
-  /*background: honeydew;*/
 }
 
 .title {
@@ -172,9 +165,6 @@ html, body {
 }
 
 .card-header {
-  //color: black;
-  /*background: steelblue;*/
-  //height: 60px;
 }
 
 .button {
