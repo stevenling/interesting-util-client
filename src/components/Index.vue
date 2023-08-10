@@ -19,10 +19,23 @@
           </el-button>
         </div>
       </el-card>
+      <el-card class="box-card">
+        <template #header>
+          <div>
+            <span>其他</span>
+          </div>
+        </template>
+        <div>
+          <el-button type="primary" @click="GotoTextFormat">
+            文本格式调整
+          </el-button>
+        </div>
+      </el-card>
     </el-col>
   </el-row>
-
-
+<footer  class = "icp">
+  <a href="https://beian.miit.gov.cn/" target="_blank">闽ICP备2023011581号</a>
+</footer >
 </template>
 
 <script>
@@ -56,9 +69,20 @@ export default {
       });
     }
 
+    /**
+     * 跳转到文本编辑页面
+     * @constructor
+     */
+    function GotoTextFormat() {
+      router.push({
+        path: "/TextFormat"
+      });
+    }
+
     return {
       GotoJsonFormat,
-      GotoColorSystemSwitch
+      GotoColorSystemSwitch,
+      GotoTextFormat
     }
   }
 }
@@ -85,6 +109,7 @@ export default {
 }
 
 .box-card {
+  margin-bottom: 2rem;
   /*display: flex;*/
   /*justify-content: center;*/
   /*align-items: center;*/
@@ -94,5 +119,15 @@ export default {
 .card-header {
   /*background: skyblue;*/
 
+}
+
+.icp {
+  //position: absolute;
+
+  //text-align: center;
+  position:fixed;
+  bottom: 0px;
+  left: 45%;
+  //left:0px;
 }
 </style>

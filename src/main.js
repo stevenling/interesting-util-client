@@ -10,7 +10,7 @@ import hljs from 'highlight.js/lib/core';
 import json from 'highlight.js/lib/languages/json'
 import hljsVuePlugin from "@highlightjs/vue-plugin";
 
-hljs.registerLanguage('javascript', json);
+hljs.registerLanguage('json', json);
 
 const app = createApp(App)
 app.use(ElementPlus)

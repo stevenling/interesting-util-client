@@ -1,5 +1,6 @@
 import JsonFormat from '@/components/JsonFormat'
 import Index from '@/components/Index'
+import TextFormat from '@/components/TextFormat'
 
 const routes = [
     {
@@ -11,6 +12,11 @@ const routes = [
         name: 'JsonFormat',
         path: '/JsonFormat',
         component: JsonFormat
+    },
+    {
+        name: 'TextFormat',
+        path: '/TextFormat',
+        component: TextFormat
     }
 ];
 
