@@ -1,22 +1,26 @@
-import JsonFormat from '@/components/JsonFormat'
-import Index from '@/components/Index'
 import TextFormat from '@/components/TextFormat'
+import UtilIndex from '@/components/UtilIndex'
 
 const routes = [
     {
         name: 'Index',
         path: '/',
-        component: Index
+        component: ()=>import("@/components/Index")
+    },
+    {
+        name: 'UtilIndex',
+        path: '/UtilIndex',
+        component: ()=>import("@/components/UtilIndex")
     },
     {
         name: 'JsonFormat',
         path: '/JsonFormat',
-        component: JsonFormat
+        component: ()=>import("@/components/JsonFormat")
     },
     {
         name: 'TextFormat',
         path: '/TextFormat',
-        component: TextFormat
+        component: ()=>import("@/components/TextFormat")
     }
 ];
 

@@ -35,8 +35,8 @@
 </template>
 
 <script>
-import  moment  from "moment" // 引入 moment 处理时间
 import {onMounted, watch, reactive} from "vue";
+import  moment  from "moment" // 引入 moment 处理时间
 import {ElMessage} from "element-plus";
 import useClipboard from "vue-clipboard3"; // 引入剪切板处理
 
@@ -160,7 +160,7 @@ html, body {
 .title {
   font-size: 1.5rem;
   font-weight: bold;
-  font-family: Arial, "Microsoft YaHei";
+  font-family: Arial, "Microsoft YaHei", serif;
   margin: 2rem;
 }
 
