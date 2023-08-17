@@ -88,7 +88,7 @@ export default {
      * @constructor
      */
     function GotoYunhuLibrary() {
-      window.open('http://library.yunhu.wiki', '_bank')
+      window.open('http://library.yunhu.wiki', '_blank')
     }
 
     /**
@@ -97,7 +97,7 @@ export default {
      * @constructor
      */
     function GotoYunhuUtils() {
-      window.open('http://utils.yunhu.wiki', '_bank')
+      window.open('http://utils.yunhu.wiki', '_blank')
     }
 
     /**
@@ -106,7 +106,7 @@ export default {
      * @constructor
      */
     function GotoYunhuLikeEssay() {
-      window.open('https://stevenling.github.io/yunhu-love-essay-doc/', '_bank')
+      window.open('https://stevenling.github.io/yunhu-love-essay-doc/', '_blank')
     }
 
     /**
@@ -115,7 +115,7 @@ export default {
      * @constructor
      */
     function GotoWaitButWhy() {
-      window.open('https://waitbutwhy.com/', '_bank')
+      window.open('https://waitbutwhy.com/', '_blank')
     }
 
     /**
@@ -124,7 +124,7 @@ export default {
      * @constructor
      */
     function GotoChineseMarxists() {
-      window.open('https://www.marxists.org/chinese/index.html', '_bank')
+      window.open('https://www.marxists.org/chinese/index.html', '_blank')
     }
 
     /**
@@ -133,7 +133,7 @@ export default {
      * @constructor
      */
     function GotoCText() {
-      window.open('https://ctext.org/zhs', '_bank')
+      window.open('https://ctext.org/zhs', '_blank')
     }
 
     return {
