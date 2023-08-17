@@ -1,11 +1,9 @@
-import TextFormat from '@/components/TextFormat'
-import UtilIndex from '@/components/UtilIndex'
-
 const routes = [
     {
         name: 'Index',
         path: '/',
-        component: ()=>import("@/components/Index")
+        component: ()=>import("@/components/Index"),
+        meta: { title: '云胡个人站' }
     },
     {
         name: 'UtilIndex',

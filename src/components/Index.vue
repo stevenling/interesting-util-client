@@ -19,6 +19,20 @@
           </el-button>
         </div>
       </el-card>
+
+      <el-card class="box-card">
+        <template #header>
+          <div>
+            <span>学习</span>
+          </div>
+        </template>
+        <div>
+          <el-button type="primary" @click="GotoYunhuLikeEssay">
+            markdown(https://markdown.com.cn/)
+          </el-button>
+        </div>
+      </el-card>
+
       <el-card class="box-card">
         <template #header>
           <div>
@@ -28,6 +42,27 @@
         <div>
           <el-button type="primary" @click="GotoYunhuLikeEssay">
             云胡喜欢的文章
+          </el-button>
+        </div>
+      </el-card>
+
+      <el-card class="box-card">
+        <template #header>
+          <div>
+            <span>网站收藏</span>
+          </div>
+        </template>
+        <div>
+          <el-button type="primary" @click="GotoWaitButWhy">
+            WaitButWhy
+          </el-button>
+
+          <el-button type="primary" @click="GotoChineseMarxists">
+            中文马克思主义文库
+          </el-button>
+
+          <el-button type="primary" @click="GotoCText">
+            中国哲学书电子化计划
           </el-button>
         </div>
       </el-card>
@@ -41,18 +76,11 @@
 <script>
 import {useRouter} from "vue-router";
 import {ElMessage} from "element-plus";
+
 export default {
   name: "index",
   setup() {
     const router = useRouter();
-    /**
-     * 转到 Json 格式化工具中
-     *
-     * @constructor
-     */
-    function GotoColorSystemSwitch() {
-      ElMessage.info("云胡哥哥努力开发中");
-    }
 
     /**
      * 跳转到云胡图书馆
@@ -72,9 +100,49 @@ export default {
       window.open('http://utils.yunhu.wiki', '_bank')
     }
 
+    /**
+     * 跳转到云胡喜欢的文章
+     *
+     * @constructor
+     */
+    function GotoYunhuLikeEssay() {
+      window.open('https://stevenling.github.io/yunhu-love-essay-doc/', '_bank')
+    }
+
+    /**
+     * 跳转到 WaitButWhy
+     *
+     * @constructor
+     */
+    function GotoWaitButWhy() {
+      window.open('https://waitbutwhy.com/', '_bank')
+    }
+
+    /**
+     * 跳转到中文马克思主义文库
+     *
+     * @constructor
+     */
+    function GotoChineseMarxists() {
+      window.open('https://www.marxists.org/chinese/index.html', '_bank')
+    }
+
+    /**
+     * 跳转到中国电子书哲学计划
+     *
+     * @constructor
+     */
+    function GotoCText() {
+      window.open('https://ctext.org/zhs', '_bank')
+    }
+
     return {
       GotoYunhuLibrary,
-      GotoYunhuUtils
+      GotoYunhuUtils,
+      GotoYunhuLikeEssay,
+      GotoWaitButWhy,
+      GotoChineseMarxists,
+      GotoCText
     }
   }
 }
