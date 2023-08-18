@@ -64,6 +64,11 @@
           <el-button type="primary" @click="GotoCText">
             中国哲学书电子化计划
           </el-button>
+
+          <el-button type="primary" @click="GotoReadPoem">
+            读首诗再睡觉
+          </el-button>
+
         </div>
       </el-card>
     </el-col>
@@ -136,13 +141,24 @@ export default {
       window.open('https://ctext.org/zhs', '_blank')
     }
 
+    /**
+     * 跳转到读首诗再睡觉
+     *
+     * @constructor
+     */
+    function GotoReadPoem() {
+      window.open('https://bedtimepoem.com/', '_blank')
+    }
+
     return {
       GotoYunhuLibrary,
       GotoYunhuUtils,
       GotoYunhuLikeEssay,
       GotoWaitButWhy,
       GotoChineseMarxists,
-      GotoCText
+      GotoCText,
+      GotoReadPoem,
+      router
     }
   }
 }
