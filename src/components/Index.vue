@@ -27,22 +27,13 @@
           </div>
         </template>
         <div>
-          <el-button type="primary" @click="GotoYunhuLikeEssay">
-            markdown(https://markdown.com.cn/)
+          <el-button type="primary" @click="GotoLearnMarkdown">
+            markdown
           </el-button>
-        </div>
-      </el-card>
+          <el-button type="primary" @click="GotoLearnLaTex">
+            LaTex
+          </el-button>
 
-      <el-card class="box-card">
-        <template #header>
-          <div>
-            <span>其他</span>
-          </div>
-        </template>
-        <div>
-          <el-button type="primary" @click="GotoYunhuLikeEssay">
-            云胡喜欢的文章
-          </el-button>
         </div>
       </el-card>
 
@@ -69,6 +60,19 @@
             读首诗再睡觉
           </el-button>
 
+        </div>
+      </el-card>
+
+      <el-card class="box-card">
+        <template #header>
+          <div>
+            <span>其他</span>
+          </div>
+        </template>
+        <div>
+          <el-button type="primary" @click="GotoYunhuLikeEssay">
+            云胡喜欢的文章
+          </el-button>
         </div>
       </el-card>
     </el-col>
@@ -150,6 +154,14 @@ export default {
       window.open('https://bedtimepoem.com/', '_blank')
     }
 
+    function GotoLearnMarkdown() {
+      window.open('https://markdown.com.cn/', '_blank')
+    }
+
+    function GotoLearnLaTex() {
+      window.open('https://flowus.cn/latex/share/66110e84-b24a-4cd5-b8a7-2ba2afb35a30', '_blank')
+    }
+
     return {
       GotoYunhuLibrary,
       GotoYunhuUtils,
@@ -158,6 +170,8 @@ export default {
       GotoChineseMarxists,
       GotoCText,
       GotoReadPoem,
+      GotoLearnMarkdown,
+      GotoLearnLaTex,
       router
     }
   }
