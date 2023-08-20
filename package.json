@@ -6,7 +6,7 @@
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
-    "push": "npm run build && scp -r dist/* root@43.142.56.47:/var/www/html"
+    "push": "npm run build && scp -r dist/* root@43.142.56.47:/root/vue-project/yunhu-utils/dist"
   },
   "dependencies": {
     "@highlightjs/vue-plugin": "^2.1.0",

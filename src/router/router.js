@@ -1,13 +1,13 @@
 const routes = [
-    {
-        name: 'Index',
-        path: '/',
-        component: ()=>import("@/components/Index"),
-        meta: { title: '云胡个人站' }
-    },
+    // {
+    //     name: 'Index',
+    //     path: '/',
+    //     component: ()=>import("@/components/Index"),
+    //     meta: { title: '云胡个人站' }
+    // },
     {
         name: 'UtilIndex',
-        path: '/UtilIndex',
+        path: '/',
         component: ()=>import("@/components/UtilIndex")
     },
     {
