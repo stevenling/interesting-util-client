@@ -14,8 +14,22 @@
           <el-button type="primary" @click="GotoJsonFormat">
             Json 代码美化
           </el-button>
+
           <el-button type="primary" @click="GotoColorSystemSwitch">
             颜色进制转换
+          </el-button>
+        </div>
+      </el-card>
+
+      <el-card class="box-card">
+        <template #header>
+          <div>
+            <span>其他</span>
+          </div>
+        </template>
+        <div>
+          <el-button type="primary" @click="GotoBetweenNowToHoliday">
+            距离放假时间
           </el-button>
         </div>
       </el-card>
@@ -51,9 +65,16 @@ export default {
       });
     }
 
+    function GotoBetweenNowToHoliday() {
+      router.push({
+        path: "/BetweenNowToHoliday"
+      });
+    }
+
     return {
       GotoJsonFormat,
-      GotoColorSystemSwitch
+      GotoColorSystemSwitch,
+      GotoBetweenNowToHoliday
     }
   }
 }

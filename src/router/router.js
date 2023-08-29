@@ -1,10 +1,4 @@
 const routes = [
-    // {
-    //     name: 'Index',
-    //     path: '/',
-    //     component: ()=>import("@/components/Index"),
-    //     meta: { title: '云胡个人站' }
-    // },
     {
         name: 'UtilIndex',
         path: '/',
@@ -19,6 +13,11 @@ const routes = [
         name: 'TextFormat',
         path: '/TextFormat',
         component: ()=>import("@/components/TextFormat")
+    },
+    {
+        name: 'BetweenNowToHoliday',
+        path: '/BetweenNowToHoliday',
+        component: ()=>import("@/components/BetweenNowToHoliday")
     }
 ];
 
