@@ -1,5 +1,9 @@
 <template>
   <div class = "title">云胡工具集合</div>
+<!--  <el-image src ="https://star-juli.oss-cn-beijing.aliyuncs.com/4e66cf59-efab-4331-acab-1601ca63d7d4">-->
+
+<!--  </el-image>-->
+
   <el-row>
     <el-col :span="6"></el-col>
     <el-col :span="12">
