@@ -1,23 +1,30 @@
 <template>
-  <el-row>
-    <el-text class="mx-1" size="large" v-model = "currentTime">当前时间: {{currentTime}}</el-text>
+  <el-row justify="center">
+    <el-col :span="6">
+      <el-text class="mx-1" size="large" v-model="currentTime">当前时间: {{ currentTime }}</el-text>
+    </el-col>
   </el-row>
 
-  <el-row>
-    <el-text class="mx-1" size="large" v-model = "currentTime">离春节: {{currentTime}}</el-text>
-  </el-row>
+<!--  <el-row>-->
+<!--    <el-col :span="6">-->
+<!--      <el-text class="mx-1" size="large" v-model="currentTime">离春节: {{ currentTime }}</el-text>-->
+<!--    </el-col>-->
+<!--  </el-row>-->
 
-  <el-row>
-    <el-text class="mx-1" size="large">离中秋节、国庆节还有: {{midAutumnAndNationalDayDiff}}</el-text>
+  <el-row justify="center">
+    <el-col :span="6">
+      <el-text class="mx-1" size="large">离中秋节、国庆节还有: {{ midAutumnAndNationalDayDiff }}</el-text>
+    </el-col>
   </el-row>
-  <el-row>
-    <el-text class="mx-1" size="large">离抗日战争胜利还有: {{victoryAgainstJapanDiff}}</el-text>
-  </el-row>
+<!--  <el-row>-->
+<!--    <el-text class="mx-1" size="large">离抗日战争胜利还有: {{ victoryAgainstJapanDiff }}</el-text>-->
+<!--  </el-row>-->
 
 </template>
 
 <script>
 import {onMounted, ref} from "vue";
+
 const dayjs = require('dayjs');
 dayjs.extend(require('dayjs/plugin/duration'));
 
@@ -25,7 +32,7 @@ export default {
   name: "BetweenNowToHoliday",
   setup() {
     let currentTime = ref("");
-    onMounted(()=>{
+    onMounted(() => {
     });
 
     /**
@@ -38,10 +45,10 @@ export default {
       const diffHours = dayjs.duration(diff).hours();
       const diffMinutes = dayjs.duration(diff).minutes();
       const diffSeconds = dayjs.duration(diff).seconds();
-      res.value = diffDay*(-1) + "  天 " + diffHours*(-1) + " 小时 " + diffMinutes*(-1) + " 分钟 " + diffSeconds*(-1) + " 秒 ";
+      res.value = diffDay * (-1) + "  天 " + diffHours * (-1) + " 小时 " + diffMinutes * (-1) + " 分钟 " + diffSeconds * (-1) + " 秒 ";
     }
 
-    const time = setInterval(()=>{
+    const time = setInterval(() => {
       // 当前时间
       currentTime.value = dayjs().format('YYYY-MM-DD HH:mm:ss');
 
@@ -62,8 +69,6 @@ export default {
     // console.log(dayjs(diff).format('HH:mm:ss'));
 
 
-
-
     const midAutumnAndNationalDayDiff = ref();
     const victoryAgainstJapanDiff = ref();
     // 格式化为需要的格式 这里是时分秒
@@ -82,5 +87,7 @@ export default {
 </script>
 
 <style scoped>
-
+.mx-1 {
+  justify-content: center;
+}
 </style>

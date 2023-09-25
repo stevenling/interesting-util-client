@@ -1,44 +1,47 @@
 <template>
-  <div id = "app">
-  <el-card class = "box-card">
-    <template #header>
-      <div class="card-header">
-        <div class = "title">Json 格式化</div>
-        <div class = "el-button-list">
-          <el-button class="button"  type="primary" @click="clickDownload">下载</el-button>
-        </div>
-      </div>
-    </template>
-    <el-row :gutter="120">
-        <el-col :span = "12" class = "el-input-content">
-          <div class = "json-title">待格式化 Json
-            <el-button class="clear-and-copy-button"  type="danger" @click="clickClear">清空</el-button>
+  <div id="app">
+    <el-card class="box-card">
+      <template #header>
+        <div class="card-header">
+          <div class="title">Json 格式化</div>
+          <div class="el-button-list">
+            <el-button class="button" type="primary" @click="clickDownload">下载</el-button>
           </div>
-            <el-input
-                v-model="currentJson.oldJson"
-                :rows="23"
-                type="textarea"
-                placeholder="请输入待格式化 JSON 字符串"
-                class = "el-input-class"
-            />
+        </div>
+      </template>
+      <el-row :gutter="40">
+        <el-col :span="12" class="el-input-content">
+          <div class="json-title">待格式化 Json
+            <el-button class="clear-and-copy-button" type="danger" @click="clickClear">清空</el-button>
+          </div>
+          <el-input
+              v-model="currentJson.oldJson"
+              :rows="23"
+              type="textarea"
+              placeholder="请输入待格式化 JSON 字符串"
+              class="el-input-class"
+          />
         </el-col>
 
-        <el-col :span = "12" class = "el-input-content">
-          <div class = "json-title">格式化后的 Json
-            <el-button class="clear-and-copy-button"  type="success" @click="clickCopy">复制到剪贴板</el-button>
+        <el-col :span="12" class="el-input-content">
+          <div class="json-title">格式化后的 Json
+            <el-button class="clear-and-copy-button" type="success" @click="clickCopy">复制到剪贴板</el-button>
           </div>
-          <highlightjs language='json' :code= "currentJson.formatJson" class = "highlight-json"/>
+          <highlightjs language='json' :code="currentJson.formatJson" class="highlight-json"/>
         </el-col>
-    </el-row>
-  </el-card>
+      </el-row>
+    </el-card>
   </div>
 </template>
 
 <script>
 import {onMounted, watch, reactive} from "vue";
-import  moment  from "moment" // 引入 moment 处理时间
 import {ElMessage} from "element-plus";
-import useClipboard from "vue-clipboard3"; // 引入剪切板处理
+
+// 引入 moment 处理时间
+import moment from "moment"
+// 引入剪切板处理
+import useClipboard from "vue-clipboard3";
 
 export default {
   setup() {
@@ -127,7 +130,7 @@ export default {
       }
     }
 
-    return  {
+    return {
       currentJson,
       onMounted,
       clickDownload,
@@ -143,7 +146,8 @@ html, body {
   width: 100%;
   height: 100%;
 }
-.app{
+
+.app {
   background: #EBEDF0;
 }
 
@@ -153,7 +157,7 @@ html, body {
   /*position: absolute;*/
 
   margin: 1rem auto;
-  width: 50%;
+  width: 80%;
   text-align: center;
 }
 
@@ -178,7 +182,7 @@ html, body {
 
 .el-input-content {
   font-size: 1.125rem; /* 18px */
-  width: 25rem;
+  width: 40rem;
 }
 
 .json-title {
@@ -199,6 +203,5 @@ html, body {
   font-size: 1.125rem; /* 18px */
   /*width: 25rem;*/
   height: 100%;
-
 }
 </style>
