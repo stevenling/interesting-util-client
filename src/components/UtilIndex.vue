@@ -1,9 +1,9 @@
 <template>
-  <div class = "title">云胡工具集合</div>
+  <div class="title">云胡工具集合</div>
   <el-row>
     <el-col :span="6"></el-col>
     <el-col :span="12">
-      <div/>
+      <div />
       <el-card class="box-card">
         <template #header>
           <div>
@@ -15,7 +15,7 @@
             Json 代码美化
           </el-button>
 
-          <el-button type="primary" @click="GotoColorSystemSwitch">
+          <el-button type="primary" @click="GotoColorConvert">
             颜色进制转换
           </el-button>
         </div>
@@ -27,23 +27,23 @@
             <span>其他</span>
           </div>
         </template>
-        <div>
+        <!-- <div>
           <el-button type="primary" @click="GotoBetweenNowToHoliday">
             距离放假时间
           </el-button>
-        </div>
+        </div> -->
       </el-card>
     </el-col>
   </el-row>
 
-  <footer  class = "icp">
+  <footer class="icp">
     <a href="https://beian.miit.gov.cn/" target="_blank">闽ICP备2023011581号</a>
-  </footer >
+  </footer>
 </template>
 
 <script>
-import {ElMessage} from "element-plus";
-import { useRouter} from "vue-router";
+import { ElMessage } from "element-plus";
+import { useRouter } from "vue-router";
 
 export default {
   name: "UtilIndex",
@@ -51,12 +51,14 @@ export default {
     const router = useRouter();
 
     /**
-     * 转到 Json 格式化工具中
+     * 转到颜色进制转换
      *
      * @constructor
      */
-    function GotoColorSystemSwitch() {
-      ElMessage.info("云胡哥哥努力开发中");
+    function GotoColorConvert() {
+      router.push({
+        path: "/ColorConvert"
+      });
     }
 
     function GotoJsonFormat() {
@@ -73,7 +75,7 @@ export default {
 
     return {
       GotoJsonFormat,
-      GotoColorSystemSwitch,
+      GotoColorConvert,
       GotoBetweenNowToHoliday
     }
   }
@@ -112,12 +114,12 @@ export default {
 }
 
 .icp {
-/*position: absolute;*/
+  /*position: absolute;*/
 
-/*text-align: center;*/
-  position:fixed;
+  /*text-align: center;*/
+  position: fixed;
   bottom: 0px;
   left: 45%;
-/*left:0px;*/
+  /*left:0px;*/
 }
 </style>
