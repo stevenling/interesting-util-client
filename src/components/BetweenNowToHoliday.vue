@@ -1,24 +1,33 @@
 <template>
-  <el-row justify="center">
-    <el-col :span="6">
-      <el-text class="mx-1" size="large" v-model="currentTime">当前时间: {{ currentTime }}</el-text>
-    </el-col>
-  </el-row>
+  <div class="common-layout">
 
-<!--  <el-row>-->
-<!--    <el-col :span="6">-->
-<!--      <el-text class="mx-1" size="large" v-model="currentTime">离春节: {{ currentTime }}</el-text>-->
-<!--    </el-col>-->
-<!--  </el-row>-->
+  <el-container>
+    <el-header>节日倒计时</el-header>
+    <el-main>
+      <el-row justify="center">
+        <el-col :span="6">
+          <el-text class="mx-1" size="large" v-model="currentTime">当前时间: {{ currentTime }}</el-text>
+        </el-col>
+      </el-row>
 
-  <el-row justify="center">
-    <el-col :span="6">
-      <el-text class="mx-1" size="large">离中秋节、国庆节还有: {{ midAutumnAndNationalDayDiff }}</el-text>
-    </el-col>
-  </el-row>
-<!--  <el-row>-->
-<!--    <el-text class="mx-1" size="large">离抗日战争胜利还有: {{ victoryAgainstJapanDiff }}</el-text>-->
-<!--  </el-row>-->
+      <!--  <el-row>-->
+      <!--    <el-col :span="6">-->
+      <!--      <el-text class="mx-1" size="large" v-model="currentTime">离春节: {{ currentTime }}</el-text>-->
+      <!--    </el-col>-->
+      <!--  </el-row>-->
+
+      <el-row justify="center">
+        <el-col :span="6">
+          <el-text class="mx-1" size="large">离中秋节、国庆节还有: {{ midAutumnAndNationalDayDiff }}</el-text>
+        </el-col>
+      </el-row>
+    </el-main>
+  </el-container>
+  </div>
+
+  <!--  <el-row>-->
+  <!--    <el-text class="mx-1" size="large">离抗日战争胜利还有: {{ victoryAgainstJapanDiff }}</el-text>-->
+  <!--  </el-row>-->
 
 </template>
 
