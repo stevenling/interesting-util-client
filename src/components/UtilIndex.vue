@@ -1,5 +1,7 @@
 <template>
-  <div class="title">云胡工具集合</div>
+  <TopMenu></TopMenu>
+  <div class="title">云胡工具集</div>
+
   <el-row>
     <el-col :span="6"></el-col>
     <el-col :span="12">
@@ -32,6 +34,12 @@
             距离放假时间
           </el-button>
         </div> -->
+        <div>
+          <el-button type="primary" @click="GotoCalcBmi">
+            BMI 计算
+          </el-button>
+        </div>
+
       </el-card>
     </el-col>
   </el-row>
@@ -44,9 +52,14 @@
 <script>
 import { ElMessage } from "element-plus";
 import { useRouter } from "vue-router";
+import TopMenu from "./TopMenu.vue"
+
 
 export default {
   name: "UtilIndex",
+  components: {
+    TopMenu
+  },
   setup() {
     const router = useRouter();
 
@@ -73,10 +86,18 @@ export default {
       });
     }
 
+    /**
+     * 计算BMI
+     */
+    const GotoCalcBmi = (() => {
+      ElMessage.error("云胡哥哥正在开发中!");
+    })
+
     return {
       GotoJsonFormat,
       GotoColorConvert,
-      GotoBetweenNowToHoliday
+      GotoBetweenNowToHoliday,
+      GotoCalcBmi
     }
   }
 }
@@ -102,10 +123,11 @@ export default {
 }
 
 .box-card {
-  /*display: flex;*/
+  /* display: flex; */
   /*justify-content: center;*/
   /*align-items: center;*/
   /*height: 100vh;*/
+  margin-bottom: 20px;
 }
 
 .card-header {

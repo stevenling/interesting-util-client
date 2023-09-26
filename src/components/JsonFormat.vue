@@ -1,4 +1,5 @@
 <template>
+  <TopMenu></TopMenu>
   <div id="app">
     <el-card class="box-card">
       <template #header>
@@ -14,20 +15,15 @@
           <div class="json-title">待格式化 Json
             <el-button class="clear-and-copy-button" type="danger" @click="clickClear">清空</el-button>
           </div>
-          <el-input
-              v-model="currentJson.oldJson"
-              :rows="23"
-              type="textarea"
-              placeholder="请输入待格式化 JSON 字符串"
-              class="el-input-class"
-          />
+          <el-input v-model="currentJson.oldJson" :rows="23" type="textarea" placeholder="请输入待格式化 JSON 字符串"
+            class="el-input-class" />
         </el-col>
 
         <el-col :span="12" class="el-input-content">
           <div class="json-title">格式化后的 Json
             <el-button class="clear-and-copy-button" type="success" @click="clickCopy">复制到剪贴板</el-button>
           </div>
-          <highlightjs language='json' :code="currentJson.formatJson" class="highlight-json"/>
+          <highlightjs language='json' :code="currentJson.formatJson" class="highlight-json" />
         </el-col>
       </el-row>
     </el-card>
@@ -35,17 +31,22 @@
 </template>
 
 <script>
-import {onMounted, watch, reactive} from "vue";
-import {ElMessage} from "element-plus";
+import { onMounted, watch, reactive } from "vue";
+import { ElMessage } from "element-plus";
 
 // 引入 moment 处理时间
 import moment from "moment"
 // 引入剪切板处理
 import useClipboard from "vue-clipboard3";
 
+import TopMenu from "./TopMenu.vue";
+
 export default {
+  components: {
+    TopMenu
+  },
   setup() {
-    let currentJson = reactive({oldJson: "", formatJson: ""});
+    let currentJson = reactive({ oldJson: "", formatJson: "" });
     onMounted(() => {
       document.querySelector('body').setAttribute('style', 'background: #EBEDF0');
     })
@@ -91,7 +92,7 @@ export default {
       eleLink.download = fileName + '.json';
       eleLink.style.display = "none";
       // 字符内容转变成 blob 地址
-      let blob = new Blob([currentJson.formatJson], {type: "text/json"});
+      let blob = new Blob([currentJson.formatJson], { type: "text/json" });
       eleLink.href = URL.createObjectURL(blob);
       // 触发点击
       document.body.appendChild(eleLink);
@@ -116,7 +117,7 @@ export default {
      */
     async function clickCopy() {
       console.log("clickCopy");
-      const {toClipboard} = useClipboard();
+      const { toClipboard } = useClipboard();
       if (currentJson.formatJson == null || currentJson.formatJson === "") {
         ElMessage.error("无法复制空的 json ");
         return;
@@ -142,7 +143,8 @@ export default {
 </script>
 
 <style scoped>
-html, body {
+html,
+body {
   width: 100%;
   height: 100%;
 }
@@ -168,8 +170,7 @@ html, body {
   margin: 2rem;
 }
 
-.card-header {
-}
+.card-header {}
 
 .button {
   color: #fffdf2;
@@ -181,7 +182,8 @@ html, body {
 }
 
 .el-input-content {
-  font-size: 1.125rem; /* 18px */
+  font-size: 1.125rem;
+  /* 18px */
   width: 40rem;
 }
 
@@ -200,7 +202,8 @@ html, body {
 
 .highlight-json {
   text-align: left;
-  font-size: 1.125rem; /* 18px */
+  font-size: 1.125rem;
+  /* 18px */
   /*width: 25rem;*/
   height: 100%;
 }

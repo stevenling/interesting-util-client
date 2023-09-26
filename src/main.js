@@ -9,10 +9,15 @@ import hljs from 'highlight.js/lib/core';
 // import javascript from 'highlight.js/lib/languages/javascript';
 import json from 'highlight.js/lib/languages/json'
 import hljsVuePlugin from "@highlightjs/vue-plugin";
+import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 
 hljs.registerLanguage('json', json);
 
 const app = createApp(App)
+
+for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
+    app.component(key, component)
+}
 app.use(ElementPlus)
 app.use(router)
 app.use(hljsVuePlugin)
