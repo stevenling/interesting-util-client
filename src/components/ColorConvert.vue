@@ -17,8 +17,7 @@
                         <p>RGB</p>
                         <div class="smart-recognize-class">
 
-                            <el-tooltip class="box-item" effect="light"
-                                content="1. 识别 (30, 80, 255) 格式\n 2. 识别 rgb(123, 200, 67)" placement="top-start">
+                            <el-tooltip class="box-item" effect="light" placement="left-start">
                                 <template #content>
                                     1. 识别 (30, 80, 255) 格式<br />2. 识别 rgb(30, 80, 255) 或者 RGB(30, 80, 255) 格式
                                     <br /> 3. 识别 30, 80, 255 格式
@@ -27,7 +26,7 @@
                                 <el-text @mouseenter="showSmartRecognizeTip">智能识别</el-text>
                             </el-tooltip>
 
-                            <el-input class="el-input-class" v-model="inputRgbColor" placeholder="Please input" clearable />
+                            <el-input class="el-input-class" v-model="inputRgbColor" placeholder="请输入 RGB 颜色值" clearable />
                             <el-button type="primary" @click="clickRecognize">一键识别</el-button>
                         </div>
 
@@ -51,7 +50,7 @@
                     <div class="hex-title-class">
                         <p>HEX</p>
                         <div class="smart-recognize-class">
-                            <el-input class="input-hex-color-class" v-model="inputHexColor" placeholder="Please input"
+                            <el-input class="input-hex-color-class" v-model="inputHexColor" placeholder="请输入 HEX 颜色值"
                                 clearable />
                             <el-button type="primary" @click="clickCopyHexColor">复制</el-button>
                         </div>
@@ -74,22 +73,17 @@
 </template>
   
 <script>
-import { onMounted, watch, reactive, ref, nextTick } from "vue";
-import moment from "moment" // 引入 moment 处理时间
+import { watch, ref } from "vue";
 import { ElMessage } from "element-plus";
-import useClipboard from "vue-clipboard3"; // 引入剪切板处理
-import ArrowRight from '@element-plus/icons-vue'
+import useClipboard from "vue-clipboard3";
 import TopMenu from "./TopMenu.vue";
 
 export default {
-    // name: ColorConvert,
     components: {
         TopMenu
     },
     setup() {
-        let selectColor = ref("#FFFFFF");
-        const elCardRef = ref();
-
+        const selectColor = ref("#FFFFFF");
         const inputHexColor = ref("");
         const inputRgbColor = ref();
 
@@ -97,28 +91,22 @@ export default {
         const inputGreenColor = ref();
         const inputBlueColor = ref();
 
-        async function onMounted() {
 
-        }
-
-        async function clickSelectColor() {
+        /**
+         * 在取色板中取色
+         */
+        const clickSelectColor = async () => {
             if (selectColor.value.length == 7) {
                 inputHexColor.value = selectColor.value;
                 inputRedColor.value = parseInt(selectColor.value.slice(1, 3), 16);
                 inputGreenColor.value = parseInt(selectColor.value.slice(3, 5), 16);
                 inputBlueColor.value = parseInt(selectColor.value.slice(5, 7), 16);
-                console.log(selectColor.value);
-                console.log(inputHexColor.value);
-
-                console.log(typeof inputHexColor.value);
-
                 inputRgbColor.value = "";
             }
-
         }
 
         /**
-         * 监听 16 进制的
+         * 监听 16 进制的颜色值
          */
         watch(inputHexColor, (newValue, oldValue) => {
             if (newValue !== null && newValue !== undefined && newValue !== "") {
@@ -134,9 +122,9 @@ export default {
         watch(() => [inputRedColor.value, inputGreenColor.value, inputBlueColor.value], (newValue, oldValue) => {
             // 10 进制 number 值
             if (newValue[0] && newValue[1] && newValue[2]) {
-                let redColor = parseInt(newValue[0], 10);
-                let greenColor = parseInt(newValue[1], 10);
-                let blueColor = parseInt(newValue[2], 10);
+                let redColor = parseInt(newValue[0]);
+                let greenColor = parseInt(newValue[1]);
+                let blueColor = parseInt(newValue[2]);
 
                 if (redColor < 0 || redColor > 255 || greenColor < 0 || greenColor > 255 || blueColor < 0 || blueColor > 255
                     || isNaN(redColor) || isNaN(greenColor) || isNaN(blueColor)) {
@@ -169,9 +157,9 @@ export default {
         /**
          * 一键识别
          */
-        function clickRecognize() {
-            // 1. 匹配 (123, 200, 150)
-            const regexFirst = /\((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\s*,\s*(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\s*,\s*(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\)/;
+        const clickRecognize = () => {
+            // 1. 匹配 (123, 200, 67)
+            const regexFirst = /\s*\((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\s*,\s*(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\s*,\s*(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\)\s*/;
             const match = inputRgbColor.value.match(regexFirst);
 
             if (match) {
@@ -182,7 +170,7 @@ export default {
             }
 
             // 2. 匹配 rgb(123, 200, 67) 或者 RGB(123, 200, 67)
-            const regexSecond = /(rgb|RGB)\((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\s*,\s*(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\s*,\s*(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\)/;
+            const regexSecond = /\s*(rgb|RGB)\((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\s*,\s*(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\s*,\s*(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\)/;
             const matchSecond = inputRgbColor.value.match(regexSecond);
 
             if (matchSecond) {
@@ -193,7 +181,7 @@ export default {
             }
 
             // 3. 匹配 123 200 67
-            const regexThird = /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\s+(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\s+(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
+            const regexThird = /^\s*(\s*25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\s+(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\s+(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\s*$/;
             const matchThird = inputRgbColor.value.match(regexThird);
 
             if (matchThird) {
@@ -204,7 +192,7 @@ export default {
             }
 
             // 4. 匹配 123, 200, 67
-            const regexFourth = /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?),\s*(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?),\s*(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
+            const regexFourth = /^\s*(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?),\s*(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?),\s*(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\s*$\s*/;
             const matchFourth = inputRgbColor.value.match(regexFourth);
 
             if (matchFourth) {
@@ -220,7 +208,7 @@ export default {
         /**
          * 复制 16 进制颜色值
          */
-        async function clickCopyHexColor() {
+        const clickCopyHexColor = async () => {
             const { toClipboard } = useClipboard();
             try {
                 await toClipboard(inputHexColor.value);
@@ -231,10 +219,11 @@ export default {
             }
         }
 
+
         /**
          * 复制 rgb 颜色值
          */
-        const clickCopyRgbColor = (async () => {
+        const clickCopyRgbColor = async () => {
             const { toClipboard } = useClipboard();
             try {
                 const rgbColor = "rgb(" + inputRedColor.value + ", " + inputGreenColor.value + ", " + inputBlueColor.value + ")";
@@ -244,23 +233,14 @@ export default {
                 console.error(e);
                 ElMessage.error("复制 RGB 进制颜色值失败");
             }
-        })
+        }
 
-        /**
-         * 显示智能识别的类型
-         */
-        const showSmartRecognizeTip = (() => {
-
-        })
 
         return {
-            onMounted,
             clickSelectColor,
             clickRecognize,
             clickCopyHexColor,
             clickCopyRgbColor,
-            showSmartRecognizeTip,
-            elCardRef,
             selectColor,
             inputHexColor,
             inputRgbColor,
