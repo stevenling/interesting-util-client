@@ -115,6 +115,7 @@ export default {
                 }
                 if (newValue.length === 7) {
                     selectColor.value = newValue;
+                    clickSelectColor();
                 }
             }
         });

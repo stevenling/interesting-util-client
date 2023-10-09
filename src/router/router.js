@@ -23,6 +23,11 @@ const routes = [
         name: 'ColorConvert',
         path: '/ColorConvert',
         component: () => import("@/components/ColorConvert")
+    },
+    {
+        name: 'DPlayer',
+        path: '/DPlayer',
+        component: () => import("@/components/DPlayer")
     }
 ];
 

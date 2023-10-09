@@ -90,7 +90,11 @@ export default {
      * 计算BMI
      */
     const GotoCalcBmi = (() => {
-      ElMessage.error("云胡哥哥正在开发中!");
+      // ElMessage.error("云胡哥哥正在开发中!");
+      
+      router.push({
+        path: "/DPlayer"
+      });
     })
 
     return {

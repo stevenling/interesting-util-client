@@ -1,37 +1,27 @@
 <template>
-  <div id = "app">
-    <el-card class = "box-card">
+  <div id="app">
+    <el-card class="box-card">
       <template #header>
         <div class="card-header">
-          <div class = "title">文本美化</div>
+          <div class="title">文本美化</div>
         </div>
       </template>
       <el-row :gutter="120">
-        <el-col :span = "12" class = "el-input-content">
-          <div class = "json-title">待格式化文本
-            <el-button class="clear-and-copy-button"  type="danger" @click="clickClear">清空</el-button>
+        <el-col :span="12" class="el-input-content">
+          <div class="json-title">待格式化文本
+            <el-button class="clear-and-copy-button" type="danger" @click="clickClear">清空</el-button>
           </div>
-          <el-input
-              v-model="currentText.oldText"
-              :rows="23"
-              type="textarea"
-              placeholder="请输入待美化文本"
-              class = "el-input-class"
-          />
+          <el-input v-model="currentText.oldText" :rows="23" type="textarea" placeholder="请输入待美化文本"
+            class="el-input-class" />
         </el-col>
 
-        <el-col :span = "12" class = "el-input-content">
-          <div class = "json-title">美化后的文本
-            <el-button class="clear-and-copy-button"  type="success" @click="clickCopy">复制到剪贴板</el-button>
+        <el-col :span="12" class="el-input-content">
+          <div class="json-title">美化后的文本
+            <el-button class="clear-and-copy-button" type="success" @click="clickCopy">复制到剪贴板</el-button>
           </div>
-<!--          <highlightjs language='json' :code= "currentText.formatText" class = "highlight-json"/>-->
-          <el-input
-              v-model="currentText.formatText"
-              :rows="23"
-              type="textarea"
-              placeholder="美化后的文本"
-              class = "el-input-class"
-          />
+          <!--          <highlightjs language='json' :code= "currentText.formatText" class = "highlight-json"/>-->
+          <el-input v-model="currentText.formatText" :rows="23" type="textarea" placeholder="美化后的文本"
+            class="el-input-class" />
         </el-col>
       </el-row>
     </el-card>
@@ -39,14 +29,14 @@
 </template>
 
 <script>
-import  moment  from "moment" // 引入 moment 处理时间
-import {onMounted, watch, reactive} from "vue";
-import {ElMessage} from "element-plus";
+import moment from "moment" // 引入 moment 处理时间
+import { onMounted, watch, reactive } from "vue";
+import { ElMessage } from "element-plus";
 import useClipboard from "vue-clipboard3"; // 引入剪切板处理
 
 export default {
   setup() {
-    let currentText = reactive({oldText: "", formatText: ""});
+    let currentText = reactive({ oldText: "", formatText: "" });
     onMounted(() => {
       document.querySelector('body').setAttribute('style', 'background: #EBEDF0');
     })
@@ -63,9 +53,9 @@ export default {
       const jsonFormatSpace = 4; // json 格式化的缩进
       if (typeof newValue == "string" && newValue !== "" && newValue != null) {
         try {
-            let pattern = '/^[a-zA-Z]+$/';
-            const res = newValue.replace('/^[a-zA-Z]+$/', "www");
-            console.log("res" + res);
+          let pattern = '/^[a-zA-Z]+$/';
+          const res = newValue.replace('/^[a-zA-Z]+$/', "www");
+          console.log("res" + res);
         } catch (e) {
           ElMessage.error('待格式化的文本有误，请检查');
           console.log(e);
@@ -92,7 +82,7 @@ export default {
       eleLink.download = fileName + '.json';
       eleLink.style.display = "none";
       // 字符内容转变成 blob 地址
-      let blob = new Blob([currentText.formatText], {type: "text/json"});
+      let blob = new Blob([currentText.formatText], { type: "text/json" });
       eleLink.href = URL.createObjectURL(blob);
       // 触发点击
       document.body.appendChild(eleLink);
@@ -117,7 +107,7 @@ export default {
      */
     async function clickCopy() {
       console.log("clickCopy");
-      const {toClipboard} = useClipboard();
+      const { toClipboard } = useClipboard();
       if (currentText.formatText == null || currentText.formatText === "") {
         ElMessage.error("无法复制空的 json ");
         return;
@@ -131,7 +121,7 @@ export default {
       }
     }
 
-    return  {
+    return {
       currentText,
       onMounted,
       clickDownload,
@@ -143,11 +133,13 @@ export default {
 </script>
 
 <style scoped>
-html, body {
+html,
+body {
   width: 100%;
   height: 100%;
 }
-.app{
+
+.app {
   background: #EBEDF0;
 }
 
@@ -168,8 +160,6 @@ html, body {
   margin: 2rem;
 }
 
-.card-header {
-}
 
 .button {
   color: #fffdf2;
@@ -181,7 +171,8 @@ html, body {
 }
 
 .el-input-content {
-  font-size: 1.125rem; /* 18px */
+  font-size: 1.125rem;
+  /* 18px */
   width: 25rem;
 }
 
@@ -200,7 +191,8 @@ html, body {
 
 .highlight-json {
   text-align: left;
-  font-size: 1.125rem; /* 18px */
+  font-size: 1.125rem;
+  /* 18px */
   /*width: 25rem;*/
   height: 100%;
 

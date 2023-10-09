@@ -6,24 +6,41 @@
         <div class="card-header">
           <div class="title">Json 格式化</div>
           <div class="el-button-list">
-            <el-button class="button" type="primary" @click="clickDownload">下载</el-button>
+            <el-button class="button" type="primary" @click="clickDownload"
+              >下载</el-button
+            >
           </div>
         </div>
       </template>
       <el-row :gutter="40">
         <el-col :span="12" class="el-input-content">
-          <div class="json-title">待格式化 Json
-            <el-button class="clear-and-copy-button" type="danger" @click="clickClear">清空</el-button>
+          <div class="json-title">
+            待格式化 Json
+            <el-button class="clear-and-copy-button" type="danger" @click="clickClear"
+              >清空</el-button
+            >
           </div>
-          <el-input v-model="currentJson.oldJson" :rows="23" type="textarea" placeholder="请输入待格式化 JSON 字符串"
-            class="el-input-class" />
+          <el-input
+            v-model="currentJson.oldJson"
+            :rows="23"
+            type="textarea"
+            placeholder="请输入待格式化 JSON 字符串"
+            class="el-input-class"
+          />
         </el-col>
 
         <el-col :span="12" class="el-input-content">
-          <div class="json-title">格式化后的 Json
-            <el-button class="clear-and-copy-button" type="success" @click="clickCopy">复制到剪贴板</el-button>
+          <div class="json-title">
+            格式化后的 Json
+            <el-button class="clear-and-copy-button" type="success" @click="clickCopy"
+              >复制到剪贴板</el-button
+            >
           </div>
-          <highlightjs language='json' :code="currentJson.formatJson" class="highlight-json" />
+          <highlightjs
+            language="json"
+            :code="currentJson.formatJson"
+            class="highlight-json"
+          />
         </el-col>
       </el-row>
     </el-card>
@@ -35,7 +52,7 @@ import { onMounted, watch, reactive } from "vue";
 import { ElMessage } from "element-plus";
 
 // 引入 moment 处理时间
-import moment from "moment"
+import moment from "moment";
 // 引入剪切板处理
 import useClipboard from "vue-clipboard3";
 
@@ -43,13 +60,13 @@ import TopMenu from "./TopMenu.vue";
 
 export default {
   components: {
-    TopMenu
+    TopMenu,
   },
   setup() {
     let currentJson = reactive({ oldJson: "", formatJson: "" });
     onMounted(() => {
-      document.querySelector('body').setAttribute('style', 'background: #EBEDF0');
-    })
+      document.querySelector("body").setAttribute("style", "background: #EBEDF0");
+    });
 
     /**
      * 监听原来的未格式化的 json 字符串，必须使用 try catch 异常处理，否则会报错
@@ -57,39 +74,46 @@ export default {
      * @param oldJson 用户输入的未格式化的 json 字符串，最开始是空
      * @param newValue 用户改变后的新的值
      */
-    watch(() => currentJson.oldJson, (newValue, oldValue) => {
-      console.log("newValue" + newValue);
-      const jsonFormatSpace = 4; // json 格式化的缩进
-      if (typeof newValue == "string" && newValue !== "" && newValue != null) {
-        try {
-          // 把 json 字符串转为 json 对象
-          let newValueJsonObject = JSON.parse(newValue);
-          // 将 json 对象通过 4 个缩进格式化，实现美化功能
-          currentJson.formatJson = JSON.stringify(newValueJsonObject, null, jsonFormatSpace);
-        } catch (e) {
-          ElMessage.error('待格式化的 Json 有误，请检查');
-          console.log(e);
-          currentJson.formatJson = '';
+    watch(
+      () => currentJson.oldJson,
+      (newValue, oldValue) => {
+        console.log("newValue" + newValue);
+        const jsonFormatSpace = 4; // json 格式化的缩进
+        if (typeof newValue == "string" && newValue !== "" && newValue != null) {
+          try {
+            // 把 json 字符串转为 json 对象
+            let newValueJsonObject = JSON.parse(newValue);
+            // 将 json 对象通过 4 个缩进格式化，实现美化功能
+            currentJson.formatJson = JSON.stringify(
+              newValueJsonObject,
+              null,
+              jsonFormatSpace
+            );
+          } catch (e) {
+            ElMessage.error("待格式化的 Json 有误，请检查");
+            console.log(e);
+            currentJson.formatJson = "";
+          }
+        }
+        if (newValue === "") {
+          currentJson.formatJson = "";
         }
       }
-      if (newValue === "") {
-        currentJson.formatJson = '';
-      }
-    });
+    );
 
     /**
      * 点击下载
      */
     function clickDownload() {
       if (currentJson.formatJson === "") {
-        ElMessage.error('下载空 Json 没有意义');
+        ElMessage.error("下载空 Json 没有意义");
         return;
       }
 
       let eleLink = document.createElement("a");
-      const fileName = moment().format('YYYY-MM-DD-hh-mm-ss');
+      const fileName = moment().format("YYYY-MM-DD-hh-mm-ss");
 
-      eleLink.download = fileName + '.json';
+      eleLink.download = fileName + ".json";
       eleLink.style.display = "none";
       // 字符内容转变成 blob 地址
       let blob = new Blob([currentJson.formatJson], { type: "text/json" });
@@ -105,11 +129,11 @@ export default {
      * 点击清空
      */
     function clickClear() {
-      if (currentJson.oldJson === '') {
-        ElMessage.info('已经清空了，没必要再次清空');
+      if (currentJson.oldJson === "") {
+        ElMessage.info("已经清空了，没必要再次清空");
       }
-      currentJson.formatJson = '';
-      currentJson.oldJson = '';
+      currentJson.formatJson = "";
+      currentJson.oldJson = "";
     }
 
     /**
@@ -124,7 +148,7 @@ export default {
       }
       try {
         await toClipboard(currentJson.formatJson);
-        ElMessage.success("复制格式化后的 json 到剪切板成功")
+        ElMessage.success("复制格式化后的 json 到剪切板成功");
       } catch (e) {
         console.error(e);
         ElMessage.error("复制格式化后的 json 到剪切板失败");
@@ -136,10 +160,10 @@ export default {
       onMounted,
       clickDownload,
       clickClear,
-      clickCopy
-    }
-  }
-}
+      clickCopy,
+    };
+  },
+};
 </script>
 
 <style scoped>
@@ -150,7 +174,7 @@ body {
 }
 
 .app {
-  background: #EBEDF0;
+  background: #ebedf0;
 }
 
 .box-card {
@@ -170,7 +194,8 @@ body {
   margin: 2rem;
 }
 
-.card-header {}
+.card-header {
+}
 
 .button {
   color: #fffdf2;
@@ -193,7 +218,7 @@ body {
 }
 
 .el-input-class {
-  font-size: 1.0rem;
+  font-size: 1rem;
 }
 
 .el-button-list {
