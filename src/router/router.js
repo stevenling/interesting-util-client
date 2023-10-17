@@ -24,11 +24,11 @@ const routes = [
         path: '/ColorConvert',
         component: () => import("@/components/ColorConvert")
     },
-    {
-        name: 'DPlayer',
-        path: '/DPlayer',
-        component: () => import("@/components/DPlayer")
-    },
+    // {
+    //     name: 'DPlayer',
+    //     path: '/DPlayer',
+    //     component: () => import("@/components/DPlayer")
+    // },
     {
         name: 'HeavenlyStemsAndEarthlyBranches',
         path: '/heavenlyStemsAndEarthlyBranches',

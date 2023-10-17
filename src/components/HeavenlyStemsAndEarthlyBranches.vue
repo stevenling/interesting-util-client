@@ -18,7 +18,6 @@
                 placeholder="请输入公历年"
                 clearable
               />
-              <el-button type="primary" @click="clickRecognize">一键识别</el-button>
             </div>
           </div>
 
@@ -31,22 +30,19 @@
                 placeholder="请输入天干地支年"
                 clearable
               />
-              <el-button type="primary" @click="clickCopyHexColor">复制</el-button>
+              <el-button type="primary" @click="clickCopyHexColor"
+                >复制</el-button
+              >
             </div>
           </div>
 
           <div class="select-color-title-class">
-            <p>取色</p>
-            <el-color-picker v-model="selectColor" @change="clickSelectColor" />
+            <p>所有年份</p>
           </div>
-
-          <div class="show-color-title-class">
-            <p>当前选择的颜色</p>
-            <el-card
-              class="show-color-el-card-class"
-              :style="{ backgroundColor: selectColor }"
-            ></el-card>
-          </div>
+          <el-table :data="yearData" style="width: 30%">
+            <el-table-column prop="year" label="公历年" />
+            <el-table-column prop="dynasty" label="朝代" />
+          </el-table>
         </el-col>
       </el-row>
     </el-card>
@@ -69,6 +65,8 @@ export default {
     // 天干地支纪年
     const heavenlyStemsEarthlyBranchesYear = ref("");
 
+    let yearData = ref([]);
+
     // 十天干
     const heavenlyStemsList = [
       "甲",
@@ -82,26 +80,148 @@ export default {
       "壬",
       "癸",
     ];
-    // 阳天干
-    const positiveHeavenlyStemsList = ["甲", "丙", "戊", "庚", "壬"];
-    // 阴天干
-    const negativeHeavenlyStemsList = ["乙", "丁", "己", "辛", "癸"];
 
     // 十二地支
-    const earthlyBranchesList = ["甲", "丙", "戊", "庚", "壬"];
+    const earthlyBranchesList = [
+      "子",
+      "丑",
+      "寅",
+      "卯",
+      "辰",
+      "巳",
+      "午",
+      "未",
+      "申",
+      "酉",
+      "戌",
+      "亥",
+    ];
 
-    /**
-     * 监听 16 进制的颜色值
-     */
+    // 完整天干地支
+    let entireHeavenlyStemsEarthlyBranchesList = [];
+
+    let digit = 0;
+    let row = 0;
+    let column = 0;
+    for (let i = 0; i < heavenlyStemsList.length; i++) {
+      entireHeavenlyStemsEarthlyBranchesList[row] = [];
+      column = 0;
+      for (let j = 0; j < earthlyBranchesList.length; j++) {
+        entireHeavenlyStemsEarthlyBranchesList[row][column] =
+          heavenlyStemsList[i] + earthlyBranchesList[j];
+        column++;
+        i++;
+        if (i === heavenlyStemsList.length) {
+          i = 0;
+        }
+        if (j === earthlyBranchesList.length - 1) {
+          i--;
+        }
+      }
+      row++;
+      if (
+        row === heavenlyStemsList.length / 2 &&
+        column === earthlyBranchesList.length
+      ) {
+        debugger;
+        break;
+      }
+    }
+    let calendarYearList = [];
+    let beginCalendarYear = 4;
+    for (let i = 0; i < entireHeavenlyStemsEarthlyBranchesList.length; i++) {
+      calendarYearList[i] = [];
+      for (
+        let j = 0;
+        j < entireHeavenlyStemsEarthlyBranchesList[i].length;
+        j++
+      ) {
+        calendarYearList[i][j] = beginCalendarYear++;
+      }
+    }
+
     watch(calendarYear, (newValue, oldValue) => {
       if (newValue && newValue !== undefined && newValue !== "") {
+        const currentCalendarYear = parseInt(newValue);
+        if (currentCalendarYear > 3) {
+          // 余数
+          let remainder = (currentCalendarYear - 3) % 60;
+          let currentRow = Math.floor((remainder - 1) / 12);
+          let currentColumn = (remainder - 1) % 12;
+          heavenlyStemsEarthlyBranchesYear.value =
+            entireHeavenlyStemsEarthlyBranchesList[currentRow][currentColumn];
+        }
       }
     });
 
     /**
-     * 一键识别
+     * 根据年份获取朝代
      */
-    const clickRecognize = () => {};
+    function calcDynasty(currentYear) {
+      if (currentYear <= 8) {
+        return "西汉";
+      } else if (currentYear > 8 && currentYear < 24) {
+        return "王莽新朝";
+      } else if (currentYear >= 23 && currentYear <= 25) {
+        return "更始政权";
+      } else if (currentYear >= 25 && currentYear <= 220) {
+        return "东汉";
+      } else if (currentYear >= 220 && currentYear <= 280) {
+        return "三国";
+      } else if (currentYear >= 266 && currentYear <= 316) {
+        return "西晋";
+      } else if (currentYear >= 317 && currentYear <= 420) {
+        return "东晋";
+      } else if (currentYear >= 420 && currentYear <= 589) {
+        return "南北朝";
+      } else if (currentYear >= 581 && currentYear <= 619) {
+        return "隋朝";
+      } else if (currentYear >= 618 && currentYear <= 907) {
+        return "唐朝";
+      } else if (currentYear >= 907 && currentYear <= 979) {
+        return "五代十国";
+      } else if (currentYear >= 960 && currentYear <= 1127) {
+        return "北宋";
+      } else if (currentYear >= 1127 && currentYear <= 1279) {
+        return "南宋";
+      } else if (currentYear >= 1271 && currentYear <= 1388) {
+        return "元朝";
+      } else if (currentYear >= 1368 && currentYear <= 1644) {
+        return "明朝";
+      } else if (currentYear >= 1636 && currentYear <= 1912) {
+        return "清朝";
+      } else if (currentYear >= 1912 && currentYear <= 1949) {
+        return "中华民国";
+      } else if (currentYear >= 1949) {
+        return "中华人民共和国";
+      }
+    }
+
+    watch(heavenlyStemsEarthlyBranchesYear, (newValue, oldValue) => {
+      if (newValue && newValue !== undefined && newValue !== "") {
+        for (
+          let i = 0;
+          i < entireHeavenlyStemsEarthlyBranchesList.length;
+          i++
+        ) {
+          for (
+            let j = 0;
+            j < entireHeavenlyStemsEarthlyBranchesList[i].length;
+            j++
+          ) {
+            if (newValue === entireHeavenlyStemsEarthlyBranchesList[i][j]) {
+              yearData.value = [];
+              for (let count = 0; count < 35; count++) {
+                let currentYear = calendarYearList[i][j] + 60 * count;
+                let currentDynasty = calcDynasty(currentYear);
+                const newObj = { year: currentYear, dynasty: currentDynasty };
+                yearData.value.push(newObj);
+              }
+            }
+          }
+        }
+      }
+    });
 
     /**
      * 复制 16 进制颜色值
@@ -109,40 +229,20 @@ export default {
     const clickCopyHexColor = async () => {
       const { toClipboard } = useClipboard();
       try {
-        await toClipboard(inputHexColor.value);
-        ElMessage.success("复制 16 进制颜色值成功");
+        await toClipboard(heavenlyStemsEarthlyBranchesYear.value);
+        ElMessage.success("复制成功");
       } catch (e) {
         console.error(e);
-        ElMessage.error("复制 16 进制颜色值失败");
-      }
-    };
-
-    /**
-     * 复制 rgb 颜色值
-     */
-    const clickCopyRgbColor = async () => {
-      const { toClipboard } = useClipboard();
-      try {
-        const rgbColor =
-          "rgb(" +
-          inputRedColor.value +
-          ", " +
-          inputGreenColor.value +
-          ", " +
-          inputBlueColor.value +
-          ")";
-        await toClipboard(rgbColor);
-        ElMessage.success("复制 RGB 颜色值成功");
-      } catch (e) {
-        console.error(e);
-        ElMessage.error("复制 RGB 进制颜色值失败");
+        ElMessage.error("复制失败");
       }
     };
 
     return {
       calendarYear,
+      clickCopyHexColor,
       heavenlyStemsEarthlyBranchesYear,
-      clickRecognize,
+      yearData,
+      calcDynasty,
     };
   },
 };
@@ -188,7 +288,6 @@ body {
 
 .el-input-class {
   width: 300px;
-  margin-left: 20px;
   margin-right: 20px;
 }
 
