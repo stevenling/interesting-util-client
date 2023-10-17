@@ -28,6 +28,11 @@ const routes = [
         name: 'DPlayer',
         path: '/DPlayer',
         component: () => import("@/components/DPlayer")
+    },
+    {
+        name: 'HeavenlyStemsAndEarthlyBranches',
+        path: '/heavenlyStemsAndEarthlyBranches',
+        component: () => import("@/components/HeavenlyStemsAndEarthlyBranches.vue")
     }
 ];
 

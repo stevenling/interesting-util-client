@@ -13,13 +13,9 @@
           </div>
         </template>
         <div>
-          <el-button type="primary" @click="GotoJsonFormat">
-            Json 代码美化
-          </el-button>
+          <el-button type="primary" @click="gotoJsonFormat"> Json 代码美化 </el-button>
 
-          <el-button type="primary" @click="GotoColorConvert">
-            颜色进制转换
-          </el-button>
+          <el-button type="primary" @click="gotoColorConvert"> 颜色进制转换 </el-button>
         </div>
       </el-card>
 
@@ -35,9 +31,10 @@
           </el-button>
         </div> -->
         <div>
-          <el-button type="primary" @click="GotoCalcBmi">
-            BMI 计算
-          </el-button>
+          <el-button type="primary" @click="gotoCalcBmi"> BMI 计算 </el-button>
+
+          <el-button type="primary" @click="gotoCalcHeavenlyStemsAndEarthlyBranches"> 天干地支纪年 </el-button>
+
         </div>
 
       </el-card>
@@ -52,13 +49,12 @@
 <script>
 import { ElMessage } from "element-plus";
 import { useRouter } from "vue-router";
-import TopMenu from "./TopMenu.vue"
-
+import TopMenu from "./TopMenu.vue";
 
 export default {
   name: "UtilIndex",
   components: {
-    TopMenu
+    TopMenu,
   },
   setup() {
     const router = useRouter();
@@ -68,43 +64,52 @@ export default {
      *
      * @constructor
      */
-    function GotoColorConvert() {
+    function gotoColorConvert() {
       router.push({
-        path: "/ColorConvert"
+        path: "/ColorConvert",
       });
     }
 
-    function GotoJsonFormat() {
+    function gotoJsonFormat() {
       router.push({
-        path: "/JsonFormat"
+        path: "/JsonFormat",
       });
     }
 
     function GotoBetweenNowToHoliday() {
       router.push({
-        path: "/BetweenNowToHoliday"
+        path: "/BetweenNowToHoliday",
       });
     }
 
     /**
-     * 计算BMI
+     * 计算 BMI
      */
-    const GotoCalcBmi = (() => {
-      // ElMessage.error("云胡哥哥正在开发中!");
-      
-      router.push({
-        path: "/DPlayer"
-      });
-    })
+    const gotoCalcBmi = () => {
+      ElMessage.error("云胡哥哥正在开发中!");
 
-    return {
-      GotoJsonFormat,
-      GotoColorConvert,
-      GotoBetweenNowToHoliday,
-      GotoCalcBmi
+      // router.push({
+      //   path: "/DPlayer",
+      // });
+    };
+
+    /**
+     * 跳转到计算天干地支
+     */
+    const gotoCalcHeavenlyStemsAndEarthlyBranches = () => {
+      router.push({
+        path: "/heavenlyStemsAndEarthlyBranches",
+      });
     }
-  }
-}
+    return {
+      gotoJsonFormat,
+      gotoColorConvert,
+      GotoBetweenNowToHoliday,
+      gotoCalcBmi,
+      gotoCalcHeavenlyStemsAndEarthlyBranches
+    };
+  },
+};
 </script>
 
 <style scoped>
@@ -136,7 +141,6 @@ export default {
 
 .card-header {
   /*background: skyblue;*/
-
 }
 
 .icp {

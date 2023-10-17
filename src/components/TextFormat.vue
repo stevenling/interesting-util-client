@@ -8,20 +8,36 @@
       </template>
       <el-row :gutter="120">
         <el-col :span="12" class="el-input-content">
-          <div class="json-title">待格式化文本
-            <el-button class="clear-and-copy-button" type="danger" @click="clickClear">清空</el-button>
+          <div class="json-title">
+            待格式化文本
+            <el-button class="clear-and-copy-button" type="danger" @click="clickClear"
+              >清空</el-button
+            >
           </div>
-          <el-input v-model="currentText.oldText" :rows="23" type="textarea" placeholder="请输入待美化文本"
-            class="el-input-class" />
+          <el-input
+            v-model="currentText.oldText"
+            :rows="23"
+            type="textarea"
+            placeholder="请输入待美化文本"
+            class="el-input-class"
+          />
         </el-col>
 
         <el-col :span="12" class="el-input-content">
-          <div class="json-title">美化后的文本
-            <el-button class="clear-and-copy-button" type="success" @click="clickCopy">复制到剪贴板</el-button>
+          <div class="json-title">
+            美化后的文本
+            <el-button class="clear-and-copy-button" type="success" @click="clickCopy"
+              >复制到剪贴板</el-button
+            >
           </div>
           <!--          <highlightjs language='json' :code= "currentText.formatText" class = "highlight-json"/>-->
-          <el-input v-model="currentText.formatText" :rows="23" type="textarea" placeholder="美化后的文本"
-            class="el-input-class" />
+          <el-input
+            v-model="currentText.formatText"
+            :rows="23"
+            type="textarea"
+            placeholder="美化后的文本"
+            class="el-input-class"
+          />
         </el-col>
       </el-row>
     </el-card>
@@ -29,7 +45,7 @@
 </template>
 
 <script>
-import moment from "moment" // 引入 moment 处理时间
+import moment from "moment"; // 引入 moment 处理时间
 import { onMounted, watch, reactive } from "vue";
 import { ElMessage } from "element-plus";
 import useClipboard from "vue-clipboard3"; // 引入剪切板处理
@@ -38,8 +54,8 @@ export default {
   setup() {
     let currentText = reactive({ oldText: "", formatText: "" });
     onMounted(() => {
-      document.querySelector('body').setAttribute('style', 'background: #EBEDF0');
-    })
+      document.querySelector("body").setAttribute("style", "background: #EBEDF0");
+    });
 
     /**
      * 监听原来的未格式化的文本，必须使用 try catch 异常处理，否则会报错
@@ -48,38 +64,41 @@ export default {
      * @param oldText 用户输入的未格式化的文本，最开始是空
      * @param newValue 用户改变后的新的值
      */
-    watch(() => currentText.oldText, (newValue, oldValue) => {
-      console.log("newValue" + newValue);
-      const jsonFormatSpace = 4; // json 格式化的缩进
-      if (typeof newValue == "string" && newValue !== "" && newValue != null) {
-        try {
-          let pattern = '/^[a-zA-Z]+$/';
-          const res = newValue.replace('/^[a-zA-Z]+$/', "www");
-          console.log("res" + res);
-        } catch (e) {
-          ElMessage.error('待格式化的文本有误，请检查');
-          console.log(e);
-          currentText.formatText = '';
+    watch(
+      () => currentText.oldText,
+      (newValue, oldValue) => {
+        console.log("newValue" + newValue);
+        const jsonFormatSpace = 4; // json 格式化的缩进
+        if (typeof newValue == "string" && newValue !== "" && newValue != null) {
+          try {
+            let pattern = "/^[a-zA-Z]+$/";
+            const res = newValue.replace("/^[a-zA-Z]+$/", "www");
+            console.log("res" + res);
+          } catch (e) {
+            ElMessage.error("待格式化的文本有误，请检查");
+            console.log(e);
+            currentText.formatText = "";
+          }
+        }
+        if (newValue === "") {
+          currentText.formatText = "";
         }
       }
-      if (newValue === "") {
-        currentText.formatText = '';
-      }
-    });
+    );
 
     /**
      * 点击下载
      */
     function clickDownload() {
       if (currentText.formatText === "") {
-        ElMessage.error('下载空 Json 没有意义');
+        ElMessage.error("下载空 Json 没有意义");
         return;
       }
 
       let eleLink = document.createElement("a");
-      const fileName = moment().format('YYYY-MM-DD-hh-mm-ss');
+      const fileName = moment().format("YYYY-MM-DD-hh-mm-ss");
 
-      eleLink.download = fileName + '.json';
+      eleLink.download = fileName + ".json";
       eleLink.style.display = "none";
       // 字符内容转变成 blob 地址
       let blob = new Blob([currentText.formatText], { type: "text/json" });
@@ -95,11 +114,11 @@ export default {
      * 点击清空
      */
     function clickClear() {
-      if (currentText.oldText === '') {
-        ElMessage.info('已经清空了，没必要再次清空');
+      if (currentText.oldText === "") {
+        ElMessage.info("已经清空了，没必要再次清空");
       }
-      currentText.formatText = '';
-      currentText.oldText = '';
+      currentText.formatText = "";
+      currentText.oldText = "";
     }
 
     /**
@@ -114,7 +133,7 @@ export default {
       }
       try {
         await toClipboard(currentText.formatText);
-        ElMessage.success("复制格式化后的 json 到剪切板成功")
+        ElMessage.success("复制格式化后的 json 到剪切板成功");
       } catch (e) {
         console.error(e);
         ElMessage.error("复制格式化后的 json 到剪切板失败");
@@ -126,10 +145,10 @@ export default {
       onMounted,
       clickDownload,
       clickClear,
-      clickCopy
-    }
-  }
-}
+      clickCopy,
+    };
+  },
+};
 </script>
 
 <style scoped>
@@ -140,7 +159,7 @@ body {
 }
 
 .app {
-  background: #EBEDF0;
+  background: #ebedf0;
 }
 
 .box-card {
@@ -159,7 +178,6 @@ body {
   font-family: Arial, "Microsoft YaHei";
   margin: 2rem;
 }
-
 
 .button {
   color: #fffdf2;
@@ -182,7 +200,7 @@ body {
 }
 
 .el-input-class {
-  font-size: 1.0rem;
+  font-size: 1rem;
 }
 
 .el-button-list {
@@ -195,6 +213,5 @@ body {
   /* 18px */
   /*width: 25rem;*/
   height: 100%;
-
 }
 </style>
