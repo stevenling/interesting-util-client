@@ -11,28 +11,27 @@
         <el-col :span="24" class="el-input-content">
           <div class="calendar-year-title-class">
             <p>公历年</p>
-            <div class="smart-recognize-class">
+            <div class="calendar-year-div-class">
               <el-input
                 class="el-input-class"
                 v-model="calendarYear"
                 placeholder="请输入公历年"
                 clearable
               />
+              <p>{{ currentDynasty }}</p>
             </div>
           </div>
 
           <div class="hex-title-class">
             <p>天干地支</p>
-            <div class="smart-recognize-class">
+            <div class="calendar-year-div-class">
               <el-input
                 class="input-hex-color-class"
                 v-model="heavenlyStemsEarthlyBranchesYear"
                 placeholder="请输入天干地支年"
                 clearable
               />
-              <el-button type="primary" @click="clickCopyHexColor"
-                >复制</el-button
-              >
+              <el-button type="primary" @click="clickCopyHexColor">复制</el-button>
             </div>
           </div>
 
@@ -66,6 +65,9 @@ export default {
     const heavenlyStemsEarthlyBranchesYear = ref("");
 
     let yearData = ref([]);
+
+    // 当前朝代
+    let currentDynasty = ref("");
 
     // 十天干
     const heavenlyStemsList = [
@@ -119,11 +121,7 @@ export default {
         }
       }
       row++;
-      if (
-        row === heavenlyStemsList.length / 2 &&
-        column === earthlyBranchesList.length
-      ) {
-        debugger;
+      if (row === heavenlyStemsList.length / 2 && column === earthlyBranchesList.length) {
         break;
       }
     }
@@ -131,11 +129,7 @@ export default {
     let beginCalendarYear = 4;
     for (let i = 0; i < entireHeavenlyStemsEarthlyBranchesList.length; i++) {
       calendarYearList[i] = [];
-      for (
-        let j = 0;
-        j < entireHeavenlyStemsEarthlyBranchesList[i].length;
-        j++
-      ) {
+      for (let j = 0; j < entireHeavenlyStemsEarthlyBranchesList[i].length; j++) {
         calendarYearList[i][j] = beginCalendarYear++;
       }
     }
@@ -145,11 +139,13 @@ export default {
         const currentCalendarYear = parseInt(newValue);
         if (currentCalendarYear > 3) {
           // 余数
-          let remainder = (currentCalendarYear - 3) % 60;
-          let currentRow = Math.floor((remainder - 1) / 12);
-          let currentColumn = (remainder - 1) % 12;
+          let remainder = (currentCalendarYear - 4) % 60;
+          let currentRow = Math.floor(remainder / 12);
+          let currentColumn = remainder % 12;
           heavenlyStemsEarthlyBranchesYear.value =
             entireHeavenlyStemsEarthlyBranchesList[currentRow][currentColumn];
+          currentDynasty.value = calcDynasty(currentCalendarYear);
+          console.log(currentDynasty.value);
         }
       }
     });
@@ -199,16 +195,8 @@ export default {
 
     watch(heavenlyStemsEarthlyBranchesYear, (newValue, oldValue) => {
       if (newValue && newValue !== undefined && newValue !== "") {
-        for (
-          let i = 0;
-          i < entireHeavenlyStemsEarthlyBranchesList.length;
-          i++
-        ) {
-          for (
-            let j = 0;
-            j < entireHeavenlyStemsEarthlyBranchesList[i].length;
-            j++
-          ) {
+        for (let i = 0; i < entireHeavenlyStemsEarthlyBranchesList.length; i++) {
+          for (let j = 0; j < entireHeavenlyStemsEarthlyBranchesList[i].length; j++) {
             if (newValue === entireHeavenlyStemsEarthlyBranchesList[i][j]) {
               yearData.value = [];
               for (let count = 0; count < 35; count++) {
@@ -243,6 +231,7 @@ export default {
       heavenlyStemsEarthlyBranchesYear,
       yearData,
       calcDynasty,
+      currentDynasty,
     };
   },
 };
@@ -277,17 +266,17 @@ body {
   text-align: left;
 }
 
-.smart-recognize-class {
+.calendar-year-div-class {
   display: flex;
   flex-direction: row;
   justify-content: flex-start;
   align-items: center;
   height: 30px;
-  margin-top: 20px;
+  margin-top: 10px;
 }
 
 .el-input-class {
-  width: 300px;
+  width: 250px;
   margin-right: 20px;
 }
 
@@ -296,7 +285,7 @@ body {
 }
 
 .el-input-single-class {
-  width: 150px;
+  width: 120px;
   margin-left: 20px;
   margin-right: 20px;
 }
@@ -332,7 +321,7 @@ body {
 }
 
 .input-hex-color-class {
-  width: 150px;
+  width: 110px;
   margin-right: 20px;
 }
 
