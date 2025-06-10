@@ -13,9 +13,13 @@
           </div>
         </template>
         <div>
-          <el-button type="primary" @click="gotoJsonFormat"> Json 代码美化 </el-button>
+          <el-button type="primary" @click="gotoJsonFormat">
+            Json 代码美化
+          </el-button>
 
-          <el-button type="primary" @click="gotoColorConvert"> 颜色进制转换 </el-button>
+          <el-button type="primary" @click="gotoColorConvert">
+            颜色进制转换
+          </el-button>
         </div>
       </el-card>
 
@@ -33,10 +37,13 @@
         <div>
           <el-button type="primary" @click="gotoCalcBmi"> BMI 计算 </el-button>
 
-          <el-button type="primary" @click="gotoCalcHeavenlyStemsAndEarthlyBranches"> 天干地支纪年 </el-button>
-
+          <el-button
+            type="primary"
+            @click="gotoCalcHeavenlyStemsAndEarthlyBranches"
+          >
+            天干地支纪年
+          </el-button>
         </div>
-
       </el-card>
     </el-col>
   </el-row>
@@ -46,69 +53,54 @@
   </footer>
 </template>
 
-<script>
+<script setup>
 import { ElMessage } from "element-plus";
 import { useRouter } from "vue-router";
 import TopMenu from "./TopMenu.vue";
 
-export default {
-  name: "UtilIndex",
-  components: {
-    TopMenu,
-  },
-  setup() {
-    const router = useRouter();
+const router = useRouter();
 
-    /**
-     * 转到颜色进制转换
-     *
-     * @constructor
-     */
-    function gotoColorConvert() {
-      router.push({
-        path: "/ColorConvert",
-      });
-    }
+/**
+ * 转到颜色进制转换
+ *
+ * @constructor
+ */
+function gotoColorConvert() {
+  router.push({
+    path: "/ColorConvert",
+  });
+}
 
-    function gotoJsonFormat() {
-      router.push({
-        path: "/JsonFormat",
-      });
-    }
+function gotoJsonFormat() {
+  router.push({
+    path: "/JsonFormat",
+  });
+}
 
-    function GotoBetweenNowToHoliday() {
-      router.push({
-        path: "/BetweenNowToHoliday",
-      });
-    }
+function GotoBetweenNowToHoliday() {
+  router.push({
+    path: "/BetweenNowToHoliday",
+  });
+}
 
-    /**
-     * 计算 BMI
-     */
-    const gotoCalcBmi = () => {
-      ElMessage.error("云胡哥哥正在开发中!");
+/**
+ * 计算 BMI
+ */
+const gotoCalcBmi = () => {
+  ElMessage.error("云胡哥哥正在开发中!");
 
-      // router.push({
-      //   path: "/DPlayer",
-      // });
-    };
+  // router.push({
+  //   path: "/DPlayer",
+  // });
+};
 
-    /**
-     * 跳转到计算天干地支
-     */
-    const gotoCalcHeavenlyStemsAndEarthlyBranches = () => {
-      router.push({
-        path: "/heavenlyStemsAndEarthlyBranches",
-      });
-    }
-    return {
-      gotoJsonFormat,
-      gotoColorConvert,
-      GotoBetweenNowToHoliday,
-      gotoCalcBmi,
-      gotoCalcHeavenlyStemsAndEarthlyBranches
-    };
-  },
+/**
+ * 跳转到计算天干地支
+ */
+const gotoCalcHeavenlyStemsAndEarthlyBranches = () => {
+  router.push({
+    path: "/heavenlyStemsAndEarthlyBranches",
+  });
 };
 </script>
 
