@@ -47,123 +47,105 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import { onMounted, watch, reactive } from "vue";
 import { ElMessage } from "element-plus";
-
-// 引入 moment 处理时间
 import moment from "moment";
-// 引入剪切板处理
 import useClipboard from "vue-clipboard3";
-
 import TopMenu from "./TopMenu.vue";
 
-export default {
-  components: {
-    TopMenu,
-  },
-  setup() {
-    let currentJson = reactive({ oldJson: "", formatJson: "" });
-    onMounted(() => {
-      document.querySelector("body").setAttribute("style", "background: #EBEDF0");
-    });
+const currentJson = reactive({ oldJson: "", formatJson: "" });
 
-    /**
-     * 监听原来的未格式化的 json 字符串，必须使用 try catch 异常处理，否则会报错
-     * 用箭头函数来监听 reactive 中的某个基本数据
-     * @param oldJson 用户输入的未格式化的 json 字符串，最开始是空
-     * @param newValue 用户改变后的新的值
-     */
-    watch(
-      () => currentJson.oldJson,
-      (newValue, oldValue) => {
-        console.log("newValue" + newValue);
-        const jsonFormatSpace = 4; // json 格式化的缩进
-        if (typeof newValue == "string" && newValue !== "" && newValue != null) {
-          try {
-            // 把 json 字符串转为 json 对象
-            let newValueJsonObject = JSON.parse(newValue);
-            // 将 json 对象通过 4 个缩进格式化，实现美化功能
-            currentJson.formatJson = JSON.stringify(
-              newValueJsonObject,
-              null,
-              jsonFormatSpace
-            );
-          } catch (e) {
-            ElMessage.error("待格式化的 Json 有误，请检查");
-            console.log(e);
-            currentJson.formatJson = "";
-          }
-        }
-        if (newValue === "") {
-          currentJson.formatJson = "";
-        }
-      }
-    );
+onMounted(() => {
+  document.querySelector("body").setAttribute("style", "background: #EBEDF0");
+});
 
-    /**
-     * 点击下载
-     */
-    function clickDownload() {
-      if (currentJson.formatJson === "") {
-        ElMessage.error("下载空 Json 没有意义");
-        return;
-      }
-
-      let eleLink = document.createElement("a");
-      const fileName = moment().format("YYYY-MM-DD-hh-mm-ss");
-
-      eleLink.download = fileName + ".json";
-      eleLink.style.display = "none";
-      // 字符内容转变成 blob 地址
-      let blob = new Blob([currentJson.formatJson], { type: "text/json" });
-      eleLink.href = URL.createObjectURL(blob);
-      // 触发点击
-      document.body.appendChild(eleLink);
-      eleLink.click();
-      // 然后移除
-      document.body.removeChild(eleLink);
-    }
-
-    /**
-     * 点击清空
-     */
-    function clickClear() {
-      if (currentJson.oldJson === "") {
-        ElMessage.info("已经清空了，没必要再次清空");
-      }
-      currentJson.formatJson = "";
-      currentJson.oldJson = "";
-    }
-
-    /**
-     * 点击复制 json 到剪切板
-     */
-    async function clickCopy() {
-      console.log("clickCopy");
-      const { toClipboard } = useClipboard();
-      if (currentJson.formatJson == null || currentJson.formatJson === "") {
-        ElMessage.error("无法复制空的 json ");
-        return;
-      }
+/**
+ * 监听原来的未格式化的 json 字符串，必须使用 try catch 异常处理，否则会报错
+ * 用箭头函数来监听 reactive 中的某个基本数据
+ * @param oldJson 用户输入的未格式化的 json 字符串，最开始是空
+ * @param newValue 用户改变后的新的值
+ */
+watch(
+  () => currentJson.oldJson,
+  (newValue, oldValue) => {
+    console.log("newValue" + newValue);
+    const jsonFormatSpace = 4; // json 格式化的缩进
+    if (typeof newValue == "string" && newValue !== "" && newValue != null) {
       try {
-        await toClipboard(currentJson.formatJson);
-        ElMessage.success("复制格式化后的 json 到剪切板成功");
+        // 把 json 字符串转为 json 对象
+        let newValueJsonObject = JSON.parse(newValue);
+        // 将 json 对象通过 4 个缩进格式化，实现美化功能
+        currentJson.formatJson = JSON.stringify(
+          newValueJsonObject,
+          null,
+          jsonFormatSpace
+        );
       } catch (e) {
-        console.error(e);
-        ElMessage.error("复制格式化后的 json 到剪切板失败");
+        ElMessage.error("待格式化的 Json 有误，请检查");
+        console.log(e);
+        currentJson.formatJson = "";
       }
     }
+    if (newValue === "") {
+      currentJson.formatJson = "";
+    }
+  }
+);
 
-    return {
-      currentJson,
-      onMounted,
-      clickDownload,
-      clickClear,
-      clickCopy,
-    };
-  },
-};
+/**
+ * 点击下载
+ */
+function clickDownload() {
+  if (currentJson.formatJson === "") {
+    ElMessage.error("下载空 Json 没有意义");
+    return;
+  }
+
+  let eleLink = document.createElement("a");
+  const fileName = moment().format("YYYY-MM-DD-hh-mm-ss");
+
+  eleLink.download = fileName + ".json";
+  eleLink.style.display = "none";
+  // 字符内容转变成 blob 地址
+  let blob = new Blob([currentJson.formatJson], { type: "text/json" });
+  eleLink.href = URL.createObjectURL(blob);
+  // 触发点击
+  document.body.appendChild(eleLink);
+  eleLink.click();
+  // 然后移除
+  document.body.removeChild(eleLink);
+}
+
+/**
+ * 点击清空
+ */
+function clickClear() {
+  if (currentJson.oldJson === "") {
+    ElMessage.info("已经清空了，没必要再次清空");
+  }
+  currentJson.formatJson = "";
+  currentJson.oldJson = "";
+}
+
+/**
+ * 点击复制 json 到剪切板
+ */
+async function clickCopy() {
+  console.log("clickCopy");
+  const { toClipboard } = useClipboard();
+  if (currentJson.formatJson == null || currentJson.formatJson === "") {
+    ElMessage.error("无法复制空的 json ");
+    return;
+  }
+  try {
+    await toClipboard(currentJson.formatJson);
+    ElMessage.success("复制格式化后的 json 到剪切板成功");
+  } catch (e) {
+    console.error(e);
+    ElMessage.error("复制格式化后的 json 到剪切板失败");
+  }
+}
 </script>
 
 <style scoped>
