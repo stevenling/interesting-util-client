@@ -33,6 +33,11 @@ const routes = [
         name: 'HeavenlyStemsAndEarthlyBranches',
         path: '/heavenlyStemsAndEarthlyBranches',
         component: () => import("@/components/HeavenlyStemsAndEarthlyBranches.vue")
+    },
+    {
+        name: 'GotoFontToImage',
+        path: '/gotoFontToImage',
+        component: () => import("@/components/fontToImage.vue")
     }
 ];
 

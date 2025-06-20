@@ -35,8 +35,8 @@
           </el-button>
         </div> -->
         <div>
+          <el-button type="primary" @click="gotoFontToImage"> 生成摘录卡片 </el-button>
           <el-button type="primary" @click="gotoCalcBmi"> BMI 计算 </el-button>
-
           <el-button
             type="primary"
             @click="gotoCalcHeavenlyStemsAndEarthlyBranches"
@@ -107,6 +107,13 @@ const gotoCalcHeavenlyStemsAndEarthlyBranches = () => {
     path: "/heavenlyStemsAndEarthlyBranches",
   });
 };
+
+const gotoFontToImage = () => {
+  router.push({
+    path: "/gotoFontToImage",
+  });
+};
+
 </script>
 
 <style scoped>

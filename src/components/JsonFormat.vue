@@ -164,65 +164,159 @@ html,
 body {
   width: 100%;
   height: 100%;
+  margin: 0;
+  padding: 0;
+  background: #ebedf0;
+  font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', Arial, sans-serif;
 }
 
-.app {
+#app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
   background: #ebedf0;
 }
 
 .box-card {
-  /* 表示上下边界为 0，左右则根据宽度自适应相同值 */
-  /*display: flex;*/
-  /*position: absolute;*/
-
-  margin: 1rem auto;
-  width: 80%;
+  margin: 1rem auto 0 auto;
+  width: 90%;
+  max-width: 1100px;
   text-align: center;
+  box-shadow: 0 4px 24px 0 rgba(0,0,0,0.08), 0 1.5px 4px 0 rgba(0,0,0,0.03);
+  border-radius: 18px;
+  background: #fff;
+  border: none;
+  padding-bottom: 0.5rem;
 }
 
 .title {
-  font-size: 1.5rem;
-  font-weight: bold;
-  font-family: Arial, "Microsoft YaHei", serif;
-  margin: 2rem;
+  font-size: 2.2rem;
+  font-weight: 700;
+  font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', Arial, sans-serif;
+  margin: 1.2rem 0 0.5rem 0;
+  color: #2d8cf0;
+  letter-spacing: 2px;
 }
 
 .card-header {
-}
-
-.button {
-  color: #fffdf2;
-  margin-left: 1rem;
-}
-
-.clear-and-copy-button {
-  margin-left: 5rem;
-}
-
-.el-input-content {
-  font-size: 1.125rem;
-  /* 18px */
-  width: 40rem;
-}
-
-.json-title {
-  font-size: 1.125rem;
-  margin: 1rem;
-}
-
-.el-input-class {
-  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.7rem 1.2rem 0.3rem 1.2rem;
+  background: transparent;
+  border-bottom: 1px solid #f0f0f0;
+  border-radius: 18px 18px 0 0;
 }
 
 .el-button-list {
-  margin-left: 2rem;
+  margin-left: 1rem;
+}
+
+.button {
+  color: #fff;
+  margin-left: 0.7rem;
+  border-radius: 6px;
+  font-weight: 500;
+  box-shadow: 0 2px 8px rgba(45,140,240,0.08);
+  transition: background 0.2s;
+}
+.button:hover {
+  background: #1765ad;
+}
+
+.clear-and-copy-button {
+  margin-left: 1rem;
+  border-radius: 6px;
+  font-weight: 500;
+  box-shadow: 0 2px 8px rgba(45,140,240,0.08);
+  transition: background 0.2s;
+}
+
+.el-input-content {
+  font-size: 1.08rem;
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto;
+  background: #f8fafc;
+  border-radius: 12px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.03);
+  padding: 0.3rem 0.3rem 0.3rem 0.3rem;
+  border: 1px solid #e6e8eb;
+  min-height: 60px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.json-title {
+  font-size: 1.08rem;
+  margin: 0 0 0.3rem 0;
+  font-weight: 600;
+  color: #333;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.el-input-class {
+  font-size: 0.98rem;
+  background: #fff;
+  border-radius: 8px;
+  border: 1px solid #e6e8eb;
+  min-height: 36px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.02);
+  margin-bottom: 0.3rem;
 }
 
 .highlight-json {
   text-align: left;
-  font-size: 1.125rem;
-  /* 18px */
-  /*width: 25rem;*/
-  height: 100%;
+  font-size: 1.08rem;
+  background: #f6f8fa;
+  border-radius: 8px;
+  border: 1px solid #e6e8eb;
+  min-height: 36px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.02);
+  padding: 0.3rem;
+  overflow-x: auto;
+}
+
+@media (max-width: 900px) {
+  .box-card {
+    width: 98%;
+    padding: 0 0.3rem;
+  }
+  .el-input-content {
+    max-width: 100%;
+    min-height: 36px;
+    padding: 0.2rem 0.1rem 0.1rem 0.1rem;
+  }
+  .el-input-class, .highlight-json {
+    min-height: 24px;
+    font-size: 0.92rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .box-card {
+    width: 100%;
+    margin: 0;
+    border-radius: 0;
+    box-shadow: none;
+  }
+  .card-header {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 0.5rem 0.2rem 0.2rem 0.2rem;
+  }
+  .title {
+    font-size: 1.1rem;
+    margin: 0.7rem 0 0.3rem 0;
+  }
+  .el-input-content {
+    min-height: 24px;
+    padding: 0.1rem 0.05rem 0.05rem 0.05rem;
+  }
 }
 </style>
