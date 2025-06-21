@@ -134,7 +134,7 @@ for (let i = 0; i < entireHeavenlyStemsEarthlyBranchesList.length; i++) {
   }
 }
 
-watch(calendarYear, (newValue, oldValue) => {
+watch(calendarYear, (newValue, ) => {
   if (newValue && newValue !== undefined && newValue !== "") {
     const currentCalendarYear = parseInt(newValue);
     if (currentCalendarYear > 3) {
