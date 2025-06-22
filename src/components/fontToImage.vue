@@ -43,11 +43,21 @@
         </div>
       </div>
     </div>
+
+    <!-- 移动端图片预览弹窗 -->
+    <el-dialog v-model="showImagePreview" title="保存图片" width="90%" center>
+      <img :src="generatedImageUrl" style="width: 100%; border-radius: 8px;" alt="生成的图片" />
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="showImagePreview = false">关闭</el-button>
+        </span>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount, computed, watch } from 'vue';
+import { ref, computed, watch } from 'vue';
 import html2canvas from 'html2canvas';
 import { ElMessage } from 'element-plus';
 import TopMenu from './TopMenu.vue';
@@ -191,31 +201,9 @@ function getTodayStr() {
 }
 const todayStr = getTodayStr();
 
-/**
- * @function exportImage
- * @description 导出预览区为图片
- */
-const exportImage = async () => {
-  if (!inputText.value.trim()) {
-    ElMessage.error('请输入要导出的文字');
-    return;
-  }
-  if (!imageCardRef.value) return;
-  try {
-    const canvas = await html2canvas(imageCardRef.value, {
-      backgroundColor: null,
-      useCORS: true,
-      scale: 2
-    });
-    const link = document.createElement('a');
-    link.download = 'weixin-read-quote.png';
-    link.href = canvas.toDataURL('image/png');
-    link.click();
-    ElMessage.success('图片导出成功');
-  } catch (e) {
-    ElMessage.error('图片导出失败');
-  }
-};
+// 用于移动端图片预览
+const showImagePreview = ref(false);
+const generatedImageUrl = ref('');
 
 /**
  * @function copyImage
@@ -224,37 +212,43 @@ const exportImage = async () => {
 const copyImage = async () => {
   if (!imageCardRef.value) return;
   try {
-    console.log('开始截图，元素尺寸:', imageCardRef.value.offsetWidth, imageCardRef.value.offsetHeight);
-    
     const canvas = await html2canvas(imageCardRef.value, {
       backgroundColor: '#ffffff',
       useCORS: true,
       scale: 3,
       allowTaint: false,
       foreignObjectRendering: false,
-      logging: true,
+      logging: false, // 在调试时可以设为 true
       imageTimeout: 0,
       removeContainer: true
     });
-    
-    console.log('截图完成，canvas尺寸:', canvas.width, canvas.height);
-    
-    canvas.toBlob(async (blob) => {
-      if (!blob) {
-        ElMessage.error('图片生成失败');
-        return;
-      }
-      console.log('Blob大小:', blob.size);
-      try {
-        await navigator.clipboard.write([
-          new window.ClipboardItem({ 'image/png': blob })
-        ]);
-        ElMessage.success('图片已复制到剪贴板，可直接粘贴');
-      } catch (err) {
-        console.error('复制失败:', err);
-        ElMessage.error('复制图片到剪贴板失败，建议使用最新版 Chrome/Edge 浏览器');
-      }
-    }, 'image/png', 1.0);
+
+    // 检测是否为移动设备
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+    if (isMobile) {
+      // 移动端：显示图片让用户手动保存
+      generatedImageUrl.value = canvas.toDataURL('image/png', 1.0);
+      showImagePreview.value = true;
+      ElMessage.info('请长按图片进行保存或复制');
+    } else {
+      // 桌面端：尝试写入剪贴板
+      canvas.toBlob(async (blob) => {
+        if (!blob) {
+          ElMessage.error('图片生成失败');
+          return;
+        }
+        try {
+          await navigator.clipboard.write([
+            new window.ClipboardItem({ 'image/png': blob })
+          ]);
+          ElMessage.success('图片已复制到剪贴板，可直接粘贴');
+        } catch (err) {
+          console.error('复制失败:', err);
+          ElMessage.error('复制图片到剪贴板失败，可能是浏览器不支持或权限问题');
+        }
+      }, 'image/png', 1.0);
+    }
   } catch (err) {
     console.error('截图失败:', err);
     ElMessage.error('图片生成失败');
