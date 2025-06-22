@@ -2,6 +2,7 @@
   "name": "interesting-util-client",
   "version": "0.1.0",
   "private": true,
+  "homepage": "https://stevenling.github.io/github-actions-demo",
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",

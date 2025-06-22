@@ -1,55 +1,98 @@
 <template>
   <TopMenu></TopMenu>
-  <div class="title">云胡工具集</div>
+  
+  <div class="main-container">
+    <div class="hero-section">
+      <div class="title">云胡工具集</div>
+      <div class="subtitle">让编程更简单，让生活更便捷</div>
+    </div>
 
-  <el-row>
-    <el-col :span="6"></el-col>
-    <el-col :span="12">
-      <div />
-      <el-card class="box-card">
-        <template #header>
-          <div>
-            <span>程序员工具</span>
-          </div>
-        </template>
-        <div>
-          <el-button type="primary" @click="gotoJsonFormat">
-            Json 代码美化
-          </el-button>
+    <div class="content-container">
+      <el-row :gutter="24">
+        <el-col :span="6"></el-col>
+        <el-col :span="12">
+          <!-- 程序员工具卡片 -->
+          <el-card class="tool-card" shadow="hover">
+            <template #header>
+              <div class="card-header">
+                <i class="el-icon-code"></i>
+                <span>程序员工具</span>
+              </div>
+            </template>
+            <div class="button-group">
+              <el-button 
+                type="primary" 
+                @click="gotoJsonFormat"
+                class="tool-button"
+                size="large"
+              >
+                <i class="el-icon-document"></i>
+                Json 代码美化
+              </el-button>
 
-          <el-button type="primary" @click="gotoColorConvert">
-            颜色进制转换
-          </el-button>
-        </div>
-      </el-card>
+              <el-button 
+                type="primary" 
+                @click="gotoColorConvert"
+                class="tool-button"
+                size="large"
+              >
+                <i class="el-icon-palette"></i>
+                颜色进制转换
+              </el-button>
+            </div>
+          </el-card>
 
-      <el-card class="box-card">
-        <template #header>
-          <div>
-            <span>其他</span>
-          </div>
-        </template>
-        <!-- <div>
-          <el-button type="primary" @click="GotoBetweenNowToHoliday">
-            距离放假时间
-          </el-button>
-        </div> -->
-        <div>
-          <el-button type="primary" @click="gotoFontToImage"> 生成摘录卡片 </el-button>
-          <el-button type="primary" @click="gotoCalcBmi"> BMI 计算 </el-button>
-          <el-button
-            type="primary"
-            @click="gotoCalcHeavenlyStemsAndEarthlyBranches"
-          >
-            天干地支纪年
-          </el-button>
-        </div>
-      </el-card>
-    </el-col>
-  </el-row>
+          <!-- 其他工具卡片 -->
+          <el-card class="tool-card" shadow="hover">
+            <template #header>
+              <div class="card-header">
+                <i class="el-icon-magic-stick"></i>
+                <span>实用工具</span>
+              </div>
+            </template>
+            <div class="button-group">
+              <el-button 
+                type="primary" 
+                @click="gotoFontToImage"
+                class="tool-button"
+                size="large"
+              >
+                <i class="el-icon-picture"></i>
+                生成摘录卡片
+              </el-button>
+              
+              <el-button 
+                type="primary" 
+                @click="gotoCalcBmi"
+                class="tool-button"
+                size="large"
+              >
+                <i class="el-icon-data-analysis"></i>
+                BMI 计算
+              </el-button>
+              
+              <el-button 
+                type="primary" 
+                @click="gotoCalcHeavenlyStemsAndEarthlyBranches"
+                class="tool-button"
+                size="large"
+              >
+                <i class="el-icon-date"></i>
+                天干地支纪年
+              </el-button>
+            </div>
+          </el-card>
+        </el-col>
+      </el-row>
+    </div>
+  </div>
 
-  <footer class="icp">
-    <a href="https://beian.miit.gov.cn/" target="_blank">闽ICP备2023011581号</a>
+  <footer class="footer">
+    <div class="footer-content">
+      <a href="https://beian.miit.gov.cn/" target="_blank" class="icp-link">
+        闽ICP备2023011581号
+      </a>
+    </div>
   </footer>
 </template>
 
@@ -117,59 +160,168 @@ const gotoFontToImage = () => {
 </script>
 
 <style scoped>
-/* 全局应用样式 */
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  /* 启用字体平滑，使字体在WebKit浏览器中更清晰 */
-  -webkit-font-smoothing: antialiased;
-  /* 启用字体平滑，使字体在Firefox浏览器中更清晰 */
-  -moz-osx-font-smoothing: grayscale;
-  /*//text-align: center;*/
-  /*color: #2c3e50;*/
-  /* 设置顶部外边距 */
-  margin-top: 60px;
-  /*position:relative;*/
+/* 主容器样式 */
+.main-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 20px 0;
 }
 
-/* 页面标题样式 */
-.title {
-  /* 文本居中对齐 */
+/* 英雄区域样式 */
+.hero-section {
   text-align: center;
-  /* 设置外边距为2rem */
-  margin: 2rem;
-  /* 设置字体大小为1.5rem */
-  font-size: 1.5rem;
-  /* 设置字体为Monotype Corsiva */
-  font-family: "Monotype Corsiva";
-  /* 设置字体粗细为粗体 */
-  font-weight: bold;
+  padding: 60px 20px 40px;
+  color: white;
 }
 
-/* 卡片容器样式 */
-.box-card {
-  /* display: flex; */
-  /*justify-content: center;*/
-  /*align-items: center;*/
-  /*height: 100vh;*/
-  /* 设置底部外边距为20px */
-  margin-bottom: 20px;
+.title {
+  font-size: 3rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+  font-family: 'Monotype Corsiva', cursive;
+}
+
+.subtitle {
+  font-size: 1.2rem;
+  opacity: 0.9;
+  font-weight: 300;
+}
+
+/* 内容容器样式 */
+.content-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* 工具卡片样式 */
+.tool-card {
+  margin-bottom: 30px;
+  border-radius: 16px;
+  border: none;
+  transition: all 0.3s ease;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+}
+
+.tool-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.1);
 }
 
 /* 卡片头部样式 */
 .card-header {
-  /*background: skyblue;*/
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #2c3e50;
 }
 
-/* ICP备案信息样式 */
-.icp {
-  /*position: absolute;*/
-  /*text-align: center;*/
-  /* 使用固定定位 */
-  position: fixed;
-  /* 距离底部0px */
-  bottom: 0px;
-  /* 距离左侧45% */
-  left: 45%;
-  /*left:0px;*/
+.card-header i {
+  font-size: 1.4rem;
+  color: #667eea;
+}
+
+/* 按钮组样式 */
+.button-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  padding: 10px 0;
+}
+
+/* 工具按钮样式 */
+.tool-button {
+  flex: 0 1 auto;
+  min-width: 160px;
+  height: 50px;
+  border-radius: 12px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: none;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.tool-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+
+.tool-button i {
+  font-size: 1.2rem;
+}
+
+/* 页脚样式 */
+.footer {
+  background: rgba(0,0,0,0.1);
+  backdrop-filter: blur(10px);
+  padding: 20px 0;
+  margin-top: 40px;
+}
+
+.footer-content {
+  text-align: center;
+}
+
+.icp-link {
+  color: rgba(255,255,255,0.8);
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: color 0.3s ease;
+}
+
+.icp-link:hover {
+  color: white;
+  text-decoration: underline;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .title {
+    font-size: 2rem;
+  }
+  
+  .subtitle {
+    font-size: 1rem;
+  }
+  
+  .button-group {
+    flex-direction: column;
+  }
+  
+  .tool-button {
+    min-width: 100%;
+  }
+  
+  .content-container {
+    padding: 0 15px;
+  }
+}
+
+/* 动画效果 */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.tool-card {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+.tool-card:nth-child(2) {
+  animation-delay: 0.2s;
 }
 </style>
