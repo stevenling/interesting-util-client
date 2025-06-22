@@ -8,16 +8,20 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4  # 拉取 master 分支代码
+        uses: actions/checkout@v4  # 拉取代码
 
-      - name: Install and Build
-        run: |
-          npm install
-          npm run build  # 生成静态文件到 build/ 或 dist/
+      - name: Install dependencies
+        run: npm install  # 安装依赖
+
+      - name: Build project
+        run: npm run build  # 执行构建，生成 dist/ 目录
+
+      - name: Verify build output
+        run: ls -R dist/  # 调试：确认 dist/ 目录内容
 
       - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}  # GitHub 自动提供的 token
-          branch: gh-pages  # 部署目标分支
-          folder: build     # 要部署的文件夹（根据你的项目调整）
+          token: ${{ secrets.GITHUB_TOKEN }}  # 使用 GitHub 自动生成的 token
+          branch: gh-pages  # 部署到 gh-pages 分支
+          folder: dist  # 关键修改：指向你的构建输出目录
