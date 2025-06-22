@@ -5,7 +5,8 @@
   "homepage": "https://stevenling.github.io/github-actions-demo",
   "scripts": {
     "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build",
+    "build": "vue-cli-service build && npm run fix-build",
+    "fix-build": "cd dist && cp index.html 404.html && touch .nojekyll",
     "lint": "vue-cli-service lint",
     "push": "npm run build && scp -r dist/* root@43.142.56.47:/root/vue-project/yunhu-utils/dist"
   },
@@ -28,6 +29,7 @@
     "@vue/cli-plugin-babel": "~5.0.0",
     "@vue/cli-plugin-eslint": "~5.0.0",
     "@vue/cli-service": "~5.0.0",
+    "dotenv": "^16.5.0",
     "eslint": "^7.32.0",
     "eslint-plugin-vue": "^8.0.3"
   },

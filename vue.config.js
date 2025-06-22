@@ -1,8 +1,12 @@
-const { defineConfig } = require('@vue/cli-service')
-
-module.exports = defineConfig({
-  transpileDependencies: true,
-  // 关闭 eslint
+module.exports = {
+  publicPath: process.env.NODE_ENV === 'production' ? './' : '/',
+  assetsDir: 'assets',
   lintOnSave: false,
- publicPath: '/interesting-util-client/', // 关键！
-})
+  productionSourceMap: false, // 生产环境关闭sourcemap
+
+  // 开发服务器配置（不影响build）
+  devServer: {
+    host: 'localhost',
+    port: 8080
+  }
+}
