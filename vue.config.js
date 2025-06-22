@@ -4,5 +4,5 @@ module.exports = defineConfig({
   transpileDependencies: true,
   // 关闭 eslint
   lintOnSave: false,
-  publicPath: './', // 关键！
+ publicPath: '/interesting-util-client/', // 关键！
 })
