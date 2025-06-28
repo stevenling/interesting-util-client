@@ -268,7 +268,7 @@ const fontOptions = [
   { label: 'Serif', value: 'serif' },
   { label: 'Monospace', value: 'monospace' }
 ];
-const selectedFont = ref('');
+const selectedFont = ref('KaiTi, "楷体", serif');
 
 // 背景与字体颜色搭配
 const bgTextColorMap = {

@@ -12,6 +12,13 @@ export default {
 </script>
 
 <style>
+/* 全局样式重置 */
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
+}
 
 #app {
   /*//font-family: Avenir, Helvetica, Arial, sans-serif;*/
@@ -20,6 +27,8 @@ export default {
   /*//text-align: center;*/
   /*color: #2c3e50;*/
   /*//margin-top: 60px;*/
-  position:relative;
+  position: relative;
+  height: 100vh;
+  overflow: hidden;
 }
 </style>

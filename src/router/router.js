@@ -38,6 +38,11 @@ const routes = [
         name: 'GotoFontToImage',
         path: '/gotoFontToImage',
         component: () => import("@/components/fontToImage.vue")
+    },
+    {
+        name: 'EpubReader',
+        path: '/epub-reader',
+        component: () => import("@/components/EpubReader.vue")
     }
 ];
 

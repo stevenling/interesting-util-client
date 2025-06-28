@@ -1,99 +1,111 @@
 <template>
-  <TopMenu></TopMenu>
-  
-  <div class="main-container">
-    <div class="hero-section">
-      <div class="title">云胡工具集</div>
-      <div class="subtitle">让编程更简单，让生活更便捷</div>
+  <div class="util-index-page">
+    <TopMenu></TopMenu>
+    
+    <div class="main-container">
+      <div class="hero-section">
+        <div class="title">云胡工具集</div>
+        <div class="subtitle">让编程更简单，让生活更便捷</div>
+      </div>
+
+      <div class="content-container">
+        <el-row :gutter="24">
+          <el-col :span="6"></el-col>
+          <el-col :span="12">
+            <!-- 程序员工具卡片 -->
+            <el-card class="tool-card" shadow="hover">
+              <template #header>
+                <div class="card-header">
+                  <i class="el-icon-code"></i>
+                  <span>程序员工具</span>
+                </div>
+              </template>
+              <div class="button-group">
+                <el-button 
+                  type="primary" 
+                  @click="gotoJsonFormat"
+                  class="tool-button"
+                  size="large"
+                >
+                  <i class="el-icon-document"></i>
+                  Json 代码美化
+                </el-button>
+
+                <el-button 
+                  type="primary" 
+                  @click="gotoColorConvert"
+                  class="tool-button"
+                  size="large"
+                >
+                  <i class="el-icon-palette"></i>
+                  颜色进制转换
+                </el-button>
+              </div>
+            </el-card>
+
+            <!-- 其他工具卡片 -->
+            <el-card class="tool-card" shadow="hover">
+              <template #header>
+                <div class="card-header">
+                  <i class="el-icon-magic-stick"></i>
+                  <span>实用工具</span>
+                </div>
+              </template>
+              <div class="button-group">
+                <el-button 
+                  type="primary" 
+                  @click="gotoFontToImage"
+                  class="tool-button"
+                  size="large"
+                >
+                  <i class="el-icon-picture"></i>
+                  生成摘录卡片
+                </el-button>
+                
+                <el-button 
+                  type="primary" 
+                  @click="gotoEpubReader"
+                  class="tool-button"
+                  size="large"
+                >
+                  <i class="el-icon-reading"></i>
+                  EPUB 阅读器
+                </el-button>
+                
+                <el-button 
+                  type="primary" 
+                  @click="gotoCalcBmi"
+                  class="tool-button"
+                  size="large"
+                >
+                  <i class="el-icon-data-analysis"></i>
+                  BMI 计算
+                </el-button>
+                
+                <el-button 
+                  type="primary" 
+                  @click="gotoCalcHeavenlyStemsAndEarthlyBranches"
+                  class="tool-button"
+                  size="large"
+                >
+                  <i class="el-icon-date"></i>
+                  天干地支纪年
+                </el-button>
+              </div>
+            </el-card>
+          </el-col>
+        </el-row>
+      </div>
     </div>
 
-    <div class="content-container">
-      <el-row :gutter="24">
-        <el-col :span="6"></el-col>
-        <el-col :span="12">
-          <!-- 程序员工具卡片 -->
-          <el-card class="tool-card" shadow="hover">
-            <template #header>
-              <div class="card-header">
-                <i class="el-icon-code"></i>
-                <span>程序员工具</span>
-              </div>
-            </template>
-            <div class="button-group">
-              <el-button 
-                type="primary" 
-                @click="gotoJsonFormat"
-                class="tool-button"
-                size="large"
-              >
-                <i class="el-icon-document"></i>
-                Json 代码美化
-              </el-button>
-
-              <el-button 
-                type="primary" 
-                @click="gotoColorConvert"
-                class="tool-button"
-                size="large"
-              >
-                <i class="el-icon-palette"></i>
-                颜色进制转换
-              </el-button>
-            </div>
-          </el-card>
-
-          <!-- 其他工具卡片 -->
-          <el-card class="tool-card" shadow="hover">
-            <template #header>
-              <div class="card-header">
-                <i class="el-icon-magic-stick"></i>
-                <span>实用工具</span>
-              </div>
-            </template>
-            <div class="button-group">
-              <el-button 
-                type="primary" 
-                @click="gotoFontToImage"
-                class="tool-button"
-                size="large"
-              >
-                <i class="el-icon-picture"></i>
-                生成摘录卡片
-              </el-button>
-              
-              <el-button 
-                type="primary" 
-                @click="gotoCalcBmi"
-                class="tool-button"
-                size="large"
-              >
-                <i class="el-icon-data-analysis"></i>
-                BMI 计算
-              </el-button>
-              
-              <el-button 
-                type="primary" 
-                @click="gotoCalcHeavenlyStemsAndEarthlyBranches"
-                class="tool-button"
-                size="large"
-              >
-                <i class="el-icon-date"></i>
-                天干地支纪年
-              </el-button>
-            </div>
-          </el-card>
-        </el-col>
-      </el-row>
-    </div>
+    <footer class="footer">
+      <div class="footer-content">
+        <a href="https://beian.miit.gov.cn/" target="_blank" class="icp-link">
+          闽ICP备2023011581号
+        </a>
+      </div>
+    </footer>
   </div>
-
-  <footer class="footer">
-    <div class="footer-content">
-      <a href="https://beian.miit.gov.cn/" target="_blank" class="icp-link">
-        闽ICP备2023011581号
-      </a>
-    </div>
-  </footer>
 </template>
 
 <script setup>
@@ -118,15 +130,6 @@ function gotoColorConvert() {
 function gotoJsonFormat() {
   router.push({
     path: "/JsonFormat",
-  });
-}
-
-/**
- * 转到距离放假时间计算页面
- */
-function GotoBetweenNowToHoliday() {
-  router.push({
-    path: "/BetweenNowToHoliday",
   });
 }
 
@@ -157,12 +160,25 @@ const gotoFontToImage = () => {
   });
 };
 
+const gotoEpubReader = () => {
+  router.push({
+    path: "/epub-reader",
+  });
+};
+
 </script>
 
 <style scoped>
+.util-index-page {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
 /* 主容器样式 */
 .main-container {
-  min-height: 100vh;
+  flex: 1;
+  overflow-y: auto;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   padding: 20px 0;
 }
@@ -170,7 +186,7 @@ const gotoFontToImage = () => {
 /* 英雄区域样式 */
 .hero-section {
   text-align: center;
-  padding: 60px 20px 40px;
+  padding: 30px 20px 20px;
   color: white;
 }
 
@@ -208,6 +224,10 @@ const gotoFontToImage = () => {
 .tool-card:hover {
   transform: translateY(-5px);
   box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+}
+
+.tool-card:last-child {
+  margin-bottom: 50px;
 }
 
 /* 卡片头部样式 */
@@ -263,7 +283,6 @@ const gotoFontToImage = () => {
   background: rgba(0,0,0,0.1);
   backdrop-filter: blur(10px);
   padding: 20px 0;
-  margin-top: 40px;
 }
 
 .footer-content {
