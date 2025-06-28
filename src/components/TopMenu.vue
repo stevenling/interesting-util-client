@@ -11,7 +11,7 @@
           :ellipsis="false"
         >
           <el-menu-item class="el-menu-item-class" index="1" @click="clickHomeMenuItem"
-            >云胡工具集</el-menu-item
+            >云胡</el-menu-item
           >
         </el-menu>
       </el-col>

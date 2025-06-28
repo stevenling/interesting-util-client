@@ -163,10 +163,6 @@ body {
 }
 
 .box-card {
-  /* 表示上下边界为 0，左右则根据宽度自适应相同值 */
-  /*display: flex;*/
-  /*position: absolute;*/
-
   margin: 1rem auto;
   width: 50%;
   text-align: center;
@@ -210,8 +206,6 @@ body {
 .highlight-json {
   text-align: left;
   font-size: 1.125rem;
-  /* 18px */
-  /*width: 25rem;*/
   height: 100%;
 }
 </style>

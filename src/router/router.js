@@ -1,3 +1,5 @@
+import YunhuMatrix from '../components/YunhuMatrix.vue'
+
 const routes = [
     {
         name: 'UtilIndex',
@@ -38,6 +40,11 @@ const routes = [
         name: 'GotoFontToImage',
         path: '/gotoFontToImage',
         component: () => import("@/components/fontToImage.vue")
+    },
+    {
+        path: '/yunhuMatrix',
+        name: 'YunhuMatrix',
+        component: YunhuMatrix
     }
 ];
 
