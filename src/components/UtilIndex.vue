@@ -39,56 +39,36 @@
                 <i class="el-icon-code"></i>
                 <span>程序员工具</span>
               </div>
-            </el-card>
+            </template>
+            <div class="button-group">
+              <el-button 
+                type="primary" 
+                @click="gotoJsonFormat"
+                class="tool-button"
+                size="large"
+              >
+                <i class="el-icon-document"></i>
+                Json 代码美化
+              </el-button>
+              
+              <el-button 
+                type="primary" 
+                @click="gotoColorConvert"
+                class="tool-button"
+                size="large"
+              >
+                <i class="el-icon-palette"></i>
+                颜色进制转换
+              </el-button>
+            </div>
+          </el-card>
 
-            <!-- 其他工具卡片 -->
-            <el-card class="tool-card" shadow="hover">
-              <template #header>
-                <div class="card-header">
-                  <i class="el-icon-magic-stick"></i>
-                  <span>实用工具</span>
-                </div>
-              </template>
-              <div class="button-group">
-                <el-button 
-                  type="primary" 
-                  @click="gotoFontToImage"
-                  class="tool-button"
-                  size="large"
-                >
-                  <i class="el-icon-picture"></i>
-                  生成摘录卡片
-                </el-button>
-                
-                <el-button 
-                  type="primary" 
-                  @click="gotoEpubReader"
-                  class="tool-button"
-                  size="large"
-                >
-                  <i class="el-icon-reading"></i>
-                  EPUB 阅读器
-                </el-button>
-                
-                <el-button 
-                  type="primary" 
-                  @click="gotoCalcBmi"
-                  class="tool-button"
-                  size="large"
-                >
-                  <i class="el-icon-data-analysis"></i>
-                  BMI 计算
-                </el-button>
-                
-                <el-button 
-                  type="primary" 
-                  @click="gotoCalcHeavenlyStemsAndEarthlyBranches"
-                  class="tool-button"
-                  size="large"
-                >
-                  <i class="el-icon-date"></i>
-                  天干地支纪年
-                </el-button>
+          <!-- 实用工具卡片 -->
+          <el-card class="tool-card" shadow="hover">
+            <template #header>
+              <div class="card-header">
+                <i class="el-icon-magic-stick"></i>
+                <span>实用工具</span>
               </div>
             </template>
             <div class="button-group">
@@ -102,7 +82,17 @@
                 生成摘录卡片
               </el-button>
               
-              <!-- <el-button 
+              <el-button 
+                type="primary" 
+                @click="gotoEpubReader"
+                class="tool-button"
+                size="large"
+              >
+                <i class="el-icon-reading"></i>
+                EPUB 阅读器
+              </el-button>
+              
+              <el-button 
                 type="primary" 
                 @click="gotoCalcBmi"
                 class="tool-button"
@@ -110,9 +100,9 @@
               >
                 <i class="el-icon-data-analysis"></i>
                 BMI 计算
-              </el-button> -->
+              </el-button>
               
-              <!-- <el-button 
+              <el-button 
                 type="primary" 
                 @click="gotoCalcHeavenlyStemsAndEarthlyBranches"
                 class="tool-button"
@@ -120,10 +110,11 @@
               >
                 <i class="el-icon-date"></i>
                 天干地支纪年
-              </el-button> -->
+              </el-button>
             </div>
           </el-card>
         </el-col>
+        <el-col :span="6"></el-col>
       </el-row>
     </div>
 
@@ -145,33 +136,11 @@ import TopMenu from "./TopMenu.vue";
 const router = useRouter();
 
 /**
- * 转到颜色进制转换页面
- */
-function gotoColorConvert() {
-  router.push({
-    path: "/ColorConvert",
-  });
-}
-
-/**
- * 转到JSON格式化页面
- */
-function gotoJsonFormat() {
-  router.push({
-    path: "/JsonFormat",
-  });
-}
-
-/**
  * 转到BMI计算页面
  * 目前功能正在开发中
  */
 const gotoCalcBmi = () => {
   ElMessage.error("云胡哥哥正在开发中!");
-
-  // router.push({
-  //   path: "/DPlayer",
-  // });
 };
 
 /**
@@ -183,18 +152,50 @@ const gotoCalcHeavenlyStemsAndEarthlyBranches = () => {
   });
 };
 
+/**
+ * 转到字体转图片页面
+ */
 const gotoFontToImage = () => {
   router.push({
     path: "/gotoFontToImage",
   });
 };
 
+/**
+ * 转到云胡矩阵页面
+ */
 const gotoYunhuMatrix = () => {
   router.push({
     path: "/yunhuMatrix",
   });
 };
 
+/**
+ * 转到EPUB阅读器页面
+ */
+const gotoEpubReader = () => {
+  router.push({
+    path: "/epubReader",
+  });
+};
+
+/**
+ * 转到Json格式化页面
+ */
+const gotoJsonFormat = () => {
+  router.push({
+    path: "/jsonFormat",
+  });
+};
+
+/**
+ * 转到颜色进制转换页面
+ */
+const gotoColorConvert = () => {
+  router.push({
+    path: "/colorConvert",
+  });
+};
 </script>
 
 <style scoped>
