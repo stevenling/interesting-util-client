@@ -42,6 +42,11 @@ const routes = [
         component: () => import("@/components/fontToImage.vue")
     },
     {
+        name: 'EpubReader',
+        path: '/epub-reader',
+        component: () => import("@/components/EpubReader.vue")
+    },
+    {
         path: '/yunhuMatrix',
         name: 'YunhuMatrix',
         component: YunhuMatrix

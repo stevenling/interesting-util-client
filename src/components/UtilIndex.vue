@@ -48,7 +48,11 @@
                 size="large"
               >
                 <i class="el-icon-document"></i>
+<<<<<<< HEAD
                 Json 代码美化
+=======
+                JSON 格式化
+>>>>>>> f0edb3ef3e424c68574e22e5353fff64f4004ef7
               </el-button>
               
               <el-button 
@@ -83,6 +87,7 @@
               </el-button>
               
               <el-button 
+<<<<<<< HEAD
                 type="primary" 
                 @click="gotoEpubReader"
                 class="tool-button"
@@ -93,6 +98,8 @@
               </el-button>
               
               <el-button 
+=======
+>>>>>>> f0edb3ef3e424c68574e22e5353fff64f4004ef7
                 type="primary" 
                 @click="gotoCalcBmi"
                 class="tool-button"
@@ -172,6 +179,7 @@ const gotoYunhuMatrix = () => {
 
 /**
  * 转到EPUB阅读器页面
+<<<<<<< HEAD
  */
 const gotoEpubReader = () => {
   router.push({
@@ -196,6 +204,14 @@ const gotoColorConvert = () => {
     path: "/colorConvert",
   });
 };
+=======
+ * 目前功能正在开发中
+ */
+const gotoEpubReader = () => {
+  ElMessage.error("云胡哥哥正在开发中!");
+};
+
+>>>>>>> f0edb3ef3e424c68574e22e5353fff64f4004ef7
 </script>
 
 <style scoped>
