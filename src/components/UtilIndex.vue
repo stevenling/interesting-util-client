@@ -1,130 +1,98 @@
 <template>
-  <TopMenu></TopMenu>
-  
-  <div class="main-container">
-    <div class="hero-section">
-      <div class="title">云胡个人站</div>
-      <div class="subtitle">I'm not bitter anymore. I'm syrupy sweet</div>
+  <div class="util-index-page">
+    <TopMenu />
+    <div class="main-container">
+      <div class="hero-section">
+        <div class="title">云胡个人站</div>
+        <div class="subtitle">I'm not bitter anymore. I'm syrupy sweet</div>
+      </div>
+      <div class="content-container">
+        <el-row :gutter="24">
+          <el-col :span="6"></el-col>
+          <el-col :span="12">
+            <!-- 云胡矩阵卡片 -->
+            <el-card class="tool-card" shadow="hover">
+              <template #header>
+                <div class="card-header">
+                  <i class="el-icon-connection"></i>
+                  <span>云胡矩阵</span>
+                </div>
+              </template>
+              <div class="button-group">
+                <el-button 
+                  type="primary" 
+                  @click="gotoYunhuMatrix"
+                  class="tool-button"
+                  size="large"
+                >
+                  <i class="el-icon-grid"></i>
+                  进入矩阵
+                </el-button>
+              </div>
+            </el-card>
+            <!-- 程序员工具卡片 -->
+            <el-card class="tool-card" shadow="hover">
+              <template #header>
+                <div class="card-header">
+                  <i class="el-icon-code"></i>
+                  <span>程序员工具</span>
+                </div>
+              </template>
+              <div class="button-group">
+                <el-button 
+                  type="primary" 
+                  @click="gotoJsonFormat"
+                  class="tool-button"
+                  size="large"
+                >
+                  <i class="el-icon-document"></i>
+                  Json 代码美化
+                </el-button>
+                <el-button 
+                  type="primary" 
+                  @click="gotoColorConvert"
+                  class="tool-button"
+                  size="large"
+                >
+                  <i class="el-icon-palette"></i>
+                  颜色进制转换
+                </el-button>
+              </div>
+            </el-card>
+            <!-- 实用工具卡片 -->
+            <el-card class="tool-card" shadow="hover">
+              <template #header>
+                <div class="card-header">
+                  <i class="el-icon-magic-stick"></i>
+                  <span>实用工具</span>
+                </div>
+              </template>
+              <div class="button-group">
+                <el-button 
+                  type="primary" 
+                  @click="gotoFontToImage"
+                  class="tool-button"
+                  size="large"
+                >
+                  <i class="el-icon-picture"></i>
+                  生成摘录卡片
+                </el-button>
+                <el-button 
+                  type="primary" 
+                  @click="gotoEpubReader"
+                  class="tool-button"
+                  size="large"
+                >
+                  <i class="el-icon-reading"></i>
+                  EPUB 阅读器
+                </el-button>
+              </div>
+            </el-card>
+          </el-col>
+          <el-col :span="6"></el-col>
+        </el-row>
+      </div>
     </div>
-
-    <div class="content-container">
-      <el-row :gutter="24">
-        <el-col :span="6"></el-col>
-        <el-col :span="12">
-          <!-- 云胡矩阵卡片 -->
-          <el-card class="tool-card" shadow="hover">
-            <template #header>
-              <div class="card-header">
-                <i class="el-icon-connection"></i>
-                <span>云胡矩阵</span>
-              </div>
-            </template>
-            <div class="button-group">
-              <el-button 
-                type="primary" 
-                @click="gotoYunhuMatrix"
-                class="tool-button"
-                size="large"
-              >
-                <i class="el-icon-grid"></i>
-                进入矩阵
-              </el-button>
-            </div>
-          </el-card>
-
-          <!-- 程序员工具卡片 -->
-          <el-card class="tool-card" shadow="hover">
-            <template #header>
-              <div class="card-header">
-                <i class="el-icon-code"></i>
-                <span>程序员工具</span>
-              </div>
-            </template>
-            <div class="button-group">
-              <el-button 
-                type="primary" 
-                @click="gotoJsonFormat"
-                class="tool-button"
-                size="large"
-              >
-                <i class="el-icon-document"></i>
-<<<<<<< HEAD
-                Json 代码美化
-=======
-                JSON 格式化
->>>>>>> f0edb3ef3e424c68574e22e5353fff64f4004ef7
-              </el-button>
-              
-              <el-button 
-                type="primary" 
-                @click="gotoColorConvert"
-                class="tool-button"
-                size="large"
-              >
-                <i class="el-icon-palette"></i>
-                颜色进制转换
-              </el-button>
-            </div>
-          </el-card>
-
-          <!-- 实用工具卡片 -->
-          <el-card class="tool-card" shadow="hover">
-            <template #header>
-              <div class="card-header">
-                <i class="el-icon-magic-stick"></i>
-                <span>实用工具</span>
-              </div>
-            </template>
-            <div class="button-group">
-              <el-button 
-                type="primary" 
-                @click="gotoFontToImage"
-                class="tool-button"
-                size="large"
-              >
-                <i class="el-icon-picture"></i>
-                生成摘录卡片
-              </el-button>
-              
-              <el-button 
-<<<<<<< HEAD
-                type="primary" 
-                @click="gotoEpubReader"
-                class="tool-button"
-                size="large"
-              >
-                <i class="el-icon-reading"></i>
-                EPUB 阅读器
-              </el-button>
-              
-              <el-button 
-=======
->>>>>>> f0edb3ef3e424c68574e22e5353fff64f4004ef7
-                type="primary" 
-                @click="gotoCalcBmi"
-                class="tool-button"
-                size="large"
-              >
-                <i class="el-icon-data-analysis"></i>
-                BMI 计算
-              </el-button>
-              
-              <el-button 
-                type="primary" 
-                @click="gotoCalcHeavenlyStemsAndEarthlyBranches"
-                class="tool-button"
-                size="large"
-              >
-                <i class="el-icon-date"></i>
-                天干地支纪年
-              </el-button>
-            </div>
-          </el-card>
-        </el-col>
-        <el-col :span="6"></el-col>
-      </el-row>
-    </div>
-
     <footer class="footer">
       <div class="footer-content">
         <a href="https://beian.miit.gov.cn/" target="_blank" class="icp-link">
@@ -179,7 +147,6 @@ const gotoYunhuMatrix = () => {
 
 /**
  * 转到EPUB阅读器页面
-<<<<<<< HEAD
  */
 const gotoEpubReader = () => {
   router.push({
@@ -204,21 +171,13 @@ const gotoColorConvert = () => {
     path: "/colorConvert",
   });
 };
-=======
- * 目前功能正在开发中
- */
-const gotoEpubReader = () => {
-  ElMessage.error("云胡哥哥正在开发中!");
-};
-
->>>>>>> f0edb3ef3e424c68574e22e5353fff64f4004ef7
 </script>
 
 <style scoped>
 .util-index-page {
+  height: 100vh;
   display: flex;
   flex-direction: column;
-  height: 100vh;
 }
 
 /* 主容器样式 */

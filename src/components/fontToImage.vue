@@ -10,7 +10,7 @@
           <el-input
             v-model="inputText"
             type="textarea"
-            :rows="20"
+            :rows="30"
             placeholder="请输入你想生成图片的文字"
             class="input-area"
           />
@@ -18,6 +18,10 @@
       </div>
       <div class="font-to-image-right">
         <div class="preview-title">预览效果</div>
+        <div style="margin-bottom: 0.5rem;">
+          <el-button size="small" @click="decreaseFontSize">A-</el-button>
+          <el-button size="small" @click="increaseFontSize">A+</el-button>
+        </div>
         <!-- 背景类型选择 -->
         <el-select v-model="selectedBgType" placeholder="选择背景类型" size="small" style="margin-bottom: 0.7rem; width: 180px;">
           <el-option v-for="item in bgTypeOptions" :key="item.value" :label="item.label" :value="item.value" />
@@ -36,10 +40,10 @@
           :class="selectedBg"
         >
           <div class="quote-mark">"</div>
-          <div class="weixin-card-text" :style="{ color: computedTextColor, fontFamily: selectedFont || undefined }">
+          <div class="weixin-card-text" :style="{ color: computedTextColor, fontFamily: selectedFont || undefined, fontSize: previewFontSize + 'rem' }">
             {{ inputText || '这里会显示你的摘录内容' }}
           </div>
-          <div class="weixin-card-date" :style="{ color: computedTextColor }">{{ todayStr }}</div>
+          <div class="weixin-card-date" :style="{ color: computedTextColor }" v-if="showDate">{{ todayStr }}</div>
         </div>
       </div>
     </div>
@@ -57,7 +61,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue';
+import { ref, computed, watch, nextTick } from 'vue';
 import html2canvas from 'html2canvas';
 import { ElMessage } from 'element-plus';
 import TopMenu from './TopMenu.vue';
@@ -121,7 +125,12 @@ const gradientBgOptions = [
   { label: '沙漠渐变', value: 'bg-gradient-desert' },
   { label: '樱花渐变', value: 'bg-gradient-cherry' },
   { label: '薄荷渐变', value: 'bg-gradient-mint' },
-  { label: '薰衣草渐变', value: 'bg-gradient-lavender' }
+  { label: '薰衣草渐变', value: 'bg-gradient-lavender' },
+  { label: '珊瑚渐变', value: 'bg-gradient-coral' },
+  { label: '薄荷蓝渐变', value: 'bg-gradient-mintblue' },
+  { label: '晨曦渐变', value: 'bg-gradient-sunrise' },
+  { label: '暮色渐变', value: 'bg-gradient-twilight' },
+  { label: '奶油渐变', value: 'bg-gradient-cream' },
 ];
 
 // 格子背景选项
@@ -137,7 +146,10 @@ const gridBgOptions = [
 const textureBgOptions = [
   { label: '纸张纹理', value: 'bg-paper' },
   { label: '小红书大理石', value: 'bg-xiaohongshu-marble' },
-  { label: '小红书纸张', value: 'bg-xiaohongshu-paper' }
+  { label: '小红书纸张', value: 'bg-xiaohongshu-paper' },
+  { label: '点状纹理', value: 'bg-dot-texture' },
+  { label: '纸张纹理2', value: 'bg-paper2' },
+  { label: '斜线纹理', value: 'bg-diagonal-line' },
 ];
 
 const selectedBgType = ref('solid');
@@ -201,9 +213,20 @@ function getTodayStr() {
 }
 const todayStr = getTodayStr();
 
+const showDate = ref(false);
+
 // 用于移动端图片预览
 const showImagePreview = ref(false);
 const generatedImageUrl = ref('');
+
+const previewFontSize = ref(1.18); // rem，初始和原来一样
+
+const increaseFontSize = () => {
+  previewFontSize.value = Math.min(previewFontSize.value + 0.1, 3);
+};
+const decreaseFontSize = () => {
+  previewFontSize.value = Math.max(previewFontSize.value - 0.1, 0.6);
+};
 
 /**
  * @function copyImage
@@ -211,8 +234,21 @@ const generatedImageUrl = ref('');
  */
 const copyImage = async () => {
   if (!imageCardRef.value) return;
+  // 保存原样式
+  const card = imageCardRef.value;
+  const originalMaxHeight = card.style.maxHeight;
+  const originalOverflowY = card.style.overflowY;
+
+  // 1. 显示日期
+  showDate.value = true;
+  await nextTick();
+
+  // 展开内容，确保截图全部内容
+  card.style.maxHeight = 'none';
+  card.style.overflowY = 'visible';
+
   try {
-    const canvas = await html2canvas(imageCardRef.value, {
+    const canvas = await html2canvas(card, {
       backgroundColor: '#ffffff',
       useCORS: true,
       scale: 3,
@@ -252,6 +288,12 @@ const copyImage = async () => {
   } catch (err) {
     console.error('截图失败:', err);
     ElMessage.error('图片生成失败');
+  } finally {
+    // 恢复原样式
+    card.style.maxHeight = originalMaxHeight;
+    card.style.overflowY = originalOverflowY;
+    // 2. 隐藏日期
+    showDate.value = false;
   }
 };
 
@@ -259,6 +301,15 @@ const copyImage = async () => {
  * @description 字体选项
  */
 const fontOptions = [
+  // 设计感字体优先
+  { label: 'Fira Sans', value: '"Fira Sans", Arial, sans-serif' },
+  { label: 'Lobster', value: 'Lobster, cursive' },
+  { label: 'Pacifico', value: 'Pacifico, cursive' },
+  { label: 'Montserrat', value: 'Montserrat, Arial, sans-serif' },
+  { label: 'Oswald', value: 'Oswald, Arial, sans-serif' },
+  { label: '站酷快乐体', value: '"ZCOOL KuaiLe", "站酷快乐体", cursive' },
+  { label: '站酷庆科黄油体', value: '"ZCOOL QingKe HuangYou", "站酷庆科黄油体", cursive' },
+  // 其他常用字体
   { label: '默认', value: '' },
   { label: '微软雅黑', value: '"Microsoft YaHei", sans-serif' },
   { label: '思源黑体', value: '"Source Han Sans", "Noto Sans SC", sans-serif' },
@@ -266,70 +317,88 @@ const fontOptions = [
   { label: '仿宋', value: 'FangSong, "仿宋", serif' },
   { label: 'Arial', value: 'Arial, sans-serif' },
   { label: 'Serif', value: 'serif' },
-  { label: 'Monospace', value: 'monospace' }
+  { label: 'Monospace', value: 'monospace' },
+  { label: '黑体', value: 'SimHei, "黑体", sans-serif' },
+  { label: '宋体', value: 'SimSun, "宋体", serif' },
+  { label: '华文中宋', value: 'STZhongsong, "华文中宋", serif' },
+  { label: '华文仿宋', value: 'STFangsong, "华文仿宋", serif' },
+  { label: '华文楷体', value: 'STKaiti, "华文楷体", serif' },
+  { label: '华文细黑', value: 'STXihei, "华文细黑", sans-serif' },
+  { label: '苹方', value: 'PingFang SC, "苹方", sans-serif' },
+  { label: '等线', value: 'DengXian, "等线", sans-serif' },
+  { label: 'Roboto', value: 'Roboto, sans-serif' },
+  { label: 'Times New Roman', value: '"Times New Roman", Times, serif' },
+  { label: 'Georgia', value: 'Georgia, serif' },
+  { label: 'Courier New', value: '"Courier New", Courier, monospace' },
 ];
 const selectedFont = ref('KaiTi, "楷体", serif');
 
 // 背景与字体颜色搭配
 const bgTextColorMap = {
+  // 浅色背景，深色字体
   'bg-white': '#222',
-  'bg-blue': '#222',
+  'bg-blue': '#1a237e',
   'bg-orange': '#a35a00',
-  'bg-gradient-green': '#1a4d2e',
-  'bg-paper': '#6b4e16',
-  'bg-gradient-bluepurple': '#fff',
-  'bg-gradient-orange-pink': '#fff',
-  'bg-gradient-cyan-green': '#1a4d2e',
   'bg-light-gray': '#222',
-  'bg-top-blue-band': '#222',
-  'bg-top-orange-band': '#a35a00',
-  'bg-v-gradient-bluepurple': '#fff',
-  'bg-v-gradient-orange-pink': '#fff',
-  'bg-v-gradient-cyan-green': '#1a4d2e',
-  'bg-dark-black': '#fff',
   'bg-milky-paper': '#6b4e16',
-  'bg-night-blue': '#e0e6f6',
   'bg-light-pink-purple': '#7c4d8a',
-  // 新增浅色系渐变字体色
-  'bg-gradient-soft-cyan-blue': '#227488',
-  'bg-gradient-soft-pink-orange': '#b87a4b',
-  'bg-gradient-soft-purple-blue': '#5a6a8e',
-  'bg-gradient-soft-green-yellow': '#6b8e23',
-  'bg-gradient-soft-milky': '#7c6f57',
-  // 新增知乎风格字体色
   'bg-zhihu-white': '#222',
   'bg-zhihu-light-blue': '#225488',
   'bg-zhihu-light-yellow': '#b89b4b',
   'bg-zhihu-light-green': '#3a7a3a',
   'bg-zhihu-light-gray': '#444',
-  'bg-zhihu-blue-white-gradient': '#225488',
-  // 新增小红书风格字体色
   'bg-xiaohongshu-pink': '#8e4a6b',
   'bg-xiaohongshu-purple': '#6b4a8e',
-  'bg-xiaohongshu-blue': '#4a6b8e',
-  'bg-xiaohongshu-green': '#4a8e6b',
-  'bg-xiaohongshu-orange': '#8e6b4a',
-  'bg-xiaohongshu-pink-purple': '#fff',
-  'bg-xiaohongshu-blue-pink': '#fff',
+  'bg-xiaohongshu-blue': '#225488',
+  'bg-xiaohongshu-green': '#2d5a2d',
+  'bg-xiaohongshu-orange': '#a35a00',
   'bg-xiaohongshu-marble': '#4a4a4a',
   'bg-xiaohongshu-paper': '#6b4e16',
-  // 新增格子背景字体色
   'bg-grid-white': '#222',
-  'bg-grid-blue': '#1a4d8e',
+  'bg-grid-blue': '#1a237e',
   'bg-grid-pink': '#8e4a6b',
   'bg-grid-gray': '#444',
   'bg-grid-green': '#2d5a2d',
-  // 新增更多渐变背景字体色
-  'bg-gradient-sunset': '#fff',
-  'bg-gradient-ocean': '#fff',
-  'bg-gradient-forest': '#fff',
-  'bg-gradient-starry': '#fff',
-  'bg-gradient-rainbow': '#fff',
-  'bg-gradient-aurora': '#fff',
-  'bg-gradient-desert': '#8e6b4a',
-  'bg-gradient-cherry': '#fff',
-  'bg-gradient-mint': '#2d5a2d',
-  'bg-gradient-lavender': '#6b4a8e'
+  // 深色背景，浅色字体
+  'bg-dark-black': '#fff',
+  'bg-night-blue': '#e0e6f6',
+  // 纸张/纹理
+  'bg-paper': '#6b4e16',
+  'bg-paper2': '#6b4e16',
+  'bg-dot-texture': '#4a4a4a',
+  'bg-diagonal-line': '#4a4a4a',
+  // 渐变背景优化
+  'bg-gradient-green': '#1a4d2e',
+  'bg-gradient-bluepurple': '#fff',
+  'bg-gradient-orange-pink': '#a35a00', // 橙粉渐变，深橙色
+  'bg-gradient-cyan-green': '#1a4d2e',
+  'bg-v-gradient-bluepurple': '#fff',
+  'bg-v-gradient-orange-pink': '#a35a00',
+  'bg-v-gradient-cyan-green': '#1a4d2e',
+  'bg-gradient-soft-cyan-blue': '#227488',
+  'bg-gradient-soft-pink-orange': '#b87a4b',
+  'bg-gradient-soft-purple-blue': '#5a6a8e',
+  'bg-gradient-soft-green-yellow': '#6b8e23',
+  'bg-gradient-soft-milky': '#7c6f57',
+  'bg-zhihu-blue-white-gradient': '#225488',
+  'bg-xiaohongshu-pink-purple': '#8e4a6b',
+  'bg-xiaohongshu-blue-pink': '#225488',
+  // 新增美观渐变优化
+  'bg-gradient-sunset': '#fff', // 日落渐变，白色
+  'bg-gradient-ocean': '#fff', // 海洋渐变，白色
+  'bg-gradient-forest': '#fff', // 森林渐变，白色
+  'bg-gradient-starry': '#fff', // 星空渐变，白色
+  'bg-gradient-rainbow': '#fff', // 彩虹渐变，白色
+  'bg-gradient-aurora': '#227488', // 极光渐变，深蓝绿色
+  'bg-gradient-desert': '#8e6b4a', // 沙漠渐变，深棕色
+  'bg-gradient-cherry': '#8e4a6b', // 樱花渐变，深粉色
+  'bg-gradient-mint': '#2d5a2d', // 薄荷渐变，深绿色
+  'bg-gradient-lavender': '#fff', // 薰衣草渐变，白色
+  'bg-gradient-coral': '#fff', // 珊瑚渐变，白色
+  'bg-gradient-mintblue': '#227488', // 薄荷蓝渐变，深蓝绿色
+  'bg-gradient-sunrise': '#a35a00', // 晨曦渐变，深橙色
+  'bg-gradient-twilight': '#fff', // 暮色渐变，白色
+  'bg-gradient-cream': '#a35a00', // 奶油渐变，深橙色
 };
 const computedTextColor = computed(() => bgTextColorMap[selectedBg.value] || '#222');
 </script>
@@ -338,7 +407,7 @@ const computedTextColor = computed(() => bgTextColorMap[selectedBg.value] || '#2
 .font-to-image-row-container {
   display: flex;
   flex-direction: row;
-  align-items: flex-start;
+  align-items: stretch;
   justify-content: center;
   gap: 2.5rem;
   max-width: 900px;
@@ -351,6 +420,7 @@ const computedTextColor = computed(() => bgTextColorMap[selectedBg.value] || '#2
   display: flex;
   flex-direction: column;
   align-items: stretch;
+  height: 100%;
 }
 .input-card {
   width: 100%;
@@ -379,8 +449,11 @@ const computedTextColor = computed(() => bgTextColorMap[selectedBg.value] || '#2
   text-align: left;
 }
 .weixin-card-preview {
+  flex: 1;
+  min-height: 400px;
+  max-height: 530px;
+  overflow-y: auto;
   width: 100%;
-  min-height: 180px;
   background: #fff;
   border-radius: 18px;
   box-shadow: 0 4px 24px 0 rgba(0,0,0,0.10), 0 1.5px 4px 0 rgba(0,0,0,0.03);
@@ -393,7 +466,6 @@ const computedTextColor = computed(() => bgTextColorMap[selectedBg.value] || '#2
   margin-bottom: 1.2rem;
   box-sizing: border-box;
   border: 1px solid rgba(0,0,0,0.08);
-  overflow: hidden;
 }
 .quote-mark {
   position: absolute;
@@ -411,7 +483,7 @@ const computedTextColor = computed(() => bgTextColorMap[selectedBg.value] || '#2
   margin: 0.5rem 0 0.7rem 0;
   word-break: break-all;
   white-space: pre-wrap;
-  min-height: 60px;
+  min-height: 120px;
   width: 100%;
   transition: color 0.2s;
   flex: 1;
@@ -569,9 +641,6 @@ const computedTextColor = computed(() => bgTextColorMap[selectedBg.value] || '#2
 .bg-zhihu-light-green {
   background: #e8f5e9 !important;
 }
-.bg-zhihu-light-gray {
-  background: #f5f5f7 !important;
-}
 .bg-zhihu-blue-white-gradient {
   background: linear-gradient(135deg, #eaf2fb 0%, #f6f7fa 100%) !important;
 }
@@ -679,5 +748,35 @@ const computedTextColor = computed(() => bgTextColorMap[selectedBg.value] || '#2
 }
 .bg-gradient-lavender {
   background: linear-gradient(135deg, #a8caba 0%, #5d4e75 100%) !important;
+}
+/* 新增美观渐变和纹理样式 */
+.bg-gradient-coral {
+  background: linear-gradient(135deg, #ff9966 0%, #ff5e62 100%) !important;
+}
+.bg-gradient-mintblue {
+  background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%) !important;
+}
+.bg-gradient-sunrise {
+  background: linear-gradient(135deg, #fbc2eb 0%, #fcd6a1 100%) !important;
+}
+.bg-gradient-twilight {
+  background: linear-gradient(135deg, #355c7d 0%, #6c5b7b 50%, #c06c84 100%) !important;
+}
+.bg-gradient-cream {
+  background: linear-gradient(135deg, #fffde4 0%, #fff1eb 100%) !important;
+}
+.bg-dot-texture {
+  background: #fff !important;
+  background-image: radial-gradient(#e0e0e0 1px, transparent 1px), radial-gradient(#e0e0e0 1px, transparent 1px) !important;
+  background-size: 20px 20px;
+  background-position: 0 0, 10px 10px;
+}
+.bg-paper2 {
+  background: #f7f3e9 !important;
+  background-image: repeating-linear-gradient(0deg, #ede7d9, #ede7d9 2px, transparent 2px, transparent 24px), repeating-linear-gradient(90deg, #ede7d9, #ede7d9 2px, transparent 2px, transparent 24px) !important;
+}
+.bg-diagonal-line {
+  background: #fff !important;
+  background-image: repeating-linear-gradient(45deg, #e0e0e0 0, #e0e0e0 1px, transparent 1px, transparent 20px) !important;
 }
 </style>
