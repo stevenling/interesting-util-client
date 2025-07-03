@@ -4,7 +4,7 @@
   "private": true,
   "homepage": "https://stevenling.github.io/github-actions-demo",
   "scripts": {
-    "serve": "vue-cli-service serve",
+    "dev": "vue-cli-service serve",
     "build": "vue-cli-service build && npm run fix-build",
     "fix-build": "node -e \"const fs=require('fs');const path=require('path');const distPath='dist';fs.copyFileSync(path.join(distPath,'index.html'),path.join(distPath,'404.html'));fs.writeFileSync(path.join(distPath,'.nojekyll'),'');\"",
     "lint": "vue-cli-service lint",

@@ -98,6 +98,9 @@
             <!-- 选中文字tooltip面板 -->
             <div v-if="selectedText" class="tooltip-panel" :style="tooltipStyle">
               <div class="tooltip-content">
+                <el-button @click="clearSelection" size="small" class="tooltip-close-btn" circle plain>
+                  <el-icon><close /></el-icon>
+                </el-button>
                 <div class="selected-text-preview">{{ selectedText }}</div>
                 <div class="tooltip-actions">
                   <el-button @click="addHighlight" type="primary" size="small">
@@ -107,9 +110,6 @@
                   <el-button @click="exportSelectedText" type="success" size="small">
                     <el-icon><picture /></el-icon>
                     导出图片
-                  </el-button>
-                  <el-button @click="clearSelection" size="small">
-                    <el-icon><close /></el-icon>
                   </el-button>
                 </div>
               </div>
@@ -166,11 +166,46 @@
         </div>
       </div>
     </div>
+
+    <el-dialog v-model="showExportImageDialog" title="图片预览" width="480px" center>
+      <div style="display: flex;">
+        <!-- 图片预览区 -->
+        <div style="flex: 1; min-width: 0; display: flex; align-items: center; justify-content: center;">
+          <div style="height: 700px; overflow-y: auto; width: 100%; display: flex; align-items: center; justify-content: center;">
+            <img
+              :src="exportImageUrl"
+              style="width: 420px; height: auto; border-radius: 8px; user-select: auto; cursor: pointer;"
+              alt="导出图片预览"
+              draggable="true"
+            />
+          </div>
+        </div>
+        <!-- 设置面板 -->
+        <div style="width: 100px; margin-left: 12px; display: flex; flex-direction: column; gap: 12px; height: 100%; box-sizing: border-box;">
+          <el-select v-model="exportFont" placeholder="字体" size="small">
+            <el-option v-for="font in fontOptions" :key="font.value" :label="font.label" :value="font.value" />
+          </el-select>
+          <div style="display: flex; align-items: center; gap: 4px;">
+            <el-button @click="exportFontSize = Math.max(12, exportFontSize - 2); generateExportPreview();" size="small">A-</el-button>
+            <span style="min-width: 32px; text-align: center;">{{ exportFontSize }}px</span>
+            <el-button @click="exportFontSize = Math.min(36, exportFontSize + 2); generateExportPreview();" size="small">A+</el-button>
+          </div>
+          <el-select v-model="exportBg" placeholder="背景" size="small">
+            <el-option v-for="bg in backgroundOptions" :key="bg.value" :label="bg.label" :value="bg.value" />
+          </el-select>
+          <el-color-picker v-model="exportFontColor" size="small" />
+        </div>
+      </div>
+      <template #footer>
+        <el-button @click="showExportImageDialog = false">关闭</el-button>
+        <el-button type="primary" @click="downloadExportImage">下载图片</el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
 <script setup>
-import { ref, onUnmounted, nextTick } from 'vue'
+import { ref, onUnmounted, nextTick, computed, watch, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { UploadFilled, ArrowLeft, ArrowRight, Refresh, Setting, Edit, Picture, Close } from '@element-plus/icons-vue'
 import TopMenu from './TopMenu.vue'
@@ -205,21 +240,9 @@ const mousePositionY = ref(0)
 // 浮动面板相关
 const tooltipStyle = ref({
   left: '0px',
-  top: '0px'
+  top: '0px',
+  position: 'absolute'
 })
-
-// 字体选项
-const fontOptions = [
-  { label: 'Arial', value: 'Arial' },
-  { label: 'Times New Roman', value: 'Times New Roman' },
-  { label: 'Georgia', value: 'Georgia' },
-  { label: 'Verdana', value: 'Verdana' },
-  { label: 'Helvetica', value: 'Helvetica' },
-  { label: '宋体', value: 'SimSun' },
-  { label: '黑体', value: 'SimHei' },
-  { label: '楷体', value: 'KaiTi' },
-  { label: '微软雅黑', value: 'Microsoft YaHei' }
-]
 
 // 背景选项
 const backgroundOptions = [
@@ -228,11 +251,71 @@ const backgroundOptions = [
   { label: '浅灰', value: '#f8f8f8' },
   { label: '浅黄', value: '#fefefe' },
   { label: '护眼绿', value: '#c7edcc' },
-  { label: '夜间模式', value: '#2c2c2c' }
+  { label: '夜间模式', value: '#2c2c2c' },
+  { label: '浅蓝', value: '#eaf4ff' },
+  { label: '浅粉', value: '#fff0f6' },
+  { label: '浅紫', value: '#f3e8ff' },
+  { label: '暗夜蓝', value: '#232946' },
+  { label: '暖米黄', value: '#fdf6e3' },
+  { label: '暖灰', value: '#ececec' },
+  { label: '蓝紫渐变', value: 'linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%)' }
 ]
+
+// 背景色与字体色适配
+const backgroundTextColorMap = {
+  '#ffffff': '#222',
+  '#f5f5dc': '#222',
+  '#f8f8f8': '#222',
+  '#fefefe': '#222',
+  '#c7edcc': '#222',
+  '#eaf4ff': '#222',
+  '#fff0f6': '#8e4a6b',
+  '#f3e8ff': '#6b4a8e',
+  '#ececec': '#222',
+  '#fdf6e3': '#6b4e16',
+  '#2c2c2c': '#fff',
+  '#232946': '#fff',
+  'linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%)': '#222'
+};
+const computedTextColor = computed(() => backgroundTextColorMap[backgroundColor.value] || '#222');
 
 let rendition = null
 let bookData = null
+
+const MAX_EPUB_SIZE = 4.5 * 1024 * 1024; // 约4.5MB，留出base64膨胀空间
+
+// 新增用于导出图片的文本
+const selectedTextForExport = ref('');
+const exportFontSize = ref(fontSize.value);
+
+// 安全的 ArrayBuffer 转 base64 工具函数
+function arrayBufferToBase64(buffer) {
+  let binary = '';
+  const bytes = new Uint8Array(buffer);
+  const len = bytes.byteLength;
+  for (let i = 0; i < len; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  return btoa(binary);
+}
+
+// 自动加载本地存储的epub书籍
+const loadBookFromLocal = () => {
+  const base64 = localStorage.getItem('epub-book-base64');
+  if (base64) {
+    const binary = atob(base64);
+    const len = binary.length;
+    const bytes = new Uint8Array(len);
+    for (let i = 0; i < len; i++) {
+      bytes[i] = binary.charCodeAt(i);
+    }
+    loadBook(bytes.buffer);
+  }
+};
+
+onMounted(() => {
+  loadBookFromLocal();
+});
 
 // 处理文件上传
 const handleFileChange = (file) => {
@@ -240,10 +323,27 @@ const handleFileChange = (file) => {
     ElMessage.error('请上传有效的EPUB文件')
     return
   }
-
+  if (file.raw.size > MAX_EPUB_SIZE) {
+    ElMessage.error('文件过大，无法自动保存到本地。请上传小于4.5MB的EPUB文件。');
+    // 仍然可以正常阅读，但不存localStorage
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      loadBook(e.target.result);
+    };
+    reader.readAsArrayBuffer(file.raw);
+    return;
+  }
   const reader = new FileReader()
   reader.onload = (e) => {
-    loadBook(e.target.result)
+    const arrayBuffer = e.target.result;
+    // 存储到 localStorage
+    const base64 = arrayBufferToBase64(arrayBuffer);
+    try {
+      localStorage.setItem('epub-book-base64', base64);
+    } catch (e) {
+      ElMessage.warning('文件过大，未能保存到本地，下次需重新上传。');
+    }
+    loadBook(arrayBuffer);
   }
   reader.readAsArrayBuffer(file.raw)
 }
@@ -468,19 +568,13 @@ const updatePageInfo = () => {
   }
 }
 
-// 通用样式应用函数
+// 修改 applyStyles 使字体色自动适配
 const applyStyles = () => {
   if (rendition && viewerElement.value) {
-    console.log('应用样式 - 字体:', fontFamily.value, '大小:', fontSize.value, '背景:', backgroundColor.value)
-    
-    // 直接操作DOM元素
     const iframe = viewerElement.value.querySelector('iframe')
     if (iframe && iframe.contentDocument) {
-      // 移除之前的样式
       const existingStyles = iframe.contentDocument.querySelectorAll('style[data-epub-reader]')
       existingStyles.forEach(style => style.remove())
-      
-      // 添加新样式
       const style = iframe.contentDocument.createElement('style')
       style.setAttribute('data-epub-reader', 'true')
       style.textContent = `
@@ -489,10 +583,12 @@ const applyStyles = () => {
           font-family: ${fontFamily.value} !important;
           font-size: ${fontSize.value}px !important;
           line-height: 1.6 !important;
+          color: ${computedTextColor.value} !important;
         }
         p, div, span, h1, h2, h3, h4, h5, h6 {
           font-family: ${fontFamily.value} !important;
           font-size: ${fontSize.value}px !important;
+          color: ${computedTextColor.value} !important;
         }
         * {
           font-family: ${fontFamily.value} !important;
@@ -676,21 +772,7 @@ const setupTextSelection = () => {
           
           if (selectedTextContent) {
             selectedText.value = selectedTextContent
-            
-            // 获取鼠标位置
-            const mouseX = mousePositionX.value || window.event?.screenX || 0
-            const mouseY = mousePositionY.value || window.event?.screenY || 0
-            
-            // 计算tooltip位置，相对于屏幕
-            const tooltipLeft = Math.max(10, mouseX - 150)
-            const tooltipTop = Math.max(10, mouseY - 120)
-            
-            tooltipStyle.value = {
-              left: `${tooltipLeft}px`,
-              top: `${tooltipTop}px`
-            }
-            
-            console.log('tooltip位置:', tooltipStyle.value, 'mouseX:', mouseX, 'mouseY:', mouseY)
+            showTooltipAtSelection();
           }
         }
       } catch (error) {
@@ -709,25 +791,7 @@ const setupTextSelection = () => {
       const selectedTextContent = selection.toString().trim()
       console.log('选中的文本:', selectedTextContent)
       selectedText.value = selectedTextContent
-      
-      // 获取鼠标位置
-      const range = selection.getRangeAt(0)
-      const rect = range.getBoundingClientRect()
-      
-      // 使用screenX和screenY进行精确定位
-      const screenX = rect.left + window.screenX
-      const screenY = rect.top + window.screenY
-      
-      // 计算tooltip位置，相对于屏幕
-      const tooltipLeft = Math.max(10, screenX - 150)
-      const tooltipTop = Math.max(10, screenY - 120)
-      
-      tooltipStyle.value = {
-        left: `${tooltipLeft}px`,
-        top: `${tooltipTop}px`
-      }
-      
-      console.log('tooltip位置:', tooltipStyle.value, 'screenX:', screenX, 'screenY:', screenY)
+      showTooltipAtSelection();
     }
   })
   
@@ -745,17 +809,7 @@ const setupTextSelection = () => {
         const selectedTextContent = selection.toString().trim()
         console.log('鼠标选择文本:', selectedTextContent)
         selectedText.value = selectedTextContent
-        
-        // 使用screenX和screenY进行精确定位
-        const tooltipLeft = Math.max(10, event.screenX - 150)
-        const tooltipTop = Math.max(10, event.screenY - 120)
-        
-        tooltipStyle.value = {
-          left: `${tooltipLeft}px`,
-          top: `${tooltipTop}px`
-        }
-        
-        console.log('鼠标tooltip位置:', tooltipStyle.value, 'screenX:', event.screenX, 'screenY:', event.screenY)
+        showTooltipAtSelection();
       }
     }, 100)
   })
@@ -776,80 +830,136 @@ const clearSelection = () => {
   }
 }
 
-// 导出选中文本图片
+// 修改导出图片时的字体色
+const showExportImageDialog = ref(false);
+const exportImageUrl = ref('');
+// 导出图片自定义设置
+const exportBg = ref(backgroundColor.value);
+const exportFont = ref(fontFamily.value);
+const exportFontColor = ref(computedTextColor.value);
+
+const downloadExportImage = () => {
+  if (exportImageUrl.value) {
+    const link = document.createElement('a');
+    link.download = `选中文本_${new Date().getTime()}.png`;
+    link.href = exportImageUrl.value;
+    link.click();
+  }
+};
+
+// 监听导出对话框打开时同步主设置，并隐藏tooltip
+watch(showExportImageDialog, (val) => {
+  if (val) {
+    exportBg.value = backgroundColor.value;
+    exportFont.value = fontFamily.value;
+    exportFontColor.value = computedTextColor.value;
+    // 重新生成图片预览
+    generateExportPreview();
+  }
+});
+
+// 监听导出设置变化实时预览
+watch([exportBg, exportFont, exportFontColor, exportFontSize, selectedTextForExport], () => {
+  if (showExportImageDialog.value) {
+    generateExportPreview();
+  }
+});
+
+// 生成图片预览
+const generateExportPreview = async () => {
+  if (!selectedTextForExport.value) return;
+  const html2canvas = await import('html2canvas');
+  const scale = 3;
+  const width = 420;
+  const imageContainer = document.createElement('div');
+  imageContainer.style.cssText = `
+    position: fixed;
+    top: -9999px;
+    left: -9999px;
+    width: ${width}px;
+    height: 700px;
+    padding: 2.2rem 1.5rem 1.5rem 1.5rem;
+    background: linear-gradient(135deg, #f6fce9 0%, #e8f5e9 100%);
+    border-radius: 18px;
+    box-shadow: 0 4px 24px 0 rgba(0,0,0,0.10), 0 1.5px 4px 0 rgba(0,0,0,0.03);
+    font-family: 'FZKai-Z03', '楷体', 'STKaiti', '仿宋', serif;
+    font-size: ${exportFontSize.value}px;
+    color: #7ca05b;
+    line-height: 2.2;
+    text-align: left;
+    z-index: -1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    position: relative;
+    box-sizing: border-box;
+    overflow: hidden;
+  `;
+  // 顶部淡雅SVG装饰（如引号）
+  const deco = document.createElement('div');
+  deco.innerHTML = `<svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg"><text x="0" y="28" font-size="32" fill="#e6e6e6" font-family="serif">"</text></svg>`;
+  deco.style.cssText = `
+    position: absolute;
+    top: 1.1rem;
+    left: 1.2rem;
+    width: 36px;
+    height: 36px;
+    opacity: 1;
+    pointer-events: none;
+  `;
+  imageContainer.appendChild(deco);
+  // 正文内容
+  const textElement = document.createElement('div');
+  textElement.style.cssText = `
+    margin: 0.5rem 0 0.7rem 0;
+    font-weight: 500;
+    word-break: break-all;
+    white-space: pre-wrap;
+    min-height: 120px;
+    width: 100%;
+    text-align: left;
+    flex: 1;
+  `;
+  textElement.textContent = selectedTextForExport.value;
+  // 日期
+  const timestampElement = document.createElement('div');
+  timestampElement.style.cssText = `
+    font-size: 0.98rem;
+    font-family: 'PingFang SC', 'Microsoft YaHei', Arial, sans-serif;
+    opacity: 0.85;
+    margin-left: 0.1rem;
+    margin-bottom: 0.2rem;
+    text-align: right;
+    align-self: flex-end;
+    width: 100%;
+    margin-top: 1rem;
+    color: #7ca05b;
+  `;
+  timestampElement.textContent = new Date().toISOString().slice(0, 10);
+  imageContainer.appendChild(textElement);
+  imageContainer.appendChild(timestampElement);
+  document.body.appendChild(imageContainer);
+  const realWidth = imageContainer.offsetWidth;
+  const realHeight = imageContainer.offsetHeight;
+  const canvas = await html2canvas.default(imageContainer, {
+    scale,
+    backgroundColor: null,
+    width: realWidth,
+    height: realHeight
+  });
+  document.body.removeChild(imageContainer);
+  exportImageUrl.value = canvas.toDataURL();
+};
+
 const exportSelectedText = async () => {
   if (selectedText.value) {
-    try {
-      // 动态导入html2canvas
-      const html2canvas = await import('html2canvas')
-      
-      // 创建文本图片容器
-      const imageContainer = document.createElement('div')
-      imageContainer.style.cssText = `
-        position: fixed;
-        top: -9999px;
-        left: -9999px;
-        width: 600px;
-        padding: 40px;
-        background: ${backgroundColor.value};
-        border-radius: 12px;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-        font-family: ${fontFamily.value};
-        font-size: ${fontSize.value}px;
-        line-height: 1.6;
-        color: #333;
-        z-index: -1;
-      `
-      
-      // 添加文本内容
-      const textElement = document.createElement('div')
-      textElement.style.cssText = `
-        padding: 8px 12px;
-        border-radius: 4px;
-        margin-bottom: 20px;
-        font-weight: 500;
-        background: ${highlightColor.value};
-      `
-      textElement.textContent = selectedText.value
-      
-      // 添加时间戳
-      const timestampElement = document.createElement('div')
-      timestampElement.style.cssText = `
-        font-size: 12px;
-        color: #666;
-        margin-top: 20px;
-        text-align: right;
-      `
-      timestampElement.textContent = new Date().toLocaleString()
-      
-      imageContainer.appendChild(textElement)
-      imageContainer.appendChild(timestampElement)
-      document.body.appendChild(imageContainer)
-      
-      // 生成图片
-      const canvas = await html2canvas.default(imageContainer, {
-        scale: 2,
-        backgroundColor: backgroundColor.value,
-        width: 600,
-        height: imageContainer.offsetHeight
-      })
-      
-      // 移除临时容器
-      document.body.removeChild(imageContainer)
-      
-      // 下载图片
-      const link = document.createElement('a')
-      link.download = `选中文本_${new Date().getTime()}.png`
-      link.href = canvas.toDataURL()
-      link.click()
-      
-      ElMessage.success('图片导出成功！')
-    } catch (error) {
-      console.error('导出图片失败:', error)
-      ElMessage.error('导出图片失败')
-    }
+    selectedTextForExport.value = selectedText.value;
+    showExportImageDialog.value = true;
+    selectedText.value = ''; // 关闭tooltip
+    ElMessage.success('图片已生成，可预览和下载');
   }
-}
+};
 
 // 添加划线
 const addHighlight = () => {
@@ -909,6 +1019,8 @@ const resetReader = () => {
   showToc.value = false
   toc.value = []
   bookData = null
+  // 清除本地存储的epub
+  localStorage.removeItem('epub-book-base64');
 }
 
 // 组件卸载时清理
@@ -917,6 +1029,42 @@ onUnmounted(() => {
     rendition.destroy()
   }
 })
+
+// 优化tooltip位置：优先显示在选区下方，空间不足时显示在上方，始终以.reader-view为基准
+const showTooltipAtSelection = async () => {
+  await nextTick();
+  const selection = window.getSelection();
+  const tooltipEl = document.querySelector('.tooltip-panel');
+  const readerViewEl = document.querySelector('.reader-view');
+  if (selection && selection.rangeCount > 0 && tooltipEl && readerViewEl) {
+    const range = selection.getRangeAt(0);
+    const rect = range.getBoundingClientRect();
+    const readerRect = readerViewEl.getBoundingClientRect();
+    const tooltipWidth = tooltipEl.offsetWidth || 320;
+    const tooltipHeight = tooltipEl.offsetHeight || 48;
+    const padding = 12;
+    // 水平居中于选区
+    let left = rect.left + rect.width / 2 - tooltipWidth / 2 - readerRect.left;
+    // 判断下方空间是否足够
+    const spaceBelow = readerRect.bottom - rect.bottom;
+    let top;
+    if (spaceBelow > tooltipHeight + padding) {
+      // 下方空间足够，显示在下方
+      top = rect.bottom - readerRect.top + padding;
+    } else {
+      // 否则显示在上方
+      top = rect.top - readerRect.top - tooltipHeight - padding;
+    }
+    // 边界处理
+    left = Math.max(8, Math.min(left, readerRect.width - tooltipWidth - 8));
+    top = Math.max(8, Math.min(top, readerRect.height - tooltipHeight - 8));
+    tooltipStyle.value = {
+      left: `${left}px`,
+      top: `${top}px`,
+      position: 'absolute'
+    };
+  }
+};
 </script>
 
 <style scoped>
@@ -1158,8 +1306,12 @@ onUnmounted(() => {
   overflow: hidden;
   position: relative;
   min-height: 0;
-  margin: 0;
+  margin: 0 auto;
   padding: 0;
+  max-width: 700px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 24px 0 rgba(0,0,0,0.08);
 }
 
 .epub-viewer {
@@ -1237,44 +1389,67 @@ onUnmounted(() => {
 
 /* tooltip面板样式 */
 .tooltip-panel {
-  position: fixed;
+  position: absolute;
   z-index: 10000;
   background: white;
-  border-radius: 8px;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.18);
   border: 1px solid #e0e0e0;
   min-width: 280px;
   max-width: 400px;
   animation: tooltipFadeIn 0.2s ease-out;
+  padding: 0;
+  overflow: visible;
 }
 
 .tooltip-content {
-  padding: 12px;
+  padding: 20px 18px 16px 18px;
   position: relative;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #f8fafc 0%, #f3f6fa 100%);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.tooltip-close-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 2;
+  background: transparent;
+  border: none;
+  color: #888;
+  transition: color 0.2s;
+}
+
+.tooltip-close-btn:hover {
+  color: #f56c6c;
+  background: #f9ecec;
 }
 
 .selected-text-preview {
   background: #f5f5f5;
-  padding: 8px 10px;
-  border-radius: 4px;
-  font-size: 0.9rem;
-  line-height: 1.4;
+  padding: 10px 12px;
+  border-radius: 6px;
+  font-size: 1rem;
+  line-height: 1.5;
   color: #333;
-  margin-bottom: 10px;
+  margin-bottom: 16px;
   word-break: break-word;
-  max-height: 80px;
+  max-height: 90px;
   overflow-y: auto;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.03);
 }
 
 .tooltip-actions {
   display: flex;
-  gap: 8px;
+  gap: 12px;
   align-items: center;
+  justify-content: flex-end;
 }
 
 .tooltip-actions .el-button {
   flex: 1;
-  font-size: 0.8rem;
+  font-size: 0.92rem;
 }
 
 .tooltip-arrow {
@@ -1286,8 +1461,8 @@ onUnmounted(() => {
   height: 0;
   border-left: 8px solid transparent;
   border-right: 8px solid transparent;
-  border-top: 8px solid white;
-  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+  border-top: 8px solid #f3f6fa;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.08));
 }
 
 @keyframes tooltipFadeIn {
