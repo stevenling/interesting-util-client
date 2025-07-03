@@ -98,10 +98,6 @@
             <!-- 选中文字tooltip面板 -->
             <div v-if="selectedText" class="tooltip-panel" :style="tooltipStyle">
               <div class="tooltip-content">
-                <el-button @click="clearSelection" size="small" class="tooltip-close-btn" circle plain>
-                  <el-icon><close /></el-icon>
-                </el-button>
-                <div class="selected-text-preview">{{ selectedText }}</div>
                 <div class="tooltip-actions">
                   <el-button @click="addHighlight" type="primary" size="small">
                     <el-icon><edit /></el-icon>
@@ -167,17 +163,37 @@
       </div>
     </div>
 
-    <el-dialog v-model="showExportImageDialog" title="图片预览" width="480px" center>
+    <el-dialog v-model="showExportImageDialog" title="图片预览" width="700px" center>
       <div style="display: flex;">
         <!-- 图片预览区 -->
         <div style="flex: 1; min-width: 0; display: flex; align-items: center; justify-content: center;">
           <div style="height: 700px; overflow-y: auto; width: 100%; display: flex; align-items: center; justify-content: center;">
-            <img
-              :src="exportImageUrl"
-              style="width: 420px; height: auto; border-radius: 8px; user-select: auto; cursor: pointer;"
-              alt="导出图片预览"
-              draggable="true"
-            />
+            <div
+              id="export-preview-area"
+              :style="{
+                width: '420px',
+                minHeight: '120px',
+                maxHeight: '700px',
+                background: exportBg,
+                color: exportFontColor,
+                fontFamily: exportFont,
+                fontSize: exportFontSize + 'px',
+                borderRadius: '8px',
+                padding: '2.2rem 1.5rem 1.5rem 1.5rem',
+                boxShadow: '0 4px 24px 0 rgba(0,0,0,0.10), 0 1.5px 4px 0 rgba(0,0,0,0.03)',
+                lineHeight: 2.2,
+                textAlign: 'left',
+                overflowY: 'auto',
+                wordBreak: 'break-all',
+                whiteSpace: 'pre-wrap',
+                display: 'block',
+                boxSizing: 'border-box',
+                userSelect: 'auto',
+                cursor: 'text',
+              }"
+            >
+              {{ selectedTextForExport }}
+            </div>
           </div>
         </div>
         <!-- 设置面板 -->
@@ -198,7 +214,7 @@
       </div>
       <template #footer>
         <el-button @click="showExportImageDialog = false">关闭</el-button>
-        <el-button type="primary" @click="downloadExportImage">下载图片</el-button>
+        <el-button type="primary" @click="copyExportImage">复制图片</el-button>
       </template>
     </el-dialog>
   </div>
@@ -286,7 +302,22 @@ const MAX_EPUB_SIZE = 4.5 * 1024 * 1024; // 约4.5MB，留出base64膨胀空间
 
 // 新增用于导出图片的文本
 const selectedTextForExport = ref('');
-const exportFontSize = ref(fontSize.value);
+const exportFontSize = ref(26);
+
+// 字体选项
+const fontOptions = [
+  { label: 'Arial', value: 'Arial' },
+  { label: 'Times New Roman', value: 'Times New Roman' },
+  { label: '微软雅黑', value: 'Microsoft YaHei' },
+  { label: '楷体', value: 'KaiTi' },
+  { label: '宋体', value: 'SimSun' },
+  { label: '黑体', value: 'SimHei' },
+  { label: 'JetBrains Mono', value: 'JetBrains Mono' },
+  { label: 'Fira Code', value: 'Fira Code' },
+  { label: 'Georgia', value: 'Georgia' },
+  { label: 'Verdana', value: 'Verdana' },
+  { label: 'Helvetica', value: 'Helvetica' }
+];
 
 // 安全的 ArrayBuffer 转 base64 工具函数
 function arrayBufferToBase64(buffer) {
@@ -772,6 +803,7 @@ const setupTextSelection = () => {
           
           if (selectedTextContent) {
             selectedText.value = selectedTextContent
+            console.log('当前选中内容:', selectedText.value)
             showTooltipAtSelection();
           }
         }
@@ -791,6 +823,7 @@ const setupTextSelection = () => {
       const selectedTextContent = selection.toString().trim()
       console.log('选中的文本:', selectedTextContent)
       selectedText.value = selectedTextContent
+      console.log('当前选中内容:', selectedText.value)
       showTooltipAtSelection();
     }
   })
@@ -809,6 +842,7 @@ const setupTextSelection = () => {
         const selectedTextContent = selection.toString().trim()
         console.log('鼠标选择文本:', selectedTextContent)
         selectedText.value = selectedTextContent
+        console.log('当前选中内容:', selectedText.value)
         showTooltipAtSelection();
       }
     }, 100)
@@ -834,24 +868,50 @@ const clearSelection = () => {
 const showExportImageDialog = ref(false);
 const exportImageUrl = ref('');
 // 导出图片自定义设置
-const exportBg = ref(backgroundColor.value);
-const exportFont = ref(fontFamily.value);
+const exportBg = ref(backgroundOptions[0].value);
+const exportFont = ref(fontOptions[0].value);
 const exportFontColor = ref(computedTextColor.value);
 
-const downloadExportImage = () => {
-  if (exportImageUrl.value) {
-    const link = document.createElement('a');
-    link.download = `选中文本_${new Date().getTime()}.png`;
-    link.href = exportImageUrl.value;
-    link.click();
+const copyExportImage = async () => {
+  const previewDiv = document.getElementById('export-preview-area');
+  if (!previewDiv) return;
+  // 复制前同步内容
+  selectedTextForExport.value = selectedText.value;
+  // 临时去掉max-height和overflow，确保全部内容渲染
+  const originalMaxHeight = previewDiv.style.maxHeight;
+  const originalOverflowY = previewDiv.style.overflowY;
+  const originalWidth = previewDiv.style.width;
+  previewDiv.style.maxHeight = 'none';
+  previewDiv.style.overflowY = 'visible';
+  previewDiv.style.width = '600px';
+  previewDiv.scrollTop = 0;
+  try {
+    const html2canvas = await import('html2canvas');
+    const canvas = await html2canvas.default(previewDiv, {
+      scale: 3,
+      backgroundColor: null,
+      width: 600,
+      height: previewDiv.scrollHeight
+    });
+    const blob = await new Promise(resolve => canvas.toBlob(resolve));
+    await navigator.clipboard.write([
+      new window.ClipboardItem({ [blob.type]: blob })
+    ]);
+    ElMessage.success('图片已复制到剪贴板！');
+  } catch (e) {
+    ElMessage.error('复制失败，可能浏览器不支持或未授权');
+  } finally {
+    previewDiv.style.maxHeight = originalMaxHeight;
+    previewDiv.style.overflowY = originalOverflowY;
+    previewDiv.style.width = originalWidth;
   }
-};
+}
 
 // 监听导出对话框打开时同步主设置，并隐藏tooltip
 watch(showExportImageDialog, (val) => {
   if (val) {
-    exportBg.value = backgroundColor.value;
-    exportFont.value = fontFamily.value;
+    exportBg.value = backgroundOptions[0].value;
+    exportFont.value = fontOptions[0].value;
     exportFontColor.value = computedTextColor.value;
     // 重新生成图片预览
     generateExportPreview();
@@ -879,12 +939,12 @@ const generateExportPreview = async () => {
     width: ${width}px;
     height: 700px;
     padding: 2.2rem 1.5rem 1.5rem 1.5rem;
-    background: linear-gradient(135deg, #f6fce9 0%, #e8f5e9 100%);
+    background: ${exportBg.value};
     border-radius: 18px;
     box-shadow: 0 4px 24px 0 rgba(0,0,0,0.10), 0 1.5px 4px 0 rgba(0,0,0,0.03);
-    font-family: 'FZKai-Z03', '楷体', 'STKaiti', '仿宋', serif;
+    font-family: ${exportFont.value}, 'FZKai-Z03', '楷体', 'STKaiti', '仿宋', serif;
     font-size: ${exportFontSize.value}px;
-    color: #7ca05b;
+    color: ${exportFontColor.value};
     line-height: 2.2;
     text-align: left;
     z-index: -1;
@@ -956,10 +1016,10 @@ const exportSelectedText = async () => {
   if (selectedText.value) {
     selectedTextForExport.value = selectedText.value;
     showExportImageDialog.value = true;
-    selectedText.value = ''; // 关闭tooltip
+    // 不要清空selectedText，这样tooltip和预览区不会立即消失
     ElMessage.success('图片已生成，可预览和下载');
   }
-};
+}
 
 // 添加划线
 const addHighlight = () => {
@@ -1337,6 +1397,7 @@ const showTooltipAtSelection = async () => {
   margin: 0;
   padding: 20px 15px;
   gap: 20px;
+  margin-right: 32px;
 }
 
 .book-info h3 {
