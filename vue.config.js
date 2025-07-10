@@ -1,10 +1,14 @@
 module.exports = {
+  //  应用部署的基础路径
   publicPath: process.env.NODE_ENV === 'production'
     ? '/interesting-util-client/'
     : '/',
+  // 静态资源目录
   assetsDir: 'assets',
+  // 是否开启eslint
   lintOnSave: false,
-  productionSourceMap: false, // 生产环境关闭sourcemap
+  // 生产环境关闭sourcemap
+  productionSourceMap: false, 
 
   // 开发服务器配置（不影响build）
   devServer: {

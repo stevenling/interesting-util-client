@@ -21,6 +21,5 @@
 [epub 电子书在线阅读](docs/EpubReader.md)
 
 ## 部署
-```shell
-npm run fix-build
-```
+
+发布到 `github` 上，会自动进行 `action` 部署。

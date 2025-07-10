@@ -26,7 +26,7 @@
                 size="large"
               >
                 <i class="el-icon-link"></i>
-                云胡的收藏
+                文章收藏
               </el-button>
 
               <el-button 
