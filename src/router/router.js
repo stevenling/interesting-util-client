@@ -1,30 +1,47 @@
+
 import YunhuMatrix from '../components/YunhuMatrix.vue'
 
-const routes = [
+/**
+ * constantRoutes
+ * a base page that does not have permission requirements
+ * all roles can be accessed
+ */
+export const constantRoutes = [
     {
         name: 'UtilIndex',
         path: '/',
         component: () => import("@/components/UtilIndex")
     },
     {
+        name: 'Login',
+        path: '/login',
+        // 我们将 ColorConvert 组件作为登录页
+        component: () => import("@/components/JsonFormat")
+    },
+];
+
+/**
+ * asyncRoutes
+ * the routes that need to be dynamically loaded based on user roles
+ */
+export const asyncRoutes = [
+    {
         name: 'JsonFormat',
         path: '/JsonFormat',
-        component: () => import("@/components/JsonFormat")
+        component: () => import("@/components/JsonFormat"),
+        meta: { roles: ['admin'] } // 只有 'admin' 角色可以访问
     },
     {
         name: 'TextFormat',
         path: '/TextFormat',
-        component: () => import("@/components/TextFormat")
+        component: () => import("@/components/TextFormat"),
+        meta: { roles: ['admin', 'editor'] } // admin 和 editor 角色可以访问
     },
     {
         name: 'BetweenNowToHoliday',
         path: '/BetweenNowToHoliday',
         component: () => import("@/components/BetweenNowToHoliday")
-    },
-    {
-        name: 'ColorConvert',
-        path: '/ColorConvert',
-        component: () => import("@/components/ColorConvert")
+        // 没有 meta.roles，表示只要登录了就能访问
     },
     {
         name: 'HeavenlyStemsAndEarthlyBranches',
@@ -45,7 +62,7 @@ const routes = [
         path: '/yunhuMatrix',
         name: 'YunhuMatrix',
         component: YunhuMatrix
-    }
+    },
+    // 404 page must be placed at the end !!!
+    // { path: '/:catchAll(.*)', redirect: '/404', hidden: true }
 ];
-
-export default routes

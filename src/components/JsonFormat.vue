@@ -12,17 +12,15 @@
           </div>
         </div>
       </template>
-      <el-row :gutter="40">
+      <el-row :gutter="40" class="content-row">
+
         <el-col :span="12" class="el-input-content">
           <div class="json-title">
             待格式化 Json
-            <el-button class="clear-and-copy-button" type="danger" @click="clickClear"
-              >清空</el-button
-            >
+            <el-button class="clear-and-copy-button" type="danger" @click="clickClear">清空</el-button>
           </div>
           <el-input
             v-model="currentJson.oldJson"
-            :rows="23"
             type="textarea"
             placeholder="请输入待格式化 JSON 字符串"
             class="el-input-class"
@@ -32,9 +30,7 @@
         <el-col :span="12" class="el-input-content">
           <div class="json-title">
             格式化后的 Json
-            <el-button class="clear-and-copy-button" type="success" @click="clickCopy"
-              >复制到剪贴板</el-button
-            >
+            <el-button class="clear-and-copy-button" type="success" @click="clickCopy">复制到剪贴板</el-button>
           </div>
           <highlightjs
             language="json"
@@ -162,8 +158,6 @@ async function clickCopy() {
 <style scoped>
 html,
 body {
-  width: 100%;
-  height: 100%;
   margin: 0;
   padding: 0;
   background: #ebedf0;
@@ -180,8 +174,10 @@ body {
 }
 
 .box-card {
-  margin: 1rem auto 0 auto;
-  width: 90%;
+  margin: 1rem auto;
+  width: 80%;
+  flex-grow: 1; /* 关键：让卡片自适应填充父容器的剩余空间，而不是使用固定的计算高度 */
+  min-height: 0; /* 关键：作为 flex item，允许自身收缩，防止内容溢出时布局破坏 */
   max-width: 1100px;
   text-align: center;
   box-shadow: 0 4px 24px 0 rgba(0,0,0,0.08), 0 1.5px 4px 0 rgba(0,0,0,0.03);
@@ -189,6 +185,8 @@ body {
   background: #fff;
   border: none;
   padding-bottom: 0.5rem;
+  display: flex;
+  flex-direction: column;
 }
 
 .title {
@@ -234,20 +232,23 @@ body {
   transition: background 0.2s;
 }
 
+.content-row {
+  display: flex;
+  flex-wrap: wrap;
+  flex-grow: 1; /* 让行填满卡片主体 */
+  min-height: 0; /* 关键：作为 flex item，允许自身收缩，从而将高度限制正确传递给子元素 */
+}
+
 .el-input-content {
   font-size: 1.08rem;
-  width: 100%;
-  max-width: 500px;
-  margin: 0 auto;
-  background: #f8fafc;
+  /* el-col 已经处理了宽度，这里移除固定的宽度限制，让其自适应 */
+  background: #f7f9fc; /* 使用更清爽的背景色 */
   border-radius: 12px;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.03);
-  padding: 0.3rem 0.3rem 0.3rem 0.3rem;
-  border: 1px solid #e6e8eb;
-  min-height: 60px;
+  padding: 1rem; /* 增加内边距，让内容更舒展 */
+  /* min-height: 20px; */
+  min-height: 0; /* 关键：修复 flex 溢出导致滚动条失效的问题 */
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
 }
 
 .json-title {
@@ -265,9 +266,14 @@ body {
   background: #fff;
   border-radius: 8px;
   border: 1px solid #e6e8eb;
-  min-height: 36px;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.02);
-  margin-bottom: 0.3rem;
+  flex-grow: 1; /* 让输入框填满剩余空间 */
+  box-shadow: none; /* 移除阴影，使界面更扁*/
+}
+
+/* 为 el-input-class 内部的 textarea 设置最小高度，这样选择器更具体，且样式目标明确 */
+.el-input-class :deep(.el-textarea__inner) {
+  /* min-height: 400px; */
+  height: 100% !important; /* 覆盖 element-plus 的内联样式 */
 }
 
 .highlight-json {
@@ -276,10 +282,14 @@ body {
   background: #f6f8fa;
   border-radius: 8px;
   border: 1px solid #e6e8eb;
-  min-height: 36px;
+  flex-grow: 1; /* 让高亮区域填满剩余空间 */
   box-shadow: 0 1px 4px rgba(0,0,0,0.02);
   padding: 0.3rem;
   overflow-x: auto;
+  overflow-y: auto; /* 内容超出时显示垂直滚动条 */
+  height: 500px; /* 或其他固定/最大高度 */
+  min-height: 0; /* 关键：在 flex 布局中，允许该元素收缩，从而触发 overflow */
+  white-space: pre-wrap; /* 允许长文本换行 */
 }
 
 @media (max-width: 900px) {
@@ -289,11 +299,10 @@ body {
   }
   .el-input-content {
     max-width: 100%;
-    min-height: 36px;
+    /* min-height: 36px; */
     padding: 0.2rem 0.1rem 0.1rem 0.1rem;
   }
   .el-input-class, .highlight-json {
-    min-height: 24px;
     font-size: 0.92rem;
   }
 }
@@ -315,7 +324,7 @@ body {
     margin: 0.7rem 0 0.3rem 0;
   }
   .el-input-content {
-    min-height: 24px;
+    /* min-height: 24px; */
     padding: 0.1rem 0.05rem 0.05rem 0.05rem;
   }
 }
