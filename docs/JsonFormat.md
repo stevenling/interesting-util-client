@@ -132,7 +132,7 @@ app.use(hljsVuePlugin);
 ```
 
 使用：
-```vue
+```js
 <highlightjs language='json' :code= "formatJson" class = "highlight-json"/>
 ```
 
