@@ -11,13 +11,14 @@ export const constantRoutes = [
         name: 'UtilIndex',
         path: '/',
         component: () => import("@/components/UtilIndex")
-    },
-    {
-        name: 'Login',
-        path: '/login',
-        // 我们将 ColorConvert 组件作为登录页
-        component: () => import("@/components/JsonFormat")
-    },
+    }
+    // ,
+    // {
+    //     name: 'Login',
+    //     path: '/login',
+    //     // 我们将 ColorConvert 组件作为登录页
+    //     component: () => import("@/components/JsonFormat")
+    // },
 ];
 
 /**

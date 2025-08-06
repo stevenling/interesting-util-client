@@ -57,6 +57,7 @@ function filterAsyncRoutes(routes, roles) {
 // 全局前置守卫
 let hasAddedRoutes = false; // 添加一个标志位，防止重复添加路由
 
+/*
 router.beforeEach(async (to, from, next) => {
     const hasToken = localStorage.getItem('user-token');
 
@@ -103,5 +104,5 @@ router.beforeEach(async (to, from, next) => {
         }
     }
 });
-
+*/
 export default router;
