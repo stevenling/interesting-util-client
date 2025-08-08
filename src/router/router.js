@@ -11,38 +11,26 @@ export const constantRoutes = [
         name: 'UtilIndex',
         path: '/',
         component: () => import("@/components/UtilIndex")
-    }
-    // ,
-    // {
-    //     name: 'Login',
-    //     path: '/login',
-    //     // 我们将 ColorConvert 组件作为登录页
-    //     component: () => import("@/components/JsonFormat")
-    // },
-];
-
-/**
- * asyncRoutes
- * the routes that need to be dynamically loaded based on user roles
- */
-export const asyncRoutes = [
+    },
     {
         name: 'JsonFormat',
         path: '/JsonFormat',
-        component: () => import("@/components/JsonFormat"),
-        meta: { roles: ['admin'] } // 只有 'admin' 角色可以访问
+        component: () => import("@/components/JsonFormat")
+    },
+    {
+        name: 'ColorConvert',
+        path: '/ColorConvert',
+        component: () => import("@/components/ColorConvert")
     },
     {
         name: 'TextFormat',
         path: '/TextFormat',
-        component: () => import("@/components/TextFormat"),
-        meta: { roles: ['admin', 'editor'] } // admin 和 editor 角色可以访问
+        component: () => import("@/components/TextFormat")
     },
     {
         name: 'BetweenNowToHoliday',
         path: '/BetweenNowToHoliday',
         component: () => import("@/components/BetweenNowToHoliday")
-        // 没有 meta.roles，表示只要登录了就能访问
     },
     {
         name: 'HeavenlyStemsAndEarthlyBranches',
@@ -63,7 +51,15 @@ export const asyncRoutes = [
         path: '/yunhuMatrix',
         name: 'YunhuMatrix',
         component: YunhuMatrix
-    },
+    }
+];
+
+/**
+ * asyncRoutes
+ * the routes that need to be dynamically loaded based on user roles
+ * 目前所有路由都移到了 constantRoutes，这里保留空数组
+ */
+export const asyncRoutes = [
     // 404 page must be placed at the end !!!
     // { path: '/:catchAll(.*)', redirect: '/404', hidden: true }
 ];

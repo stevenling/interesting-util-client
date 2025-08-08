@@ -1,59 +1,94 @@
 <template>
-  <div>
+  <div class="font-to-image-container">
     <TopMenu />
-    <div class="font-to-image-row-container">
-      <div class="font-to-image-left">
-        <el-card class="input-card">
-          <template #header>
-            <div class="input-title">输入你的摘录文字</div>
-          </template>
+    <div class="main-content">
+      <!-- 左侧输入区域 -->
+      <div class="input-section">
+        <div class="input-card">
+          <div class="input-header">
+            <h3 class="input-title">文字输入</h3>
+            <div class="input-subtitle">输入你想生成图片的文字内容</div>
+          </div>
           <el-input
             v-model="inputText"
             type="textarea"
-            :rows="30"
-            placeholder="请输入你想生成图片的文字"
+            :rows="18"
+            placeholder="在这里输入你的文字..."
             class="input-area"
           />
-        </el-card>
-      </div>
-      <div class="font-to-image-right">
-        <div class="preview-title">预览效果</div>
-        <div style="margin-bottom: 0.5rem;">
-          <el-button size="small" @click="decreaseFontSize">A-</el-button>
-          <el-button size="small" @click="increaseFontSize">A+</el-button>
         </div>
-        <!-- 背景类型选择 -->
-        <el-select v-model="selectedBgType" placeholder="选择背景类型" size="small" style="margin-bottom: 0.7rem; width: 180px;">
-          <el-option v-for="item in bgTypeOptions" :key="item.value" :label="item.label" :value="item.value" />
-        </el-select>
-        <!-- 背景选择 -->
-        <el-select v-model="selectedBg" placeholder="选择背景" size="small" style="margin-bottom: 0.7rem; width: 180px;">
-          <el-option v-for="item in currentBgOptions" :key="item.value" :label="item.label" :value="item.value" />
-        </el-select>
-        <el-select v-model="selectedFont" placeholder="选择字体" size="small" style="margin-bottom: 0.7rem; width: 180px;">
-          <el-option v-for="item in fontOptions" :key="item.value" :label="item.label" :value="item.value" />
-        </el-select>
-        <el-button type="success" class="copy-btn" @click="copyImage" size="small">复制图片</el-button>
-        <div
-          ref="imageCardRef"
-          class="weixin-card-preview"
-          :class="selectedBg"
-        >
-          <div class="quote-mark">"</div>
-          <div class="weixin-card-text" :style="{ color: computedTextColor, fontFamily: selectedFont || undefined, fontSize: previewFontSize + 'rem' }">
-            {{ inputText || '这里会显示你的摘录内容' }}
+      </div>
+
+      <!-- 右侧控制和预览区域 -->
+      <div class="right-section">
+        <!-- 控制面板 -->
+        <div class="control-panel">
+          <div class="control-header">
+            <h3 class="control-title">控制面板</h3>
+            <div class="control-subtitle">调整图片样式和效果</div>
           </div>
-          <div class="weixin-card-date" :style="{ color: computedTextColor }" v-if="showDate">{{ todayStr }}</div>
+          
+          <div class="control-content">
+            <div class="control-group">
+              <label class="control-label">字体大小</label>
+              <div class="font-size-controls">
+                <el-button size="small" @click="decreaseFontSize" class="control-btn">A-</el-button>
+                <el-button size="small" @click="increaseFontSize" class="control-btn">A+</el-button>
+              </div>
+            </div>
+
+            <div class="control-group">
+              <label class="control-label">背景类型</label>
+              <el-select v-model="selectedBgType" placeholder="选择背景类型" size="small" class="control-select">
+                <el-option v-for="item in bgTypeOptions" :key="item.value" :label="item.label" :value="item.value" />
+              </el-select>
+            </div>
+
+            <div class="control-group">
+              <label class="control-label">背景样式</label>
+              <el-select v-model="selectedBg" placeholder="选择背景" size="small" class="control-select">
+                <el-option v-for="item in currentBgOptions" :key="item.value" :label="item.label" :value="item.value" />
+              </el-select>
+            </div>
+
+            <div class="control-group">
+              <label class="control-label">字体</label>
+              <el-select v-model="selectedFont" placeholder="选择字体" size="small" class="control-select">
+                <el-option v-for="item in fontOptions" :key="item.value" :label="item.label" :value="item.value" />
+              </el-select>
+            </div>
+
+            <el-button type="primary" class="copy-btn" @click="copyImage" size="small">
+              <span class="btn-text">生成图片</span>
+            </el-button>
+          </div>
+        </div>
+
+        <!-- 预览区域 -->
+        <div class="preview-area">
+          <div class="preview-header">
+            <h3 class="preview-title">预览效果</h3>
+            <div class="preview-subtitle">实时预览生成的图片</div>
+          </div>
+          <div
+            ref="imageCardRef"
+            class="preview-card"
+            :class="selectedBg"
+          >
+            <div class="preview-text" :style="{ color: computedTextColor, fontFamily: selectedFont || undefined, fontSize: previewFontSize + 'rem' }">
+              {{ inputText || '这里会显示你的文字内容' }}
+            </div>
+          </div>
         </div>
       </div>
     </div>
 
     <!-- 移动端图片预览弹窗 -->
-    <el-dialog v-model="showImagePreview" title="保存图片" width="90%" center>
-      <img :src="generatedImageUrl" style="width: 100%; border-radius: 8px;" alt="生成的图片" />
+    <el-dialog v-model="showImagePreview" title="保存图片" width="90%" center class="preview-dialog">
+      <img :src="generatedImageUrl" class="preview-image" alt="生成的图片" />
       <template #footer>
         <span class="dialog-footer">
-          <el-button @click="showImagePreview = false">关闭</el-button>
+          <el-button @click="showImagePreview = false" class="dialog-btn">关闭</el-button>
         </span>
       </template>
     </el-dialog>
@@ -79,15 +114,6 @@ const bgTypeOptions = [
 
 // 纯色背景选项
 const solidBgOptions = [
-  { label: '经典白', value: 'bg-white' },
-  { label: '淡雅蓝', value: 'bg-blue' },
-  { label: '活力橙', value: 'bg-orange' },
-  { label: '淡灰卡片', value: 'bg-light-gray' },
-  { label: '雅黑黑', value: 'bg-dark-black' },
-  { label: '米黄纸', value: 'bg-milky-paper' },
-  { label: '夜间深蓝', value: 'bg-night-blue' },
-  { label: '淡粉紫', value: 'bg-light-pink-purple' },
-  { label: '知乎白', value: 'bg-zhihu-white' },
   { label: '知乎淡蓝', value: 'bg-zhihu-light-blue' },
   { label: '知乎淡黄', value: 'bg-zhihu-light-yellow' },
   { label: '知乎淡绿', value: 'bg-zhihu-light-green' },
@@ -96,13 +122,28 @@ const solidBgOptions = [
   { label: '小红书紫', value: 'bg-xiaohongshu-purple' },
   { label: '小红书蓝', value: 'bg-xiaohongshu-blue' },
   { label: '小红书绿', value: 'bg-xiaohongshu-green' },
-  { label: '小红书橙', value: 'bg-xiaohongshu-orange' }
+  { label: '小红书橙', value: 'bg-xiaohongshu-orange' },
+  { label: '经典白', value: 'bg-white' },
+  { label: '淡雅蓝', value: 'bg-blue' },
+  { label: '活力橙', value: 'bg-orange' },
+  { label: '淡灰卡片', value: 'bg-light-gray' },
+  { label: '雅黑黑', value: 'bg-dark-black' },
+  { label: '米黄纸', value: 'bg-milky-paper' },
+  { label: '夜间深蓝', value: 'bg-night-blue' },
+  { label: '淡粉紫', value: 'bg-light-pink-purple' },
+  { label: '知乎白', value: 'bg-zhihu-white' }
 ];
 
 // 渐变背景选项
 const gradientBgOptions = [
   { label: '渐变绿', value: 'bg-gradient-green' },
+  { label: '柔紫蓝', value: 'bg-gradient-soft-purple-blue' },
+  { label: '柔绿黄', value: 'bg-gradient-soft-green-yellow' },
+  { label: '柔米白', value: 'bg-gradient-soft-milky' },
   { label: '蓝紫渐变', value: 'bg-gradient-bluepurple' },
+  { label: '知乎蓝白渐变', value: 'bg-zhihu-blue-white-gradient' },
+  { label: '小红书粉紫渐变', value: 'bg-xiaohongshu-pink-purple' },
+  { label: '小红书蓝粉渐变', value: 'bg-xiaohongshu-blue-pink' },
   { label: '橙粉渐变', value: 'bg-gradient-orange-pink' },
   { label: '青绿渐变', value: 'bg-gradient-cyan-green' },
   { label: '蓝紫竖向渐变', value: 'bg-v-gradient-bluepurple' },
@@ -110,12 +151,6 @@ const gradientBgOptions = [
   { label: '青绿竖向渐变', value: 'bg-v-gradient-cyan-green' },
   { label: '柔和青蓝', value: 'bg-gradient-soft-cyan-blue' },
   { label: '柔粉橙黄', value: 'bg-gradient-soft-pink-orange' },
-  { label: '柔紫蓝', value: 'bg-gradient-soft-purple-blue' },
-  { label: '柔绿黄', value: 'bg-gradient-soft-green-yellow' },
-  { label: '柔米白', value: 'bg-gradient-soft-milky' },
-  { label: '知乎蓝白渐变', value: 'bg-zhihu-blue-white-gradient' },
-  { label: '小红书粉紫渐变', value: 'bg-xiaohongshu-pink-purple' },
-  { label: '小红书蓝粉渐变', value: 'bg-xiaohongshu-blue-pink' },
   { label: '日落渐变', value: 'bg-gradient-sunset' },
   { label: '海洋渐变', value: 'bg-gradient-ocean' },
   { label: '森林渐变', value: 'bg-gradient-forest' },
@@ -201,19 +236,7 @@ const inputText = ref('');
  */
 const imageCardRef = ref(null);
 
-/**
- * @description 获取当前日期字符串，格式为YYYY-MM-DD
- */
-function getTodayStr() {
-  const d = new Date();
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, '0');
-  const day = String(d.getDate()).padStart(2, '0');
-  return `${y}-${m}-${day}`;
-}
-const todayStr = getTodayStr();
 
-const showDate = ref(false);
 
 // 用于移动端图片预览
 const showImagePreview = ref(false);
@@ -238,10 +261,6 @@ const copyImage = async () => {
   const card = imageCardRef.value;
   const originalMaxHeight = card.style.maxHeight;
   const originalOverflowY = card.style.overflowY;
-
-  // 1. 显示日期
-  showDate.value = true;
-  await nextTick();
 
   // 展开内容，确保截图全部内容
   card.style.maxHeight = 'none';
@@ -292,8 +311,6 @@ const copyImage = async () => {
     // 恢复原样式
     card.style.maxHeight = originalMaxHeight;
     card.style.overflowY = originalOverflowY;
-    // 2. 隐藏日期
-    showDate.value = false;
   }
 };
 
@@ -404,69 +421,306 @@ const computedTextColor = computed(() => bgTextColorMap[selectedBg.value] || '#2
 </script>
 
 <style scoped>
-.font-to-image-row-container {
-  display: flex;
-  flex-direction: row;
-  align-items: stretch;
-  justify-content: center;
-  gap: 2.5rem;
-  max-width: 900px;
-  margin: 2.5rem auto;
-  width: 100%;
-}
-.font-to-image-left, .font-to-image-right {
-  flex: 1 1 0;
-  min-width: 0;
+.font-to-image-container {
   display: flex;
   flex-direction: column;
-  align-items: stretch;
-  height: 100%;
+  align-items: center;
+  padding: 20px;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 }
+
+.main-content {
+  display: flex;
+  gap: 30px;
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  align-items: flex-start;
+  justify-content: center;
+  min-height: calc(100vh - 100px);
+}
+
+.input-section {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+
 .input-card {
   width: 100%;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
-  border-radius: 14px;
-  min-height: 500px;
+  max-width: 450px;
+  height: 650px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  border-radius: 16px;
+  overflow: hidden;
+  transition: all 0.3s ease;
   display: flex;
   flex-direction: column;
-  justify-content: stretch;
 }
-.input-title {
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: #2d8cf0;
-}
+
 .input-area {
-  margin-bottom: 0.5rem;
-  min-height: 420px;
-  height: 100%;
-}
-.preview-title {
-  font-size: 1rem;
-  color: #888;
-  margin-bottom: 0.7rem;
-  margin-top: 0.5rem;
-  text-align: left;
-}
-.weixin-card-preview {
   flex: 1;
-  min-height: 400px;
-  max-height: 530px;
-  overflow-y: auto;
+  padding: 20px 25px;
+  font-size: 1rem;
+  line-height: 1.6;
+  color: #333;
+  border: none;
+  resize: none;
+  outline: none;
+  box-sizing: border-box;
+  background: transparent;
+}
+
+.right-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  height: 650px;
+}
+
+.input-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+}
+
+.input-header {
+  padding: 20px 25px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  text-align: center;
+}
+
+.input-title {
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin: 0 0 8px 0;
+  color: white;
+}
+
+.input-subtitle {
+  font-size: 0.9rem;
+  opacity: 0.9;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+
+
+.input-area:focus {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.control-panel {
   width: 100%;
-  background: #fff;
-  border-radius: 18px;
-  box-shadow: 0 4px 24px 0 rgba(0,0,0,0.10), 0 1.5px 4px 0 rgba(0,0,0,0.03);
-  padding: 2.2rem 1.5rem 1.5rem 1.5rem;
-  position: relative;
+  max-width: 450px;
+  height: 290px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  transition: all 0.3s ease;
+  overflow: visible;
+}
+
+.control-content {
+  flex: 1;
+  padding: 15px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow: visible;
+}
+
+.control-panel:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+}
+
+.control-header {
+  padding: 20px 25px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  text-align: center;
+}
+
+.control-title {
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin: 0 0 8px 0;
+  color: white;
+}
+
+.control-subtitle {
+  font-size: 0.9rem;
+  opacity: 0.9;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.control-group {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 2px 0;
+}
+
+.control-label {
+  font-size: 0.9rem;
+  color: #555;
+  font-weight: 500;
+  min-width: 75px;
+  line-height: 1.3;
+}
+
+.font-size-controls {
+  display: flex;
+  gap: 6px;
+}
+
+.control-btn {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  color: white;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  transition: all 0.3s ease;
+}
+
+.control-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.control-select {
+  width: 100%;
+  max-width: 160px;
+  min-width: 140px;
+}
+
+.control-select :deep(.el-input__wrapper) {
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(102, 126, 234, 0.2);
+  border-radius: 4px;
+  padding: 4px 8px;
+  min-height: 28px;
+  transition: all 0.3s ease;
+}
+
+.control-select :deep(.el-input__wrapper:hover) {
+  border-color: rgba(102, 126, 234, 0.5);
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+}
+
+.copy-btn {
+  width: 100%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  color: white;
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 4px;
+  min-height: 32px;
+}
+
+.copy-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+}
+
+.copy-btn:active {
+  transform: translateY(0);
+}
+
+.copy-btn .btn-text {
+  margin-left: 8px;
+}
+
+.preview-area {
+  width: 100%;
+  max-width: 450px;
+  height: 320px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  border-radius: 16px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.3s ease;
+}
+
+.preview-area:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+}
+
+.preview-header {
+  padding: 20px 25px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  text-align: center;
+}
+
+.preview-title {
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin: 0;
+  color: white;
+}
+
+.preview-subtitle {
+  font-size: 0.9rem;
+  opacity: 0.9;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.preview-card {
+  flex: 1;
+  padding: 20px;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  justify-content: space-between;
-  margin-bottom: 1.2rem;
+  justify-content: center;
+  position: relative;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
   box-sizing: border-box;
-  border: 1px solid rgba(0,0,0,0.08);
+  overflow-y: auto;
+  margin: 15px;
 }
+
+.preview-text {
+  font-size: 1.18rem;
+  line-height: 1.8;
+  margin: 0;
+  word-break: break-all;
+  white-space: pre-wrap;
+  min-height: 120px;
+  width: 100%;
+  transition: color 0.2s;
+  flex: 1;
+  text-align: left;
+}
+
 .quote-mark {
   position: absolute;
   top: 1.1rem;
@@ -477,34 +731,14 @@ const computedTextColor = computed(() => bgTextColorMap[selectedBg.value] || '#2
   user-select: none;
   pointer-events: none;
 }
-.weixin-card-text {
-  font-size: 1.18rem;
-  line-height: 1.8;
-  margin: 0.5rem 0 0.7rem 0;
-  word-break: break-all;
-  white-space: pre-wrap;
-  min-height: 120px;
-  width: 100%;
-  transition: color 0.2s;
-  flex: 1;
-}
-.weixin-card-date {
-  font-size: 0.98rem;
-  font-family: 'PingFang SC', 'Microsoft YaHei', Arial, sans-serif;
-  opacity: 0.85;
-  margin-left: 0.1rem;
-  margin-bottom: 0.2rem;
-  text-align: right;
-  align-self: flex-end;
-  width: 100%;
-  margin-top: 1rem;
-}
+
 .date-below {
   margin-top: 0.2rem;
   margin-bottom: 0.7rem;
   text-align: left;
   display: none;
 }
+
 .weixin-card-footer {
   align-self: flex-end;
   font-size: 0.98rem;
@@ -513,21 +747,59 @@ const computedTextColor = computed(() => bgTextColorMap[selectedBg.value] || '#2
   margin-top: 0.2rem;
   opacity: 0.7;
 }
-@media (max-width: 900px) {
-  .font-to-image-row-container {
-    flex-direction: column;
-    gap: 1.5rem;
-    max-width: 98vw;
-    margin: 1.2rem auto;
-  }
-  .font-to-image-left, .font-to-image-right {
-    width: 100%;
-  }
-  .weixin-card-preview {
-    min-height: 120px;
-    padding: 1.2rem 0.7rem 1rem 0.7rem;
-  }
+
+.preview-dialog :deep(.el-dialog) {
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
 }
+
+.preview-dialog :deep(.el-dialog__header) {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 20px 25px;
+}
+
+.preview-dialog :deep(.el-dialog__title) {
+  color: white;
+  font-weight: 600;
+  font-size: 1.2rem;
+}
+
+.preview-dialog :deep(.el-dialog__body) {
+  padding: 25px;
+  background: #f8f9fa;
+}
+
+.preview-dialog :deep(.el-dialog__footer) {
+  background: #f8f9fa;
+  border-top: 1px solid #eee;
+  padding: 20px 25px;
+}
+
+.preview-dialog .dialog-btn {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  color: white;
+  font-weight: 600;
+  padding: 10px 20px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.preview-dialog .dialog-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.preview-image {
+  width: 100%;
+  border-radius: 12px;
+  display: block;
+  margin: 0 auto;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
 .bg-radio-group {
   margin-bottom: 0.7rem;
   display: flex;
@@ -681,6 +953,7 @@ const computedTextColor = computed(() => bgTextColorMap[selectedBg.value] || '#2
 .copy-btn {
   width: 100px;
   margin-bottom: 0.7rem;
+  align-self: flex-end;
 }
 /* 新增格子背景样式 */
 .bg-grid-white {
@@ -778,5 +1051,100 @@ const computedTextColor = computed(() => bgTextColorMap[selectedBg.value] || '#2
 .bg-diagonal-line {
   background: #fff !important;
   background-image: repeating-linear-gradient(45deg, #e0e0e0 0, #e0e0e0 1px, transparent 1px, transparent 20px) !important;
+}
+
+/* 响应式设计 */
+@media (max-width: 1200px) {
+  .main-content {
+    max-width: 1000px;
+    gap: 25px;
+  }
+  
+  .input-card, .control-panel, .preview-area {
+    max-width: 350px;
+  }
+}
+
+@media (max-width: 900px) {
+  .font-to-image-container {
+    padding: 15px;
+  }
+  
+  .main-content {
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    min-height: auto;
+    padding: 20px 0;
+  }
+  
+  .input-section, .right-section {
+    width: 100%;
+    max-width: 600px;
+  }
+  
+  .input-card {
+    height: auto;
+    min-height: 500px;
+    max-width: 100%;
+  }
+  
+  .right-section {
+    height: auto;
+    order: 1;
+  }
+  
+  .input-section {
+    order: 2;
+  }
+  
+  .control-panel, .preview-area {
+    max-width: 100%;
+    height: auto;
+  }
+  
+  .control-panel {
+    min-height: 240px;
+  }
+  
+  .preview-area {
+    min-height: 300px;
+  }
+}
+
+@media (max-width: 600px) {
+  .font-to-image-container {
+    padding: 10px;
+  }
+  
+  .main-content {
+    gap: 15px;
+  }
+  
+  .input-card, .preview-area, .control-panel {
+    border-radius: 12px;
+  }
+  
+  .input-header, .control-header, .preview-header {
+    padding: 15px 20px;
+  }
+  
+  .input-area, .preview-card {
+    padding: 15px 20px;
+  }
+  
+  .control-content {
+    padding: 15px 20px;
+  }
+  
+  .control-group {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  
+  .control-select {
+    max-width: 100%;
+  }
 }
 </style>

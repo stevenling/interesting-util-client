@@ -159,7 +159,7 @@ const gotoEpubReader = () => {
  */
 const gotoJsonFormat = () => {
   router.push({
-    path: "/jsonFormat",
+    path: "/JsonFormat",
   });
 };
 
@@ -168,7 +168,7 @@ const gotoJsonFormat = () => {
  */
 const gotoColorConvert = () => {
   router.push({
-    path: "/colorConvert",
+    path: "/ColorConvert",
   });
 };
 </script>
