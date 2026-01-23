@@ -9,7 +9,7 @@ import YunhuMatrix from '../components/YunhuMatrix.vue'
 export const constantRoutes = [
     {
         name: 'UtilIndex',
-        path: '/',
+        path: '/utilIndex',
         component: () => import("@/components/UtilIndex")
     },
     {
@@ -48,7 +48,7 @@ export const constantRoutes = [
         component: () => import("@/components/EpubReader.vue")
     },
     {
-        path: '/yunhuMatrix',
+        path: '/',
         name: 'YunhuMatrix',
         component: YunhuMatrix
     }

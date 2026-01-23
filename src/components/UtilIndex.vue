@@ -4,7 +4,7 @@
     <div class="main-container">
       <div class="hero-section">
         <div class="title">云胡个人站</div>
-        <div class="subtitle">I'm not bitter anymore. I'm syrupy sweet</div>
+        <div class="subtitle">小砂糖，你是我漫山遍野的喜欢～</div>
       </div>
       <div class="content-container">
         <el-row :gutter="24">
