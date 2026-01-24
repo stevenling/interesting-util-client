@@ -6,6 +6,7 @@
       <div class="list-container">
         <div class="header-section">
           <h1>云胡收藏文章集</h1>
+          <p>献给七纱，你是唯一的月亮呀～</p>
           <div class="search-section">
             <el-input
               v-model="searchKeyword"
@@ -259,7 +260,7 @@ onMounted(async () => {
   align-items: center;
   gap: 12px;
   max-width: 500px;
-  margin: 0 auto;
+  margin: 15px auto 0 auto;
 }
 
 .search-input {

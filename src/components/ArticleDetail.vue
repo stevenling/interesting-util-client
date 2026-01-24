@@ -21,53 +21,84 @@
       
       <div v-else-if="articleContent" class="article-section">
         <div class="toolbar">
-          <el-button @click="goBack" type="info" plain>
-            <el-icon><arrow-left /></el-icon>
-            返回
-          </el-button>
-          <el-button @click="handleExportPDF" type="primary" :loading="exporting">
-            <el-icon><document /></el-icon>
-            导出
-          </el-button>
-          <div class="font-size-controls">
-            <el-button @click="decreaseFontSize" type="default" :icon="Minus" circle title="减小字体"></el-button>
-            <span class="font-size-display">{{ fontSize }}px</span>
-            <el-button @click="increaseFontSize" type="default" :icon="Plus" circle title="增大字体"></el-button>
-          </div>
+          <el-button @click="goBack" type="primary" :icon="ArrowLeft" circle plain title="返回"></el-button>
           <el-popover
-            placement="bottom"
-            :width="200"
+            placement="bottom-start"
+            :width="320"
             trigger="click"
-            title="主题设置"
+            title="设置"
           >
             <template #reference>
-              <el-button type="default" :icon="Setting" circle title="主题设置"></el-button>
+              <el-button type="primary" :icon="Setting" circle plain title="设置"></el-button>
             </template>
-            <div class="theme-options">
-              <div class="theme-category">
-                <div class="category-title">纯色背景</div>
-                <div 
-                  v-for="theme in solidThemes" 
-                  :key="theme.name"
-                  class="theme-option"
-                  :class="{ active: currentTheme === theme.name }"
-                  @click="changeTheme(theme.name)"
-                >
-                  <div class="theme-preview" :style="getPreviewStyle(theme)"></div>
-                  <span class="theme-name">{{ theme.label }}</span>
+            <div class="settings-panel">
+              <!-- 字体大小设置 -->
+              <div class="setting-section">
+                <div class="section-title">字体大小</div>
+                <div class="font-size-controls">
+                  <el-button @click="decreaseFontSize" type="default" :icon="Minus" circle size="small"></el-button>
+                  <span class="font-size-display">{{ fontSize }}px</span>
+                  <el-button @click="increaseFontSize" type="default" :icon="Plus" circle size="small"></el-button>
                 </div>
               </div>
-              <div class="theme-category">
-                <div class="category-title">渐变背景</div>
-                <div 
-                  v-for="theme in gradientThemes" 
-                  :key="theme.name"
-                  class="theme-option"
-                  :class="{ active: currentTheme === theme.name }"
-                  @click="changeTheme(theme.name)"
-                >
-                  <div class="theme-preview" :style="getPreviewStyle(theme)"></div>
-                  <span class="theme-name">{{ theme.label }}</span>
+
+              <!-- 字体选择 -->
+              <div class="setting-section">
+                <div class="section-title">字体</div>
+                <el-select v-model="currentFont" @change="changeFont" style="width: 100%;">
+                  <el-option
+                    v-for="font in fontOptions"
+                    :key="font.value"
+                    :label="font.label"
+                    :value="font.value"
+                    :style="{ fontFamily: font.value }"
+                  />
+                </el-select>
+              </div>
+
+              <!-- 导出功能 -->
+              <div class="setting-section">
+                <div class="section-title">导出</div>
+                <el-button @click="handleExportPDF" type="primary" :loading="exporting" style="width: 100%;">
+                  <el-icon><document /></el-icon>
+                  导出PDF
+                </el-button>
+              </div>
+
+              <!-- 主题设置 -->
+              <div class="setting-section">
+                <div class="section-title">主题背景</div>
+                <div class="theme-options">
+                  <div class="theme-category">
+                    <div class="category-title">纯色背景</div>
+                    <div class="theme-grid">
+                      <div 
+                        v-for="theme in solidThemes" 
+                        :key="theme.name"
+                        class="theme-option"
+                        :class="{ active: currentTheme === theme.name }"
+                        @click="changeTheme(theme.name)"
+                        :title="theme.label"
+                      >
+                        <div class="theme-preview" :style="getPreviewStyle(theme)"></div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="theme-category">
+                    <div class="category-title">渐变背景</div>
+                    <div class="theme-grid">
+                      <div 
+                        v-for="theme in gradientThemes" 
+                        :key="theme.name"
+                        class="theme-option"
+                        :class="{ active: currentTheme === theme.name }"
+                        @click="changeTheme(theme.name)"
+                        :title="theme.label"
+                      >
+                        <div class="theme-preview" :style="getPreviewStyle(theme)"></div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -78,9 +109,10 @@
         <div class="content-area" ref="contentArea" :style="currentBgStyle">
           <div 
             class="markdown-content" 
+            :class="{ 'dark-theme': isDarkTheme }"
             v-html="renderedContent"
             ref="markdownContentRef"
-            :style="{ fontSize: fontSize + 'px' }"
+            :style="{ fontSize: fontSize + 'px', color: currentTextColor, ...getContentStyle() }"
           ></div>
         </div>
       </div>
@@ -110,27 +142,45 @@ const contentArea = ref(null);
 const markdownContentRef = ref(null);
 const exporting = ref(false);
 const fontSize = ref(20); // 默认字体大小
+const currentFont = ref('default'); // 当前字体
 
 // 主题设置（基于主流阅读网站常用颜色）
 const themes = [
   // 纯色背景
-  { name: 'white', label: '白色', bgColor: '#ffffff', type: 'solid' }, // 标准白色，最常用
-  { name: 'sepia', label: '米色', bgColor: '#FBF0D9', type: 'solid' }, // Kindle Sepia色，暖色调护眼
-  { name: 'light-gray', label: '浅灰', bgColor: '#F5F5F5', type: 'solid' }, // 柔和灰色，减少对比度
-  { name: 'light-green', label: '护眼绿', bgColor: '#E8F5E9', type: 'solid' }, // 柔和绿色，护眼舒适
-  { name: 'light-blue', label: '浅蓝', bgColor: '#E3F2FD', type: 'solid' }, // 微信读书护眼模式
-  { name: 'warm-white', label: '暖白', bgColor: '#FFF8E1', type: 'solid' }, // 温暖黄色调，类似纸张
+  { name: 'white', label: '白色', bgColor: '#ffffff', textColor: '#2c3e50', type: 'solid' }, // 标准白色，最常用
+  { name: 'sepia', label: '米色', bgColor: '#FBF0D9', textColor: '#2c3e50', type: 'solid' }, // Kindle Sepia色，暖色调护眼
+  { name: 'light-gray', label: '浅灰', bgColor: '#F5F5F5', textColor: '#2c3e50', type: 'solid' }, // 柔和灰色，减少对比度
+  { name: 'light-green', label: '护眼绿', bgColor: '#E8F5E9', textColor: '#2c3e50', type: 'solid' }, // 柔和绿色，护眼舒适
+  { name: 'light-blue', label: '浅蓝', bgColor: '#E3F2FD', textColor: '#2c3e50', type: 'solid' }, // 微信读书护眼模式
+  { name: 'dark', label: '黑色', bgColor: '#1a1a1a', textColor: '#ffffff', type: 'solid' }, // 黑色背景，白色文字
   // 渐变色背景
-  { name: 'sky-gradient', label: '天空蓝', bgColor: 'linear-gradient(180deg, #E3F2FD 0%, #BBDEFB 100%)', type: 'gradient' }, // 天空蓝渐变
-  { name: 'sunset-gradient', label: '日落', bgColor: 'linear-gradient(180deg, #FFF3E0 0%, #FFE0B2 100%)', type: 'gradient' }, // 日落渐变
-  { name: 'forest-gradient', label: '森林绿', bgColor: 'linear-gradient(180deg, #E8F5E9 0%, #C8E6C9 100%)', type: 'gradient' }, // 森林绿渐变
-  { name: 'dawn-gradient', label: '晨光', bgColor: 'linear-gradient(180deg, #FFF8E1 0%, #FFECB3 100%)', type: 'gradient' }, // 晨光渐变
-  { name: 'ocean-gradient', label: '海洋', bgColor: 'linear-gradient(180deg, #E0F2F1 0%, #B2DFDB 100%)', type: 'gradient' }, // 海洋渐变
-  { name: 'lavender-gradient', label: '紫霞', bgColor: 'linear-gradient(180deg, #F3E5F5 0%, #E1BEE7 100%)', type: 'gradient' } // 紫霞渐变
+  { name: 'sky-gradient', label: '天空蓝', bgColor: 'linear-gradient(180deg, #E3F2FD 0%, #BBDEFB 100%)', textColor: '#2c3e50', type: 'gradient' }, // 天空蓝渐变
+  { name: 'sunset-gradient', label: '日落', bgColor: 'linear-gradient(180deg, #FFF3E0 0%, #FFE0B2 100%)', textColor: '#2c3e50', type: 'gradient' }, // 日落渐变
+  { name: 'forest-gradient', label: '森林绿', bgColor: 'linear-gradient(180deg, #E8F5E9 0%, #C8E6C9 100%)', textColor: '#2c3e50', type: 'gradient' }, // 森林绿渐变
+  { name: 'dark-gradient', label: '深邃', bgColor: 'linear-gradient(180deg, #2c2c2c 0%, #1a1a1a 100%)', textColor: '#ffffff', type: 'gradient' }, // 深色渐变
+  { name: 'ocean-gradient', label: '海洋', bgColor: 'linear-gradient(180deg, #E0F2F1 0%, #B2DFDB 100%)', textColor: '#2c3e50', type: 'gradient' }, // 海洋渐变
+  { name: 'lavender-gradient', label: '紫霞', bgColor: 'linear-gradient(180deg, #F3E5F5 0%, #E1BEE7 100%)', textColor: '#2c3e50', type: 'gradient' } // 紫霞渐变
 ];
 
 const currentTheme = ref('white');
 const currentBgStyle = ref('background-color: #ffffff');
+const currentTextColor = ref('#2c3e50');
+
+// 字体选项
+const fontOptions = [
+  { label: '系统默认', value: 'default' },
+  { label: '苹方', value: 'PingFang SC, -apple-system, BlinkMacSystemFont' },
+  { label: '微软雅黑', value: 'Microsoft YaHei, sans-serif' },
+  { label: '思源黑体', value: 'Source Han Sans CN, sans-serif' },
+  { label: '宋体', value: 'SimSun, serif' },
+  { label: '楷体', value: 'KaiTi, serif' },
+  { label: '仿宋', value: 'FangSong, serif' },
+  { label: 'Times New Roman', value: 'Times New Roman, serif' },
+  { label: 'Georgia', value: 'Georgia, serif' },
+  { label: 'Helvetica', value: 'Helvetica, Arial, sans-serif' }
+];
+
+const currentFontStyle = ref('');
 
 // 配置 marked 选项
 marked.setOptions({
@@ -215,6 +265,8 @@ const goBack = () => {
 const increaseFontSize = () => {
   if (fontSize.value < 32) {
     fontSize.value += 2;
+    // 保存到 localStorage
+    localStorage.setItem('articleFontSize', fontSize.value.toString());
   }
 };
 
@@ -224,12 +276,17 @@ const increaseFontSize = () => {
 const decreaseFontSize = () => {
   if (fontSize.value > 12) {
     fontSize.value -= 2;
+    // 保存到 localStorage
+    localStorage.setItem('articleFontSize', fontSize.value.toString());
   }
 };
 
 // 计算纯色和渐变主题
 const solidThemes = computed(() => themes.filter(t => t.type === 'solid'));
 const gradientThemes = computed(() => themes.filter(t => t.type === 'gradient'));
+
+// 判断是否为深色主题
+const isDarkTheme = computed(() => currentTheme.value === 'dark' || currentTheme.value === 'dark-gradient');
 
 /**
  * 获取预览样式
@@ -247,6 +304,20 @@ const getPreviewStyle = (theme) => {
 };
 
 /**
+ * 获取内容样式（包括字体）
+ */
+const getContentStyle = () => {
+  const styles = {};
+  if (currentFont.value !== 'default') {
+    const font = fontOptions.find(f => f.value === currentFont.value);
+    if (font) {
+      styles.fontFamily = font.value;
+    }
+  }
+  return styles;
+};
+
+/**
  * 切换主题
  */
 const changeTheme = (themeName) => {
@@ -258,8 +329,27 @@ const changeTheme = (themeName) => {
     } else {
       currentBgStyle.value = `background-color: ${theme.bgColor}`;
     }
+    // 设置文字颜色
+    currentTextColor.value = theme.textColor;
     // 保存到localStorage
     localStorage.setItem('articleTheme', themeName);
+  }
+};
+
+/**
+ * 切换字体
+ */
+const changeFont = (fontValue) => {
+  currentFont.value = fontValue;
+  const font = fontOptions.find(f => f.value === fontValue);
+  if (font) {
+    if (fontValue === 'default') {
+      currentFontStyle.value = '';
+    } else {
+      currentFontStyle.value = `font-family: ${font.value};`;
+    }
+    // 保存到localStorage
+    localStorage.setItem('articleFont', fontValue);
   }
 };
 
@@ -268,11 +358,38 @@ const changeTheme = (themeName) => {
  */
 const initTheme = () => {
   const savedTheme = localStorage.getItem('articleTheme');
-  if (savedTheme) {
+  if (savedTheme && themes.find(t => t.name === savedTheme)) {
     changeTheme(savedTheme);
   } else {
     // 默认使用白色主题
     changeTheme('white');
+  }
+};
+
+/**
+ * 初始化字体大小
+ */
+const initFontSize = () => {
+  const savedFontSize = localStorage.getItem('articleFontSize');
+  if (savedFontSize) {
+    const size = parseInt(savedFontSize, 10);
+    // 确保字体大小在合理范围内
+    if (size >= 12 && size <= 32) {
+      fontSize.value = size;
+    }
+  }
+};
+
+/**
+ * 初始化字体
+ */
+const initFont = () => {
+  const savedFont = localStorage.getItem('articleFont');
+  if (savedFont) {
+    changeFont(savedFont);
+  } else {
+    // 默认使用系统字体
+    changeFont('default');
   }
 };
 
@@ -429,6 +546,8 @@ const handleExportPDF = async () => {
 onMounted(() => {
   document.querySelector('body').setAttribute('style', 'background: #EBEDF0');
   initTheme();
+  initFontSize();
+  initFont();
   loadArticle();
 });
 </script>
@@ -473,10 +592,29 @@ onMounted(() => {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-left: 10px;
-  padding: 0 10px;
-  border-left: 1px solid #e4e7ed;
-  border-right: 1px solid #e4e7ed;
+  justify-content: center;
+}
+
+.settings-panel {
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+.setting-section {
+  margin-bottom: 20px;
+}
+
+.setting-section:last-child {
+  margin-bottom: 0;
+}
+
+.section-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #303133;
+  margin-bottom: 8px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid #f0f0f0;
 }
 
 .font-size-display {
@@ -491,8 +629,12 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  max-height: 400px;
-  overflow-y: auto;
+}
+
+.theme-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
 }
 
 .theme-category {
@@ -514,9 +656,9 @@ onMounted(() => {
 
 .theme-option {
   display: flex;
+  justify-content: center;
   align-items: center;
-  gap: 10px;
-  padding: 8px;
+  padding: 4px;
   border-radius: 4px;
   cursor: pointer;
   transition: background-color 0.2s;
@@ -531,7 +673,7 @@ onMounted(() => {
 }
 
 .theme-preview {
-  width: 30px;
+  width: 40px;
   height: 30px;
   border-radius: 4px;
   border: 2px solid #e4e7ed;
@@ -575,6 +717,57 @@ onMounted(() => {
 /* Markdown 内容样式 */
 :deep(.markdown-content) {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+/* 深色主题样式 */
+:deep(.markdown-content.dark-theme h1),
+:deep(.markdown-content.dark-theme h2) {
+  border-color: #444;
+}
+
+:deep(.markdown-content.dark-theme blockquote) {
+  color: #ccc;
+  border-color: #555;
+}
+
+:deep(.markdown-content.dark-theme code) {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+:deep(.markdown-content.dark-theme pre) {
+  background-color: #2d2d2d;
+}
+
+:deep(.markdown-content.dark-theme pre code) {
+  background-color: transparent;
+  color: #fff;
+}
+
+:deep(.markdown-content.dark-theme table th),
+:deep(.markdown-content.dark-theme table td) {
+  border-color: #555;
+}
+
+:deep(.markdown-content.dark-theme table th) {
+  background-color: #333;
+}
+
+:deep(.markdown-content.dark-theme table tr) {
+  background-color: #1a1a1a;
+  border-color: #555;
+}
+
+:deep(.markdown-content.dark-theme table tr:nth-child(2n)) {
+  background-color: #2a2a2a;
+}
+
+:deep(.markdown-content.dark-theme hr) {
+  background-color: #555;
+}
+
+:deep(.markdown-content.dark-theme a) {
+  color: #66b3ff;
 }
 
 :deep(.markdown-content h1) {
