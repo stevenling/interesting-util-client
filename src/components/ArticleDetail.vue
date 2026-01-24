@@ -173,7 +173,17 @@ const loadArticle = async () => {
   
   try {
     // 从public/articles目录加载md文件
-    const response = await fetch(`/articles/${article.file}`);
+    // 动态获取 base URL 以适配 GitHub Pages 的 base path
+    const getBaseUrl = () => {
+      // 检查当前路径是否包含 GitHub Pages 的 base path
+      if (window.location.pathname.startsWith('/interesting-util-client/')) {
+        return '/interesting-util-client/';
+      }
+      return '/';
+    };
+    const baseUrl = getBaseUrl();
+    const articlePath = `${baseUrl}articles/${article.file}`;
+    const response = await fetch(articlePath);
     
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
