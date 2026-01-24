@@ -14,7 +14,7 @@
           :sub-title="error"
         >
           <template #extra>
-            <el-button type="primary" @click="goBack">返回列表</el-button>
+            <el-button type="primary" @click="goBack">返回</el-button>
           </template>
         </el-result>
       </div>
@@ -23,20 +23,64 @@
         <div class="toolbar">
           <el-button @click="goBack" type="info" plain>
             <el-icon><arrow-left /></el-icon>
-            返回列表
+            返回
           </el-button>
           <el-button @click="handleExportPDF" type="primary" :loading="exporting">
             <el-icon><document /></el-icon>
-            导出 PDF
+            导出
           </el-button>
+          <div class="font-size-controls">
+            <el-button @click="decreaseFontSize" type="default" :icon="Minus" circle title="减小字体"></el-button>
+            <span class="font-size-display">{{ fontSize }}px</span>
+            <el-button @click="increaseFontSize" type="default" :icon="Plus" circle title="增大字体"></el-button>
+          </div>
+          <el-popover
+            placement="bottom"
+            :width="200"
+            trigger="click"
+            title="主题设置"
+          >
+            <template #reference>
+              <el-button type="default" :icon="Setting" circle title="主题设置"></el-button>
+            </template>
+            <div class="theme-options">
+              <div class="theme-category">
+                <div class="category-title">纯色背景</div>
+                <div 
+                  v-for="theme in solidThemes" 
+                  :key="theme.name"
+                  class="theme-option"
+                  :class="{ active: currentTheme === theme.name }"
+                  @click="changeTheme(theme.name)"
+                >
+                  <div class="theme-preview" :style="getPreviewStyle(theme)"></div>
+                  <span class="theme-name">{{ theme.label }}</span>
+                </div>
+              </div>
+              <div class="theme-category">
+                <div class="category-title">渐变背景</div>
+                <div 
+                  v-for="theme in gradientThemes" 
+                  :key="theme.name"
+                  class="theme-option"
+                  :class="{ active: currentTheme === theme.name }"
+                  @click="changeTheme(theme.name)"
+                >
+                  <div class="theme-preview" :style="getPreviewStyle(theme)"></div>
+                  <span class="theme-name">{{ theme.label }}</span>
+                </div>
+              </div>
+            </div>
+          </el-popover>
           <span class="article-title-text">{{ articleTitle }}</span>
         </div>
         
-        <div class="content-area" ref="contentArea">
+        <div class="content-area" ref="contentArea" :style="currentBgStyle">
           <div 
             class="markdown-content" 
             v-html="renderedContent"
             ref="markdownContentRef"
+            :style="{ fontSize: fontSize + 'px' }"
           ></div>
         </div>
       </div>
@@ -48,7 +92,7 @@
 import { ref, computed, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { ElMessage } from 'element-plus';
-import { ArrowLeft, Document } from '@element-plus/icons-vue';
+import { ArrowLeft, Document, Minus, Plus, Setting } from '@element-plus/icons-vue';
 import TopMenu from './TopMenu.vue';
 import { marked } from 'marked';
 import html2canvas from 'html2canvas';
@@ -65,6 +109,28 @@ const articleTitle = ref('');
 const contentArea = ref(null);
 const markdownContentRef = ref(null);
 const exporting = ref(false);
+const fontSize = ref(20); // 默认字体大小
+
+// 主题设置（基于主流阅读网站常用颜色）
+const themes = [
+  // 纯色背景
+  { name: 'white', label: '白色', bgColor: '#ffffff', type: 'solid' }, // 标准白色，最常用
+  { name: 'sepia', label: '米色', bgColor: '#FBF0D9', type: 'solid' }, // Kindle Sepia色，暖色调护眼
+  { name: 'light-gray', label: '浅灰', bgColor: '#F5F5F5', type: 'solid' }, // 柔和灰色，减少对比度
+  { name: 'light-green', label: '护眼绿', bgColor: '#E8F5E9', type: 'solid' }, // 柔和绿色，护眼舒适
+  { name: 'light-blue', label: '浅蓝', bgColor: '#E3F2FD', type: 'solid' }, // 微信读书护眼模式
+  { name: 'warm-white', label: '暖白', bgColor: '#FFF8E1', type: 'solid' }, // 温暖黄色调，类似纸张
+  // 渐变色背景
+  { name: 'sky-gradient', label: '天空蓝', bgColor: 'linear-gradient(180deg, #E3F2FD 0%, #BBDEFB 100%)', type: 'gradient' }, // 天空蓝渐变
+  { name: 'sunset-gradient', label: '日落', bgColor: 'linear-gradient(180deg, #FFF3E0 0%, #FFE0B2 100%)', type: 'gradient' }, // 日落渐变
+  { name: 'forest-gradient', label: '森林绿', bgColor: 'linear-gradient(180deg, #E8F5E9 0%, #C8E6C9 100%)', type: 'gradient' }, // 森林绿渐变
+  { name: 'dawn-gradient', label: '晨光', bgColor: 'linear-gradient(180deg, #FFF8E1 0%, #FFECB3 100%)', type: 'gradient' }, // 晨光渐变
+  { name: 'ocean-gradient', label: '海洋', bgColor: 'linear-gradient(180deg, #E0F2F1 0%, #B2DFDB 100%)', type: 'gradient' }, // 海洋渐变
+  { name: 'lavender-gradient', label: '紫霞', bgColor: 'linear-gradient(180deg, #F3E5F5 0%, #E1BEE7 100%)', type: 'gradient' } // 紫霞渐变
+];
+
+const currentTheme = ref('white');
+const currentBgStyle = ref('background-color: #ffffff');
 
 // 配置 marked 选项
 marked.setOptions({
@@ -131,6 +197,73 @@ const goBack = () => {
   router.push({
     path: '/articleList'
   });
+};
+
+/**
+ * 增大字体
+ */
+const increaseFontSize = () => {
+  if (fontSize.value < 32) {
+    fontSize.value += 2;
+  }
+};
+
+/**
+ * 减小字体
+ */
+const decreaseFontSize = () => {
+  if (fontSize.value > 12) {
+    fontSize.value -= 2;
+  }
+};
+
+// 计算纯色和渐变主题
+const solidThemes = computed(() => themes.filter(t => t.type === 'solid'));
+const gradientThemes = computed(() => themes.filter(t => t.type === 'gradient'));
+
+/**
+ * 获取预览样式
+ */
+const getPreviewStyle = (theme) => {
+  if (theme.type === 'gradient') {
+    return {
+      background: theme.bgColor
+    };
+  } else {
+    return {
+      backgroundColor: theme.bgColor
+    };
+  }
+};
+
+/**
+ * 切换主题
+ */
+const changeTheme = (themeName) => {
+  currentTheme.value = themeName;
+  const theme = themes.find(t => t.name === themeName);
+  if (theme) {
+    if (theme.type === 'gradient') {
+      currentBgStyle.value = `background: ${theme.bgColor}`;
+    } else {
+      currentBgStyle.value = `background-color: ${theme.bgColor}`;
+    }
+    // 保存到localStorage
+    localStorage.setItem('articleTheme', themeName);
+  }
+};
+
+/**
+ * 初始化主题
+ */
+const initTheme = () => {
+  const savedTheme = localStorage.getItem('articleTheme');
+  if (savedTheme) {
+    changeTheme(savedTheme);
+  } else {
+    // 默认使用白色主题
+    changeTheme('white');
+  }
 };
 
 /**
@@ -225,7 +358,6 @@ const handleExportPDF = async () => {
     } else {
       // 内容需要分页
       let sourceY = 0;
-      let sourceHeight = imgHeight;
       
       while (remainingHeight > 0) {
         // 计算当前页可以显示的内容高度
@@ -286,6 +418,7 @@ const handleExportPDF = async () => {
 
 onMounted(() => {
   document.querySelector('body').setAttribute('style', 'background: #EBEDF0');
+  initTheme();
   loadArticle();
 });
 </script>
@@ -326,6 +459,84 @@ onMounted(() => {
   background: #f5f7fa;
 }
 
+.font-size-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: 10px;
+  padding: 0 10px;
+  border-left: 1px solid #e4e7ed;
+  border-right: 1px solid #e4e7ed;
+}
+
+.font-size-display {
+  min-width: 50px;
+  text-align: center;
+  color: #606266;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.theme-options {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.theme-category {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.category-title {
+  font-size: 12px;
+  color: #909399;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+  padding: 4px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.theme-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.theme-option:hover {
+  background-color: #f5f7fa;
+}
+
+.theme-option.active {
+  background-color: #e6f7ff;
+}
+
+.theme-preview {
+  width: 30px;
+  height: 30px;
+  border-radius: 4px;
+  border: 2px solid #e4e7ed;
+  flex-shrink: 0;
+}
+
+.theme-option.active .theme-preview {
+  border-color: #409eff;
+}
+
+.theme-name {
+  font-size: 14px;
+  color: #606266;
+}
+
 .article-title-text {
   margin-left: auto;
   color: #606266;
@@ -338,6 +549,7 @@ onMounted(() => {
   max-height: calc(100vh - 200px);
   overflow-y: auto;
   background: #ffffff;
+  transition: background-color 0.3s ease;
 }
 
 .markdown-content {
@@ -345,13 +557,9 @@ onMounted(() => {
   margin: 0 auto;
   line-height: 1.8;
   color: #2c3e50;
-  font-size: 16px;
-}
-
-/* PDF导出时的样式优化 */
-.markdown-content {
   word-wrap: break-word;
   overflow-wrap: break-word;
+  transition: font-size 0.2s ease;
 }
 
 /* Markdown 内容样式 */
@@ -524,6 +732,13 @@ onMounted(() => {
   
   .toolbar {
     flex-wrap: wrap;
+  }
+  
+  .font-size-controls {
+    margin-left: 0;
+    border-left: none;
+    border-right: none;
+    padding: 0 5px;
   }
   
   .article-title-text {

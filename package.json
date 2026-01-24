@@ -10,7 +10,7 @@
     "lint": "vue-cli-service lint",
     "push": "npm run build && scp -r dist/* root@43.142.56.47:/root/vue-project/yunhu-utils/dist",
     "test:unit": "jest",
-    "generate-articles": "node scripts/generate-articles-config.js"
+    "gen": "node scripts/generate-articles-config.js"
   },
   "dependencies": {
     "@highlightjs/vue-plugin": "^2.1.0",

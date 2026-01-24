@@ -5,12 +5,27 @@
     <div class="scrollable-content">
       <div class="list-container">
         <div class="header-section">
-          <h1>文章列表</h1>
+          <h1>云胡收藏文章集</h1>
+          <div class="search-section">
+            <el-input
+              v-model="searchKeyword"
+              placeholder="搜索文章标题..."
+              clearable
+              class="search-input"
+            >
+              <template #prefix>
+                <el-icon><search /></el-icon>
+              </template>
+            </el-input>
+            <span v-if="searchKeyword" class="search-result-count">
+              找到 {{ filteredArticles.length }} 篇文章
+            </span>
+          </div>
         </div>
         
         <div class="articles-container">
           <el-card 
-            v-for="article in articles" 
+            v-for="article in filteredArticles" 
             :key="article.id"
             class="article-card"
             shadow="hover"
@@ -20,13 +35,34 @@
               <h3 class="article-title">{{ article.title }}</h3>
               <p class="article-description">{{ article.description }}</p>
               <div class="article-meta">
-                <span class="article-date">{{ article.date }}</span>
+                <div class="meta-left">
+                  <span class="article-date">{{ article.date }}</span>
+                  <span class="article-stats" v-if="articleStats[article.id]">
+                    <span class="word-count">
+                      <el-icon class="stat-icon"><document /></el-icon>
+                      <span>{{ articleStats[article.id].wordCount }} 字</span>
+                    </span>
+                    <span class="reading-time">
+                      <el-icon class="stat-icon"><clock /></el-icon>
+                      <span>{{ articleStats[article.id].readingTime }} 分钟</span>
+                    </span>
+                  </span>
+                </div>
                 <span class="article-author" v-if="article.author">{{ article.author }}</span>
               </div>
             </div>
           </el-card>
           
-          <el-empty v-if="articles.length === 0" description="暂无文章"></el-empty>
+          <el-empty 
+            v-if="filteredArticles.length === 0 && !searchKeyword" 
+            description="暂无文章"
+          ></el-empty>
+          <el-empty 
+            v-if="filteredArticles.length === 0 && searchKeyword" 
+            description="未找到相关文章"
+          >
+            <el-button @click="clearSearch" type="primary">清空搜索</el-button>
+          </el-empty>
         </div>
       </div>
     </div>
@@ -34,13 +70,46 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
+import { Search, Document, Clock } from '@element-plus/icons-vue';
 import TopMenu from './TopMenu.vue';
 import { getAllArticles } from '@/config/articles';
 
 const router = useRouter();
 const articles = ref([]);
+const searchKeyword = ref('');
+const articleStats = ref({}); // 存储文章统计信息
+
+/**
+ * 按日期倒序排序的文章列表（最新的在前）
+ */
+const sortedArticles = computed(() => {
+  return [...articles.value].sort((a, b) => {
+    const dateA = new Date(a.date);
+    const dateB = new Date(b.date);
+    // 倒序排序：日期越新越靠前
+    return dateB - dateA;
+  });
+});
+
+/**
+ * 过滤后的文章列表
+ */
+const filteredArticles = computed(() => {
+  const articlesToFilter = sortedArticles.value;
+  
+  if (!searchKeyword.value.trim()) {
+    return articlesToFilter;
+  }
+  
+  const keyword = searchKeyword.value.trim().toLowerCase();
+  return articlesToFilter.filter(article => 
+    article.title.toLowerCase().includes(keyword) ||
+    (article.description && article.description.toLowerCase().includes(keyword)) ||
+    (article.author && article.author.toLowerCase().includes(keyword))
+  );
+});
 
 /**
  * 跳转到文章详情页
@@ -54,9 +123,81 @@ const goToArticle = (articleId) => {
   });
 };
 
-onMounted(() => {
+/**
+ * 清空搜索
+ */
+const clearSearch = () => {
+  searchKeyword.value = '';
+};
+
+/**
+ * 计算文章字数（去除Markdown语法和HTML标签）
+ */
+const calculateWordCount = (content) => {
+  if (!content) return 0;
+  
+  // 移除HTML标签
+  let text = content.replace(/<[^>]+>/g, '');
+  
+  // 移除Markdown语法
+  text = text
+    .replace(/^#+\s+/gm, '') // 标题
+    .replace(/\*\*([^*]+)\*\*/g, '$1') // 粗体
+    .replace(/\*([^*]+)\*/g, '$1') // 斜体
+    .replace(/\[([^\]]+)\]\([^(]+\)/g, '$1') // 链接
+    .replace(/!\[([^\]]*)\]\([^(]+\)/g, '') // 图片
+    .replace(/`([^`]+)`/g, '$1') // 行内代码
+    .replace(/```[\s\S]*?```/g, '') // 代码块
+    .replace(/^\s*[-*+]\s+/gm, '') // 列表
+    .replace(/^\s*\d+\.\s+/gm, '') // 有序列表
+    .replace(/^>\s+/gm, '') // 引用
+    .replace(/---+/g, '') // 分割线
+    .replace(/\n+/g, ' ') // 换行符
+    .trim();
+  
+  // 计算中文字符数（中文字符算1个字，其他字符也算1个）
+  return text.length;
+};
+
+/**
+ * 估算阅读时间（按每分钟200字计算）
+ */
+const estimateReadingTime = (wordCount) => {
+  const wordsPerMinute = 200;
+  const minutes = Math.ceil(wordCount / wordsPerMinute);
+  return minutes || 1; // 至少1分钟
+};
+
+/**
+ * 加载文章统计信息
+ */
+const loadArticleStats = async () => {
+  const stats = {};
+  
+  // 并行加载所有文章内容
+  const promises = articles.value.map(async (article) => {
+    try {
+      const response = await fetch(`/articles/${article.file}`);
+      if (response.ok) {
+        const content = await response.text();
+        const wordCount = calculateWordCount(content);
+        const readingTime = estimateReadingTime(wordCount);
+        stats[article.id] = { wordCount, readingTime };
+      }
+    } catch (error) {
+      console.error(`加载文章 ${article.title} 统计信息失败:`, error);
+    }
+  });
+  
+  await Promise.all(promises);
+  articleStats.value = stats;
+};
+
+onMounted(async () => {
   articles.value = getAllArticles();
   document.querySelector('body').setAttribute('style', 'background: #EBEDF0');
+  // 异步加载文章统计信息
+  loadArticleStats();
 });
 </script>
 
@@ -92,7 +233,7 @@ onMounted(() => {
 .header-section h1 {
   font-size: 2.5rem;
   color: #2c3e50;
-  margin: 0 0 10px 0;
+  margin: 0 0 30px 0;
   font-weight: bold;
 }
 
@@ -100,6 +241,39 @@ onMounted(() => {
   font-size: 1.1rem;
   color: #666;
   margin: 0;
+}
+
+.search-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.search-input {
+  width: 100%;
+}
+
+.search-input :deep(.el-input__wrapper) {
+  border-radius: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.search-input :deep(.el-input__wrapper:hover) {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.search-input :deep(.el-input__wrapper.is-focus) {
+  box-shadow: 0 4px 12px rgba(64, 158, 255, 0.2);
+}
+
+.search-result-count {
+  font-size: 0.9rem;
+  color: #909399;
+  font-weight: 500;
 }
 
 .articles-container {
@@ -155,7 +329,32 @@ onMounted(() => {
   border-top: 1px solid #f0f0f0;
 }
 
+.meta-left {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
 .article-date {
+  color: #909399;
+}
+
+.article-stats {
+  display: flex;
+  gap: 16px;
+  font-size: 0.8rem;
+  color: #909399;
+}
+
+.word-count,
+.reading-time {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.stat-icon {
+  font-size: 0.9em;
   color: #909399;
 }
 
