@@ -1,8 +1,9 @@
 module.exports = {
   //  应用部署的基础路径
-  publicPath: process.env.NODE_ENV === 'production'
-    ? '/interesting-util-client/'
-    : '/',
+  // Vercel 使用根路径，GitHub Pages 使用子路径
+  publicPath: process.env.VERCEL === '1' || process.env.VERCEL_URL
+    ? '/' 
+    : (process.env.NODE_ENV === 'production' ? '/interesting-util-client/' : '/'),
   // 静态资源目录
   assetsDir: 'assets',
   // 是否开启eslint

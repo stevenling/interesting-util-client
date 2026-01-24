@@ -22,6 +22,7 @@
       <div v-else-if="articleContent" class="article-section">
         <div class="toolbar">
           <el-button @click="goBack" type="primary" :icon="ArrowLeft" circle plain title="返回"></el-button>
+          <el-button @click="handleExportBookmark" type="primary" :icon="Picture" circle plain title="导出书摘"></el-button>
           <el-popover
             placement="bottom-start"
             :width="320"
@@ -113,10 +114,102 @@
             v-html="renderedContent"
             ref="markdownContentRef"
             :style="{ fontSize: fontSize + 'px', color: currentTextColor, ...getContentStyle() }"
+            @mouseup="handleTextSelection"
           ></div>
         </div>
       </div>
     </div>
+    
+    <!-- 书摘对话框 -->
+    <el-dialog
+      v-model="bookmarkDialogVisible"
+      title="导出书摘"
+      width="600px"
+      :close-on-click-modal="false"
+    >
+      <div class="bookmark-preview-container">
+        <div 
+          class="bookmark-card" 
+          ref="bookmarkCardRef"
+          :style="bookmarkCardStyle"
+        >
+          <!-- 日期部分 -->
+          <div class="bookmark-date-section">
+            <div class="bookmark-day" :style="{ color: bookmarkTextColor, fontFamily: bookmarkFontFamily }">{{ currentDate.day }}</div>
+            <div class="bookmark-month-year" :style="{ color: bookmarkTextColor, fontFamily: bookmarkFontFamily }">{{ currentDate.monthYear }}</div>
+            <div class="bookmark-weekday" :style="{ color: bookmarkTextColor, fontFamily: bookmarkFontFamily }">{{ currentDate.weekday }}</div>
+            <div class="bookmark-separator" :style="{ background: bookmarkTextColor }"></div>
+          </div>
+          
+          <!-- 书摘内容 -->
+          <div class="bookmark-quote-section">
+            <div class="bookmark-quote-text" :style="{ color: bookmarkTextColor, fontFamily: bookmarkFontFamily }">{{ selectedText }}</div>
+          </div>
+          
+          <!-- 来源信息 -->
+          <div class="bookmark-source-section">
+            <div class="bookmark-book-title" :style="{ color: bookmarkTextColor, fontFamily: bookmarkFontFamily }">《{{ articleTitle }}》</div>
+            <div class="bookmark-author" v-if="articleAuthor" :style="{ color: bookmarkTextColor, fontFamily: bookmarkFontFamily }">{{ articleAuthor }}</div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 模版设置（可展开） -->
+      <div v-show="bookmarkTemplateExpanded" class="bookmark-template-content">
+        <div class="bookmark-setting-item">
+          <div class="setting-label">主题颜色</div>
+          <div class="bookmark-theme-grid">
+            <div
+              v-for="theme in bookmarkThemes"
+              :key="theme.name"
+              class="bookmark-theme-option"
+              :class="{ active: bookmarkCurrentTheme === theme.name }"
+              @click="bookmarkCurrentTheme = theme.name"
+              :title="theme.label"
+            >
+              <div class="bookmark-theme-preview" :style="getBookmarkPreviewStyle(theme)"></div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="bookmark-setting-item">
+          <div class="setting-label">字体</div>
+          <el-select v-model="bookmarkCurrentFont" style="width: 100%;">
+            <el-option
+              v-for="font in bookmarkFontOptions"
+              :key="font.value"
+              :label="font.label"
+              :value="font.value"
+              :style="{ fontFamily: font.value }"
+            />
+          </el-select>
+        </div>
+      </div>
+      
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button 
+            @click="bookmarkTemplateExpanded = !bookmarkTemplateExpanded" 
+            type="default"
+          >
+            <el-icon style="margin-right: 8px;">
+              <ArrowDown v-if="bookmarkTemplateExpanded" />
+              <ArrowRight v-else />
+            </el-icon>
+            更换模版
+          </el-button>
+          <el-button 
+            type="primary" 
+            @click="copyBookmarkToClipboard" 
+            :loading="generatingBookmark"
+            :icon="generatingBookmark ? undefined : CopyDocument"
+            size="default"
+          >
+            {{ generatingBookmark ? '生成中...' : '复制' }}
+          </el-button>
+        </div>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -124,7 +217,7 @@
 import { ref, computed, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { ElMessage } from 'element-plus';
-import { ArrowLeft, Document, Minus, Plus, Setting } from '@element-plus/icons-vue';
+import { ArrowLeft, Document, Minus, Plus, Setting, Bookmark, CopyDocument, Picture, ArrowDown, ArrowRight } from '@element-plus/icons-vue';
 import TopMenu from './TopMenu.vue';
 import { marked } from 'marked';
 import html2canvas from 'html2canvas';
@@ -143,6 +236,14 @@ const markdownContentRef = ref(null);
 const exporting = ref(false);
 const fontSize = ref(20); // 默认字体大小
 const currentFont = ref('default'); // 当前字体
+const selectedText = ref(''); // 选中的文本
+const bookmarkDialogVisible = ref(false); // 书摘对话框显示状态
+const bookmarkCardRef = ref(null); // 书摘卡片引用
+const generatingBookmark = ref(false); // 生成书摘中
+const articleAuthor = ref(''); // 文章作者
+const bookmarkCurrentTheme = ref('sepia-gradient'); // 书摘当前主题
+const bookmarkCurrentFont = ref('default'); // 书摘当前字体
+const bookmarkTemplateExpanded = ref(false); // 模版设置是否展开
 
 // 主题设置（基于主流阅读网站常用颜色）
 const themes = [
@@ -178,6 +279,28 @@ const fontOptions = [
   { label: 'Times New Roman', value: 'Times New Roman, serif' },
   { label: 'Georgia', value: 'Georgia, serif' },
   { label: 'Helvetica', value: 'Helvetica, Arial, sans-serif' }
+];
+
+// 书摘主题选项（渐变式背景）
+const bookmarkThemes = [
+  { name: 'sepia-gradient', label: '米色', bgColor: 'linear-gradient(180deg, #FBF0D9 0%, #F5E6C8 100%)', textColor: '#2c3e50' },
+  { name: 'white-gradient', label: '白色', bgColor: 'linear-gradient(180deg, #ffffff 0%, #f8f8f8 100%)', textColor: '#2c3e50' },
+  { name: 'gray-gradient', label: '浅灰', bgColor: 'linear-gradient(180deg, #F5F5F5 0%, #E8E8E8 100%)', textColor: '#2c3e50' },
+  { name: 'green-gradient', label: '护眼绿', bgColor: 'linear-gradient(180deg, #E8F5E9 0%, #C8E6C9 100%)', textColor: '#2c3e50' },
+  { name: 'blue-gradient', label: '浅蓝', bgColor: 'linear-gradient(180deg, #E3F2FD 0%, #BBDEFB 100%)', textColor: '#2c3e50' },
+  { name: 'yellow-gradient', label: '暖黄', bgColor: 'linear-gradient(180deg, #FFF8E1 0%, #FFECB3 100%)', textColor: '#2c3e50' },
+  { name: 'dark-gradient', label: '黑色', bgColor: 'linear-gradient(180deg, #2c2c2c 0%, #1a1a1a 100%)', textColor: '#ffffff' }
+];
+
+// 书摘字体选项（简化版）
+const bookmarkFontOptions = [
+  { label: '系统默认', value: 'default' },
+  { label: '苹方', value: 'PingFang SC, -apple-system, BlinkMacSystemFont' },
+  { label: '微软雅黑', value: 'Microsoft YaHei, sans-serif' },
+  { label: '思源黑体', value: 'Source Han Sans CN, sans-serif' },
+  { label: '宋体', value: 'SimSun, serif' },
+  { label: '楷体', value: 'KaiTi, serif' },
+  { label: '仿宋', value: 'FangSong, serif' }
 ];
 
 const currentFontStyle = ref('');
@@ -220,6 +343,7 @@ const loadArticle = async () => {
   }
   
   articleTitle.value = article.title;
+  articleAuthor.value = article.author || '';
   
   try {
     // 从public/articles目录加载md文件
@@ -260,6 +384,123 @@ const goBack = () => {
 };
 
 /**
+ * 处理文本选择
+ */
+const handleTextSelection = () => {
+  const selection = window.getSelection();
+  if (selection && selection.toString().trim()) {
+    const text = selection.toString().trim();
+    selectedText.value = text;
+  }
+};
+
+/**
+ * 导出书摘
+ */
+const handleExportBookmark = () => {
+  if (!selectedText.value) {
+    ElMessage.warning('请先选中要导出的文本');
+    return;
+  }
+  bookmarkTemplateExpanded.value = false; // 每次打开时默认关闭模版设置
+  bookmarkDialogVisible.value = true;
+};
+
+/**
+ * 复制书摘图片到剪贴板
+ */
+const copyBookmarkToClipboard = async () => {
+  if (!bookmarkCardRef.value) {
+    ElMessage.error('书摘卡片未准备好');
+    return;
+  }
+  
+  if (!selectedText.value) {
+    ElMessage.warning('请先选中要导出的文本');
+    return;
+  }
+  
+  generatingBookmark.value = true;
+  
+  try {
+    // 使用 html2canvas 生成图片
+    const theme = bookmarkThemes.find(t => t.name === bookmarkCurrentTheme.value);
+    const bgColor = theme ? theme.bgColor : 'linear-gradient(180deg, #FBF0D9 0%, #F5E6C8 100%)';
+    
+    ElMessage.info('正在生成图片...');
+    
+    const canvas = await html2canvas(bookmarkCardRef.value, {
+      scale: 2,
+      useCORS: true,
+      logging: false,
+      backgroundColor: null, // 渐变背景不能使用backgroundColor
+      onclone: (clonedDoc) => {
+        // 确保克隆的文档中样式正确应用
+        const clonedCard = clonedDoc.querySelector('.bookmark-card');
+        if (clonedCard) {
+          clonedCard.style.background = bgColor;
+        }
+      }
+    });
+    
+    // 转换为 Blob
+    canvas.toBlob(async (blob) => {
+      if (!blob) {
+        ElMessage.error('生成图片失败，请重试');
+        generatingBookmark.value = false;
+        return;
+      }
+      
+      try {
+        // 使用 Clipboard API 复制到剪贴板
+        await navigator.clipboard.write([
+          new ClipboardItem({
+            'image/png': blob
+          })
+        ]);
+        
+        ElMessage.success({
+          message: '书摘图片已复制到剪贴板，可直接粘贴使用',
+          duration: 3000
+        });
+        
+        // 延迟关闭对话框，让用户看到成功提示
+        setTimeout(() => {
+          bookmarkDialogVisible.value = false;
+        }, 500);
+      } catch (clipboardErr) {
+        // 如果 Clipboard API 不支持，尝试降级方案
+        console.warn('Clipboard API 不支持，使用降级方案:', clipboardErr);
+        
+        // 降级方案：创建临时链接下载
+        const imgData = canvas.toDataURL('image/png', 1.0);
+        const link = document.createElement('a');
+        link.download = `书摘-${articleTitle.value}-${new Date().getTime()}.png`;
+        link.href = imgData;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        ElMessage.info({
+          message: '已下载书摘图片（浏览器不支持直接复制到剪贴板）',
+          duration: 3000
+        });
+        
+        setTimeout(() => {
+          bookmarkDialogVisible.value = false;
+        }, 500);
+      } finally {
+        generatingBookmark.value = false;
+      }
+    }, 'image/png', 1.0);
+  } catch (err) {
+    console.error('生成书摘失败:', err);
+    ElMessage.error('生成书摘失败，请重试');
+    generatingBookmark.value = false;
+  }
+};
+
+/**
  * 增大字体
  */
 const increaseFontSize = () => {
@@ -287,6 +528,55 @@ const gradientThemes = computed(() => themes.filter(t => t.type === 'gradient'))
 
 // 判断是否为深色主题
 const isDarkTheme = computed(() => currentTheme.value === 'dark' || currentTheme.value === 'dark-gradient');
+
+// 获取当前日期
+const currentDate = computed(() => {
+  const now = new Date();
+  const day = now.getDate();
+  const months = ['JANUARY', 'FEBRUARY', 'MARCH', 'APRIL', 'MAY', 'JUNE', 
+                   'JULY', 'AUGUST', 'SEPTEMBER', 'OCTOBER', 'NOVEMBER', 'DECEMBER'];
+  const weekdays = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
+  const month = months[now.getMonth()];
+  const year = now.getFullYear();
+  const weekday = weekdays[now.getDay()];
+  
+  return {
+    day: day.toString(),
+    monthYear: `${month} ${year}`,
+    weekday: weekday
+  };
+});
+
+// 书摘卡片样式
+const bookmarkCardStyle = computed(() => {
+  const theme = bookmarkThemes.find(t => t.name === bookmarkCurrentTheme.value);
+  if (!theme) return { background: 'linear-gradient(180deg, #FBF0D9 0%, #F5E6C8 100%)' };
+  return {
+    background: theme.bgColor
+  };
+});
+
+// 书摘文字颜色
+const bookmarkTextColor = computed(() => {
+  const theme = bookmarkThemes.find(t => t.name === bookmarkCurrentTheme.value);
+  return theme ? theme.textColor : '#2c3e50';
+});
+
+// 书摘字体
+const bookmarkFontFamily = computed(() => {
+  if (bookmarkCurrentFont.value === 'default') {
+    return 'PingFang SC, -apple-system, BlinkMacSystemFont, Microsoft YaHei, sans-serif';
+  }
+  const font = bookmarkFontOptions.find(f => f.value === bookmarkCurrentFont.value);
+  return font ? font.value : 'PingFang SC, -apple-system, BlinkMacSystemFont, Microsoft YaHei, sans-serif';
+});
+
+// 获取书摘主题预览样式
+const getBookmarkPreviewStyle = (theme) => {
+  return {
+    background: theme.bgColor
+  };
+};
 
 /**
  * 获取预览样式
@@ -977,6 +1267,209 @@ onMounted(() => {
   border: 0;
 }
 
+/* 书摘相关样式 */
+.bookmark-preview-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  background: #f5f5f5;
+}
+
+.bookmark-card {
+  width: 500px;
+  min-height: 400px;
+  background: #FBF0D9;
+  padding: 60px 50px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.bookmark-date-section {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.bookmark-day {
+  font-size: 100px;
+  font-weight: 900;
+  color: #2c3e50;
+  line-height: 1;
+  margin-bottom: 10px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+}
+
+.bookmark-month-year {
+  font-size: 22px;
+  font-weight: 600;
+  color: #2c3e50;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+}
+
+.bookmark-weekday {
+  font-size: 18px;
+  font-weight: 400;
+  color: #606266;
+  margin-bottom: 20px;
+  font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+}
+
+.bookmark-separator {
+  width: 40px;
+  height: 2px;
+  background: #606266;
+  margin: 0 auto;
+}
+
+.bookmark-quote-section {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  margin: 40px 0;
+}
+
+.bookmark-quote-text {
+  font-size: 20px;
+  line-height: 2.0;
+  color: #2c3e50;
+  text-align: left;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+}
+
+.bookmark-source-section {
+  text-align: center;
+  margin-top: 40px;
+}
+
+.bookmark-book-title {
+  font-size: 18px;
+  font-weight: 400;
+  color: #606266;
+  margin-bottom: 8px;
+  font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+}
+
+.bookmark-author {
+  font-size: 18px;
+  font-weight: 400;
+  color: #606266;
+  font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+}
+
+.dialog-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding-top: 10px;
+}
+
+.dialog-footer .el-button {
+  flex: 1;
+  font-weight: 500;
+}
+
+.dialog-footer .el-button--primary {
+  flex: 1;
+}
+
+.dialog-footer .el-button--primary {
+  box-shadow: 0 2px 8px rgba(64, 158, 255, 0.2);
+  transition: all 0.3s ease;
+}
+
+.dialog-footer .el-button--primary:hover {
+  box-shadow: 0 4px 12px rgba(64, 158, 255, 0.3);
+  transform: translateY(-1px);
+}
+
+.dialog-footer .el-button--primary:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(64, 158, 255, 0.2);
+}
+
+.bookmark-template-content {
+  margin-top: 20px;
+  margin-bottom: 20px;
+  padding: 16px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.bookmark-settings {
+  margin-top: 0;
+}
+
+.bookmark-setting-item {
+  margin-bottom: 20px;
+}
+
+.bookmark-setting-item:last-child {
+  margin-bottom: 0;
+}
+
+.setting-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #303133;
+  margin-bottom: 12px;
+}
+
+.bookmark-theme-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+}
+
+.bookmark-theme-option {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 4px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.bookmark-theme-option:hover {
+  background-color: #f5f7fa;
+}
+
+.bookmark-theme-option.active {
+  background-color: #e6f7ff;
+}
+
+.bookmark-theme-preview {
+  width: 30px;
+  height: 30px;
+  border-radius: 4px;
+  border: 2px solid #e4e7ed;
+  flex-shrink: 0;
+}
+
+.bookmark-theme-option.active .bookmark-theme-preview {
+  border-color: #409eff;
+}
+
 /* 响应式设计 */
 @media (max-width: 768px) {
   .detail-container {
@@ -1002,6 +1495,23 @@ onMounted(() => {
     width: 100%;
     margin-left: 0;
     margin-top: 10px;
+  }
+  
+  .bookmark-card {
+    width: 100%;
+    padding: 40px 30px;
+  }
+  
+  .bookmark-day {
+    font-size: 80px;
+  }
+  
+  .bookmark-month-year {
+    font-size: 18px;
+  }
+  
+  .bookmark-quote-text {
+    font-size: 18px;
   }
 }
 </style>
