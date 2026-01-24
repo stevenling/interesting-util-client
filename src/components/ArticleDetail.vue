@@ -407,10 +407,10 @@ const handleExportPDF = async () => {
   try {
     ElMessage.info('正在生成 PDF，请稍候...');
     
-    // 页面边距设置（mm）
+    // 页面边距设置（mm） - 增加底部边距以防止文字截断
     const margin = {
       top: 20,
-      bottom: 20,
+      bottom: 35, // 增加底部边距
       left: 20,
       right: 20
     };
@@ -431,12 +431,31 @@ const handleExportPDF = async () => {
     const originalWidth = markdownContentRef.value.style.width;
     const originalMaxWidth = markdownContentRef.value.style.maxWidth;
     const originalPadding = markdownContentRef.value.style.padding;
+    const originalPageBreak = markdownContentRef.value.style.pageBreakInside;
     
-    // 设置固定宽度，确保内容不会超出
+    // 设置固定宽度和分页样式，确保内容不会超出且不会分割文字
     markdownContentRef.value.style.width = `${contentWidthPx}px`;
     markdownContentRef.value.style.maxWidth = `${contentWidthPx}px`;
     markdownContentRef.value.style.boxSizing = 'border-box';
     markdownContentRef.value.style.margin = '0 auto';
+    markdownContentRef.value.style.pageBreakInside = 'avoid';
+    
+    // 添加分页相关的CSS样式
+    const styleElement = document.createElement('style');
+    styleElement.textContent = `
+      .markdown-content p, .markdown-content h1, .markdown-content h2, 
+      .markdown-content h3, .markdown-content h4, .markdown-content h5, 
+      .markdown-content h6, .markdown-content blockquote, 
+      .markdown-content pre, .markdown-content table {
+        page-break-inside: avoid;
+        break-inside: avoid;
+      }
+      .markdown-content h1, .markdown-content h2, .markdown-content h3 {
+        page-break-after: avoid;
+        break-after: avoid;
+      }
+    `;
+    document.head.appendChild(styleElement);
     
     // 等待样式应用
     await new Promise(resolve => setTimeout(resolve, 100));
@@ -456,6 +475,10 @@ const handleExportPDF = async () => {
     markdownContentRef.value.style.padding = originalPadding;
     markdownContentRef.value.style.boxSizing = '';
     markdownContentRef.value.style.margin = '';
+    markdownContentRef.value.style.pageBreakInside = originalPageBreak || '';
+    
+    // 移除临时添加的样式
+    document.head.removeChild(styleElement);
     
     const imgData = canvas.toDataURL('image/png', 1.0);
     const imgWidth = canvas.width; // 实际canvas宽度 = contentWidthPx * scale
@@ -473,60 +496,91 @@ const handleExportPDF = async () => {
     // 创建 PDF
     const pdf = new jsPDF('p', 'mm', 'a4');
     
-    // 计算每页可容纳的内容高度
-    const pageContentHeight = contentHeight;
+    // 使用非常保守的分页策略，避免任何文字截断
+    const veryStaticSafePageHeight = contentHeight * 0.75; // 只使用75%的页面高度，预留25%作为安全缓冲
+    const veryStaticSafePageHeightPx = Math.floor((veryStaticSafePageHeight / imgHeightInMm) * imgHeight);
+    
+    // 添加基于行高的智能检测
+    const estimatedLineHeight = Math.ceil(fontSize.value * 1.8 * scale); // 估算行高（考虑line-height 1.8）
+    const safetyBuffer = estimatedLineHeight * 3; // 额外预留3行的安全空间
+    const finalSafePageHeightPx = Math.max(veryStaticSafePageHeightPx - safetyBuffer, Math.floor(veryStaticSafePageHeightPx * 0.8));
+    
     let remainingHeight = imgHeightInMm;
     let yPosition = margin.top;
     
     // 添加第一页内容
-    if (remainingHeight <= pageContentHeight) {
+    if (remainingHeight <= veryStaticSafePageHeight) {
       // 内容可以在一页内显示
       pdf.addImage(imgData, 'PNG', margin.left, yPosition, imgWidthInMm, imgHeightInMm);
     } else {
-      // 内容需要分页
+      // 内容需要分页 - 使用最保守的策略
       let sourceY = 0;
+      let pageCount = 0;
       
-      while (remainingHeight > 0) {
+      while (sourceY < imgHeight) {
         // 计算当前页可以显示的内容高度
-        const currentPageHeight = Math.min(remainingHeight, pageContentHeight);
-        const currentPageHeightPx = (currentPageHeight / imgHeightInMm) * imgHeight;
+        const remainingPx = imgHeight - sourceY;
+        let currentPageHeightPx;
         
-        // 创建临时canvas来裁剪当前页的内容
+        if (remainingPx <= finalSafePageHeightPx) {
+          // 剩余内容可以放在一页内
+          currentPageHeightPx = remainingPx;
+        } else {
+          // 使用最保守的高度
+          currentPageHeightPx = finalSafePageHeightPx;
+          
+          // 如果剩余内容不多，直接放在下一页
+          if (remainingPx < finalSafePageHeightPx * 1.2) {
+            currentPageHeightPx = Math.floor(finalSafePageHeightPx * 0.6); // 更保守地分页
+          }
+        }
+        
+        // 创建当前页的canvas
         const pageCanvas = document.createElement('canvas');
         pageCanvas.width = imgWidth;
         pageCanvas.height = currentPageHeightPx;
         const pageCtx = pageCanvas.getContext('2d');
         
+        // 填充白色背景
+        pageCtx.fillStyle = '#ffffff';
+        pageCtx.fillRect(0, 0, imgWidth, currentPageHeightPx);
+        
         // 从原图中裁剪当前页的内容
         pageCtx.drawImage(
           canvas,
-          0, sourceY, imgWidth, currentPageHeightPx,  // 源图像区域
-          0, 0, imgWidth, currentPageHeightPx          // 目标canvas区域
+          0, sourceY, imgWidth, currentPageHeightPx,
+          0, 0, imgWidth, currentPageHeightPx
         );
         
         const pageImgData = pageCanvas.toDataURL('image/png', 1.0);
-        const pageImgHeightInMm = currentPageHeight;
         
         // 如果不是第一页，添加新页面
-        if (yPosition !== margin.top) {
+        if (pageCount > 0) {
           pdf.addPage();
-          yPosition = margin.top;
         }
         
-        // 添加当前页内容
+        // 计算在PDF中的尺寸
+        const pageImgHeightInMm = (currentPageHeightPx / scale) / mmToPx;
+        
+        // 添加当前页内容到PDF
         pdf.addImage(
           pageImgData,
           'PNG',
           margin.left,
-          yPosition,
+          margin.top,
           imgWidthInMm,
           pageImgHeightInMm
         );
         
         // 更新位置
         sourceY += currentPageHeightPx;
-        remainingHeight -= currentPageHeight;
-        yPosition += pageImgHeightInMm;
+        pageCount++;
+        
+        // 防止无限循环
+        if (pageCount > 100) {
+          console.warn('PDF页面数量过多，停止分页');
+          break;
+        }
       }
     }
     

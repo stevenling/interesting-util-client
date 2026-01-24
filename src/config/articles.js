@@ -6,13 +6,21 @@
 export const articles = [
   {
     id: 'article1',
+    title: '有哪些你终身难忘的女同学',
+    description: '我中学后排同桌。Transgender 身体特征男自我认知女，所以算是我的女同学吧。',
+    date: '2026-01-24',
+    author: 'zzzz',
+    file: 'zzzz《有哪些你终身难忘的女同学》.md'
+  },
+  {
+    id: 'article2',
     title: '一封来自真我的情书',
     description: '亲爱的，当你看到这封信，我希望你知道，你是如何被深爱的。 如果有一份爱，超越了人间的一切情爱，超越了爱人、父母、孩子的爱，甚至超越你自己对自己的爱，一直在陪伴着你，守护着你，你相信吗?',
     date: '2026-01-24',
     file: '一封来自真我的情书.md'
   },
   {
-    id: 'article2',
+    id: 'article3',
     title: '商鞅黑洞',
     description: '春秋中期，秦国也是天下四大强国之一，尤其秦穆公时，也是西方一霸。但是穆公以后，秦国能发出的声音就越来越小。 秦国和晋国是世亲，也是世仇。',
     date: '2026-01-24',
@@ -20,7 +28,7 @@ export const articles = [
     file: '刘勃《商鞅黑洞》.md'
   },
   {
-    id: 'article3',
+    id: 'article4',
     title: 'Two English Poems (I)',
     description: 'The useless dawn finds me in a deserted Street corner; I have outlived the night.',
     date: '2026-01-24',
@@ -28,7 +36,7 @@ export const articles = [
     file: '博尔赫斯《Two English Poems (I)》.md'
   },
   {
-    id: 'article4',
+    id: 'article5',
     title: '死镜',
     description: '博尔赫斯邀请了法国大批评家罗朗·巴尔特到他隐居的乡间别墅来帮助他解决一个“具有巨大文学批评重要性的理论问题”。 巴尔特如约在下午五时到达，双方互致仰慕相见恨晚之情后，博尔赫斯请巴尔特看他刚写好的...',
     date: '2026-01-24',
@@ -36,14 +44,14 @@ export const articles = [
     file: '博尔赫斯《死镜》.md'
   },
   {
-    id: 'article5',
+    id: 'article6',
     title: '卡尔·马克思《黑格尔法哲学批判》导言',
     description: '就德国来说，对宗教的批判实际上已经结束；而对宗教的批判是其它一切批判的前提。 谬误在天国的申辩一经驳倒，它在人间的存在就陷入了窘境。',
     date: '2026-01-24',
     file: '卡尔·马克思《黑格尔法哲学批判》导言.md'
   },
   {
-    id: 'article6',
+    id: 'article7',
     title: '中国经济社会矛盾几乎到了临界点',
     description: '《财经》：在过去 30 年，中国 “两头冒尖” 的轮廓显得更加突出和鲜明了。从光明面看，30 年来中国经济持续高速增长。2010 年中国国内生产总值GDP超过日本，跃居全球第二位。与此同时，人均...',
     date: '2026-01-24',
@@ -51,7 +59,15 @@ export const articles = [
     file: '吴敬琏《中国经济社会矛盾几乎到了临界点》.md'
   },
   {
-    id: 'article7',
+    id: 'article8',
+    title: '百分之百',
+    description: '他们害怕年轻人的思想和理想 他们害怕葬礼，和墓上的鲜花',
+    date: '2026-01-24',
+    author: '宇宙塑胶人',
+    file: '宇宙塑胶人《百分之百》.md'
+  },
+  {
+    id: 'article9',
     title: '烹尸奇案',
     description: '事件发生在数年前的一个夜晚。 头天忙了一整天的我，四仰八叉地躺在床上打着呼噜，在梦中吃着美味的海鲜。',
     date: '2026-01-24',
@@ -59,7 +75,7 @@ export const articles = [
     file: '小鉴定师大宝《烹尸奇案》.md'
   },
   {
-    id: 'article8',
+    id: 'article10',
     title: '七种类型的爱',
     description: '作者：Neel Burton，医学博士尼尔·伯顿 原文地址：https://www.psychologytoday.com/intl/blog/hide-and-seek/201606/thes...',
     date: '2026-01-24',
@@ -67,7 +83,7 @@ export const articles = [
     file: '尼尔·伯顿《七种类型的爱》.md'
   },
   {
-    id: 'article9',
+    id: 'article11',
     title: '大家一起习惯被凝视，是平权的进步还是退步？',
     description: '真的听不下去了，有些男性就是对女性的理解如此之肤浅，各位我们来说一说什么叫做真正的凝视。 你们真的觉得在这个社会里面，女性和男性被凝视的感觉是一样的吗？',
     date: '2026-01-24',
@@ -75,7 +91,7 @@ export const articles = [
     file: '席瑞《大家一起习惯被凝视，是平权的进步还是退步？》.md'
   },
   {
-    id: 'article10',
+    id: 'article12',
     title: '哀悼与忧郁症',
     description: '梦可以被我们当做各种自恋性的精神紊乱在正常生活中的原型，现在我们将通过比较忧郁症和正常的哀悼情感，以此来尝试解释一下忧郁症的性质。 但是，这一次我们必须首先承认绝不能高估我们所作诸结论之价值。即...',
     date: '2026-01-24',
@@ -83,15 +99,15 @@ export const articles = [
     file: '弗洛伊德《哀悼与忧郁症》.md'
   },
   {
-    id: 'article11',
+    id: 'article13',
     title: '漫磋嗟',
-    description: '链接：https://www.zhihu.com/question/45694301/answer/99820492 著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。',
+    description: '很多年前师傅告诉我，这世上没有什么问题是不能够用刀来解决的。 唯一要考虑的，是刀够不够快。',
     date: '2026-01-24',
     author: '情何以甚',
     file: '情何以甚《漫磋嗟》.md'
   },
   {
-    id: 'article12',
+    id: 'article14',
     title: '不死者',
     description: '原文链接：https://www.theplayerstribune.com/articles/faker-players-tribune-korean-translationopens new...',
     date: '2026-01-24',
@@ -99,7 +115,15 @@ export const articles = [
     file: '李相赫《不死者》.md'
   },
   {
-    id: 'article13',
+    id: 'article15',
+    title: '我心目中的伟大作品',
+    description: '我心目中的伟大作品，是那些具有永恒性的作品。即这类作家的作品无论经历多少个世纪的轮回，依然不断地得到后人的解释，使后人产生新感受。这样的作家身上具有“神性”，有点类似于先知。 就读者的数量来说，...',
+    date: '2026-01-24',
+    author: '残雪 ',
+    file: '残雪 《我心目中的伟大作品》.md'
+  },
+  {
+    id: 'article16',
     title: '乔治 · 巴塔耶的色情和死亡',
     description: '哈贝马斯在《现代性的哲学话语》中，表述了一个著名的观点：乔治·巴塔耶 Georges Bataille 和海德格尔是尼采最重要的继承者，这两个人，是尼采通往法国后现代思想的两个必经之道。 但是，...',
     date: '2026-01-24',
@@ -107,7 +131,7 @@ export const articles = [
     file: '汪民安《乔治 · 巴塔耶的色情和死亡》.md'
   },
   {
-    id: 'article14',
+    id: 'article17',
     title: '权力、权利与身体',
     description: '福柯是一个巨大的矿藏，在欧美知识界，在不同时期，人们在他那里挖掘不同的资源。 七十年代在挖掘他的考古学，八十年代在挖掘他的 谱系学，最近，人们对他的政治学充满了兴趣。',
     date: '2026-01-24',
@@ -115,7 +139,7 @@ export const articles = [
     file: '汪民安《权力、权利与身体》.md'
   },
   {
-    id: 'article15',
+    id: 'article18',
     title: '论工业社会及其未来',
     description: '大学炸弹客泰德·卡辛斯基 1995 年发表的《论工业社会及其未来》。中文译文基于 1996 年中国文史出版社《轰炸文明——发往人类未来的死亡通知单》，原译者王小东。 工业革命及其后果为人类带来了...',
     date: '2026-01-24',
@@ -123,7 +147,7 @@ export const articles = [
     file: '泰德.卡辛斯基《论工业社会及其未来》.md'
   },
   {
-    id: 'article16',
+    id: 'article19',
     title: '你们这些回魂尸',
     description: '1970 年 11 月7  日，第 5 时区（东部标准时间）22：17。纽约市“老爹”酒吧。 我正在擦净一只喝白兰地酒用的矮脚杯时，“未婚妈妈”进来了。我注意了一下时间：1970 年 11 月 ...',
     date: '2026-01-24',
@@ -131,7 +155,7 @@ export const articles = [
     file: '海因莱因《你们这些回魂尸》.md'
   },
   {
-    id: 'article17',
+    id: 'article20',
     title: '长生不死的祖父',
     description: '祖父是一位巨富，他仅靠一代的奋斗便构筑起现在数亿万日元的家业。可是他在刚过花甲之年，打算将家业传给他的儿子，也就是我父亲的时候，被查出患了癌症。 由于内脏的癌肿摘除手术十分成功，所以虽然还会有复...',
     date: '2026-01-24',
@@ -139,7 +163,7 @@ export const articles = [
     file: '渡边浩二《长生不死的祖父》.md'
   },
   {
-    id: 'article18',
+    id: 'article21',
     title: '呼吸',
     description: '> 2009 年雨果奖最佳短篇小说奖 | 2009 年轨迹奖最佳短篇小说奖 空气（还有人称之为氩气）就是生命之源的说法流传已久，实际情况却不是这样。我刻下这些文字的目的，就是为了说明我是如何理解...',
     date: '2026-01-24',
@@ -147,7 +171,7 @@ export const articles = [
     file: '特德姜《呼吸》.md'
   },
   {
-    id: 'article19',
+    id: 'article22',
     title: '王兴饭否精选',
     description: '1. 总结了一下，发现前段时间犯了不少错。再往前几个月，我没犯什么错，因为我没干什么事。以一句老话自勉：Courage is grace under pressure. 2. 有些人似乎无法理解...',
     date: '2026-01-24',
@@ -155,7 +179,7 @@ export const articles = [
     file: '王兴《王兴饭否精选》.md'
   },
   {
-    id: 'article20',
+    id: 'article23',
     title: '滴血的罂粟花',
     description: '> 命运这个东西就是这样的无情，它可以把你弄到天堂，也可把你弄到地狱，人只是它的玩物，人在其中是无法抗拒它的安排的。 -----米小吒 一直想在这儿做点什么，做点有意义的事情，但一直下不了决心。...',
     date: '2026-01-24',
@@ -163,7 +187,7 @@ export const articles = [
     file: '米小吒《滴血的罂粟花》.md'
   },
   {
-    id: 'article21',
+    id: 'article24',
     title: '期末考试',
     description: '郭怀睿安静地坐在椅子上，右手夹着的香烟已经快要燃尽，左手撑着下巴，眼睛看着窗外依然沉睡的天空，嘴里跟着旁边的老式音箱吹着节奏轻快的歌曲。身后的红木书架上，整齐而充实地摆放着哲学专业书籍以及各种资...',
     date: '2026-01-24',
@@ -171,7 +195,7 @@ export const articles = [
     file: '腾腾马《期末考试》.md'
   },
   {
-    id: 'article22',
+    id: 'article25',
     title: 'LSD 简史',
     description: '中文名：麦角酰二乙酰胺（LSD） 英文名：Lysergic acid diethylamide 分子式：C20H25N3O 从人类有历史记载以来，人们就不断地找寻各种能够拓展心灵领域同时又具有医...',
     date: '2026-01-24',
@@ -179,7 +203,23 @@ export const articles = [
     file: '袁越《LSD 简史》.md'
   },
   {
-    id: 'article23',
+    id: 'article26',
+    title: '看，这个激动人心的地方',
+    description: '大学不是诗人的圣地，但一所大学如果不能激起年轻人一些诗心的回荡，一些对人类问题的思索，那么，这所大学之缺少感染力是毋庸置疑的。 13 世纪，当一群年轻的僧侣集中在中世纪的修道院中研究 “一根针尖...',
+    date: '2026-01-24',
+    author: '许知远',
+    file: '许知远《看，这个激动人心的地方》.md'
+  },
+  {
+    id: 'article27',
+    title: '无头有感',
+    description: '我一生中最美好的一天，可以说是我的重生之日，是我发现自己没有头的那一天。 这不是文字游戏，也不是不惜代价吸引眼球的俏皮话。我说这句话再严肃不过了：我没有头。',
+    date: '2026-01-24',
+    author: '道格拉斯·哈丁',
+    file: '道格拉斯·哈丁《无头有感》.md'
+  },
+  {
+    id: 'article28',
     title: '会山崩地裂，我会血肉模糊',
     description: '> 本文摘抄自《鳄鱼手记》 从前，我相信每个男人一生中在深处都会有一个关于女人的“原型”，他最爱的就是那个像他“原型”的女人。',
     date: '2026-01-24',
@@ -187,7 +227,7 @@ export const articles = [
     file: '邱妙津《会山崩地裂，我会血肉模糊》.md'
   },
   {
-    id: 'article24',
+    id: 'article29',
     title: '逃亡',
     description: '从前我是不玩魔兽的，自从认识了老夏。 认识老夏是在大学报到的第一天，他和我分在同一个寝室。我是本地人，漫长的暑假早让我百无聊赖，那天天刚亮，我就迫不及待离了家，随身的一只大箱子装了我在学校需要的...',
     date: '2026-01-24',
@@ -195,7 +235,7 @@ export const articles = [
     file: '郭龙《逃亡》.md'
   },
   {
-    id: 'article25',
+    id: 'article30',
     title: '敬菩萨',
     description: '唉！人生在世，弄钱是不容易的，辛辛苦苦弄的几文钱，除了衣食而外，完纳国税，教育子弟，到〔倒〕是正经。 偏偏我们中国人，无论穷富老幼，都要白费银钱，办些无益的事，好像把钱丢在水里响都不响。',
     date: '2026-01-24',
@@ -203,7 +243,7 @@ export const articles = [
     file: '陈独秀《敬菩萨》.md'
   },
   {
-    id: 'article26',
+    id: 'article31',
     title: '人们可以自由买卖生命时间，你支持吗？',
     description: '这个题其实有三种解法，是三个不同维度对这个问题的判断，而这基本上刚才在场上，基本上都出现了。 第一个是看个例，就是看某个具体的个体的人，欧阳超提到了自己的亲人即将离去，那是一个迫切需要时间的时刻...',
     date: '2026-01-24',
@@ -211,7 +251,7 @@ export const articles = [
     file: '陈铭《人们可以自由买卖生命时间，你支持吗？》.md'
   },
   {
-    id: 'article27',
+    id: 'article32',
     title: '李贽――自相冲突的哲学家',
     description: '1602 年，李贽在狱中以剃刀自刎，死后，被称为牺牲自我。 这一评论不能不使人感到怀疑。',
     date: '2026-01-24',
