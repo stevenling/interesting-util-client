@@ -48,9 +48,29 @@ export const constantRoutes = [
         component: () => import("@/components/EpubReader.vue")
     },
     {
+        name: 'MarkdownReader',
+        path: '/markdownReader',
+        component: () => import("@/components/MarkdownReader.vue")
+    },
+    {
+        name: 'ArticleList',
+        path: '/articleList',
+        component: () => import("@/components/ArticleList.vue")
+    },
+    {
+        name: 'ArticleDetail',
+        path: '/articleDetail',
+        component: () => import("@/components/ArticleDetail.vue")
+    },
+    {
         path: '/',
         name: 'YunhuMatrix',
         component: YunhuMatrix
+    },
+    {
+        path: '/login',
+        name: 'Login',
+        component: import("@/components/UtilIndex")
     }
 ];
 

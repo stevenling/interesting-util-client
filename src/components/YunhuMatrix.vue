@@ -41,12 +41,12 @@
 
               <el-button 
                 type="warning" 
-                @click="openLink('https://twitter.com/yunhu')"
+                @click="goToUtilIndex"
                 class="matrix-button"
                 size="large"
               >
                 <i class="el-icon-chat-dot-round"></i>
-                Twitter
+                云胡个人站
               </el-button>
 
               <el-button 
@@ -96,7 +96,10 @@
 
 <script setup>
 import { ElMessage } from "element-plus";
+import { useRouter } from "vue-router";
 import TopMenu from "./TopMenu.vue";
+
+const router = useRouter();
 
 /**
  * 打开外部链接
@@ -109,6 +112,13 @@ function openLink(url) {
   } catch (error) {
     ElMessage.error('打开链接失败');
   }
+}
+
+/**
+ * 跳转到 UtilIndex 页面
+ */
+function goToUtilIndex() {
+  router.push('/utilIndex');
 }
 </script>
 

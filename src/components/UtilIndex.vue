@@ -15,7 +15,7 @@
               <template #header>
                 <div class="card-header">
                   <i class="el-icon-connection"></i>
-                  <span>云胡矩阵</span>
+                  <span>云胡</span>
                 </div>
               </template>
               <div class="button-group">
@@ -26,7 +26,17 @@
                   size="large"
                 >
                   <i class="el-icon-grid"></i>
-                  进入矩阵
+                  云胡矩阵
+                </el-button>
+
+                <el-button 
+                  type="primary" 
+                  @click="gotoMarkdownReader"
+                  class="tool-button"
+                  size="large"
+                >
+                  <i class="el-icon-reading"></i>
+                  阅读
                 </el-button>
               </div>
             </el-card>
@@ -86,6 +96,15 @@
                   <i class="el-icon-reading"></i>
                   EPUB 阅读器
                 </el-button>
+                <el-button 
+                  type="primary" 
+                  @click="gotoArticleList"
+                  class="tool-button"
+                  size="large"
+                >
+                  <i class="el-icon-document"></i>
+                  文章列表
+                </el-button>
               </div>
             </el-card>
           </el-col>
@@ -141,7 +160,7 @@ const gotoFontToImage = () => {
  */
 const gotoYunhuMatrix = () => {
   router.push({
-    path: "/yunhuMatrix",
+    path: "/",
   });
 };
 
@@ -171,6 +190,24 @@ const gotoColorConvert = () => {
     path: "/ColorConvert",
   });
 };
+
+/**
+ * 转到Markdown阅读器页面
+ */
+const gotoMarkdownReader = () => {
+  router.push({
+    path: "/markdownReader",
+  });
+};
+
+/**
+ * 转到文章列表页面
+ */
+const gotoArticleList = () => {
+  router.push({
+    path: "/articleList",
+  });
+};
 </script>
 
 <style scoped>
@@ -178,12 +215,14 @@ const gotoColorConvert = () => {
   height: 100vh;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
 
 /* 主容器样式 */
 .main-container {
   flex: 1;
-  overflow-y: auto;
+  overflow-y: hidden;
+  overflow-x: hidden;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   padding: 20px 0;
 }

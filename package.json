@@ -9,7 +9,8 @@
     "fix-build": "node -e \"const fs=require('fs');const path=require('path');const distPath='dist';fs.copyFileSync(path.join(distPath,'index.html'),path.join(distPath,'404.html'));fs.writeFileSync(path.join(distPath,'.nojekyll'),'');\"",
     "lint": "vue-cli-service lint",
     "push": "npm run build && scp -r dist/* root@43.142.56.47:/root/vue-project/yunhu-utils/dist",
-    "test:unit": "jest"
+    "test:unit": "jest",
+    "generate-articles": "node scripts/generate-articles-config.js"
   },
   "dependencies": {
     "@highlightjs/vue-plugin": "^2.1.0",
@@ -20,7 +21,9 @@
     "epubjs": "^0.3.93",
     "highlight.js": "^11.8.0",
     "html2canvas": "^1.4.1",
+    "jspdf": "^4.0.0",
     "jszip": "^3.10.1",
+    "marked": "^17.0.1",
     "moment": "^2.29.4",
     "vue-clipboard3": "^2.0.0",
     "vue-router": "^4.2.4"
