@@ -43,10 +43,11 @@
             </el-tooltip>
             <el-tooltip content="设置" placement="left">
               <el-popover
-                placement="left-start"
-                :width="360"
+                :placement="isMobile ? 'bottom' : 'left-start'"
+                :width="isMobile ? '90vw' : 360"
                 trigger="click"
                 title="设置"
+                popper-class="settings-popover"
               >
                 <template #reference>
                   <el-button type="primary" :icon="Setting" circle plain></el-button>
@@ -268,10 +269,11 @@ const articleTitle = ref('');
 const contentArea = ref(null);
 const markdownContentRef = ref(null);
 const exporting = ref(false);
-const toolbarVisible = ref(true); // 工具栏显示状态
+const toolbarVisible = ref(false); // 工具栏显示状态
 const manualToolbarControl = ref(false); // 是否手动控制工具栏
 const isScrolling = ref(false); // 是否在滚动状态
 const toolbarTop = ref(0); // 工具栏垂直位置（像素值）
+const isMobile = ref(false); // 是否为移动端
 let lastScrollTop = 0; // 上次滚动位置
 let scrollTimer = null; // 滚动定时器
 let isAtBottom = false; // 是否在底部
@@ -431,13 +433,9 @@ const loadArticle = async () => {
       if (detailContainer) {
         detailContainer.scrollTop = 0;
       }
-      // 重置工具栏状态
-      toolbarVisible.value = true;
+      // 重置工具栏状态（默认隐藏）
+      toolbarVisible.value = false;
       lastScrollTop = 0;
-      // 更新工具栏位置到当前可视区域中心
-      setTimeout(() => {
-        updateToolbarPosition();
-      }, 200);
     }, 150);
   } catch (err) {
     console.error('加载文章失败:', err);
@@ -601,9 +599,8 @@ const handleScroll = () => {
   // 设置滚动状态
   isScrolling.value = scrollTop > 10;
   
-  // 如果工具栏可见且是手动控制，更新其位置到当前可视区域中心
-  if (toolbarVisible.value && manualToolbarControl.value) {
-    // 只在手动控制模式下更新位置，避免自动隐藏/显示时频繁更新
+  // 如果工具栏可见，更新其位置到当前可视区域中心
+  if (toolbarVisible.value) {
     // 使用 requestAnimationFrame 优化性能
     requestAnimationFrame(() => {
       updateToolbarPosition();
@@ -620,47 +617,14 @@ const handleScroll = () => {
     isScrolling.value = false;
   }, 150);
   
-  // 如果手动控制工具栏，不自动隐藏
-  if (manualToolbarControl.value) {
-    lastScrollTop = scrollTop;
-    return;
-  }
-  
-  // 滚动到顶部时显示工具栏
-  if (scrollTop <= 10) {
-    toolbarVisible.value = true;
-    isAtBottom = false;
-    lastScrollTop = scrollTop;
-    return;
-  }
-  
-  // 滚动到底部时显示工具栏（距离底部30px以内，增加容差避免抖动）
-  const distanceToBottom = scrollHeight - scrollTop - clientHeight;
-  const nearBottom = distanceToBottom <= 30;
-  
-  if (nearBottom) {
-    // 如果已经在底部状态，保持显示，避免频繁切换
-    if (!isAtBottom) {
-      isAtBottom = true;
-      toolbarVisible.value = true;
-    }
-    
-    // 防止继续向下滚动：如果已经到底部，强制滚动位置保持在底部
-    if (distanceToBottom < 0 || scrollTop > scrollHeight - clientHeight) {
-      contentArea.value.scrollTop = scrollHeight - clientHeight;
-    }
-    
-    lastScrollTop = scrollTop;
-    return;
-  }
-  
-  // 离开底部区域时，重置底部状态并隐藏工具栏
-  if (isAtBottom) {
-    isAtBottom = false;
-  }
-  
-  // 其他情况隐藏工具栏
+  // 滑动时隐藏工具栏
   toolbarVisible.value = false;
+  
+  // 防止继续向下滚动：如果已经到底部，强制滚动位置保持在底部
+  const distanceToBottom = scrollHeight - scrollTop - clientHeight;
+  if (distanceToBottom < 0 || scrollTop > scrollHeight - clientHeight) {
+    contentArea.value.scrollTop = scrollHeight - clientHeight;
+  }
   
   lastScrollTop = scrollTop;
 };
@@ -1258,8 +1222,23 @@ const handleExportPDF = async () => {
   }
 };
 
+// 窗口大小变化处理函数
+const handleResize = () => {
+  isMobile.value = window.innerWidth <= 768;
+};
+
 onMounted(() => {
   document.querySelector('body').setAttribute('style', 'background: #EBEDF0');
+  // 检测移动端
+  isMobile.value = window.innerWidth <= 768;
+  // 移动端设置默认字体大小为16px
+  if (isMobile.value) {
+    const html = document.documentElement;
+    html.style.fontSize = '16px';
+  }
+  // 监听窗口大小变化
+  window.addEventListener('resize', handleResize);
+  
   initTheme();
   initFontSize();
   initFont();
@@ -1278,7 +1257,7 @@ onMounted(() => {
   });
 });
 
-// 组件卸载时移除滚动监听
+// 组件卸载时移除滚动监听和窗口大小监听
 onBeforeUnmount(() => {
   if (contentArea.value) {
     contentArea.value.removeEventListener('scroll', handleScroll);
@@ -1288,6 +1267,8 @@ onBeforeUnmount(() => {
   if (scrollTimer) {
     clearTimeout(scrollTimer);
   }
+  // 移除窗口大小监听
+  window.removeEventListener('resize', handleResize);
 });
 </script>
 
@@ -1535,7 +1516,6 @@ onBeforeUnmount(() => {
 .markdown-content {
   max-width: 800px;
   margin: 0 auto;
-  padding-right: 60px;
   line-height: 1.8;
   color: #2c3e50;
   word-wrap: break-word;
@@ -1546,11 +1526,10 @@ onBeforeUnmount(() => {
 .article-navigation {
   max-width: 800px;
   margin: 30px auto 20px auto;
-  padding-top: 20px;
-  padding-bottom: 20px;
+  padding: 20px;
   border-top: 1px solid #e4e7ed;
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   gap: 20px;
   transition: margin-bottom 0.3s ease, padding-bottom 0.3s ease;
 }
@@ -1609,7 +1588,7 @@ onBeforeUnmount(() => {
 }
 
 .nav-button {
-  flex: 1;
+  width: 280px;
   padding: 16px 20px;
   border-radius: 8px;
   cursor: pointer;
@@ -1619,6 +1598,7 @@ onBeforeUnmount(() => {
   gap: 8px;
   border: 1px solid rgba(0, 0, 0, 0.12);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  flex-shrink: 0;
 }
 
 .nav-button:hover {
@@ -2172,7 +2152,17 @@ onBeforeUnmount(() => {
 }
 
 /* 响应式设计 */
+/* 设置对话框移动端样式 */
+:deep(.settings-popover) {
+  max-width: 90vw !important;
+}
+
 @media (max-width: 768px) {
+  :deep(.settings-popover) {
+    width: 90vw !important;
+    max-width: 90vw !important;
+  }
+  
   .detail-container {
     padding: 10px;
   }
@@ -2184,11 +2174,14 @@ onBeforeUnmount(() => {
   .article-navigation {
     flex-direction: column;
     margin-top: 40px;
-    padding-top: 30px;
+    padding: 15px;
+    gap: 15px;
   }
   
   .nav-button {
-    width: 100%;
+    width: calc(100% - 30px);
+    max-width: 100%;
+    padding: 14px 16px;
   }
   
   .nav-button.next-article {
@@ -2207,9 +2200,6 @@ onBeforeUnmount(() => {
     gap: 8px;
   }
   
-  .markdown-content {
-    padding-right: 50px;
-  }
   
   .article-title-bar {
     padding: 12px 15px;
