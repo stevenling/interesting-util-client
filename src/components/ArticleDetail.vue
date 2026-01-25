@@ -1,7 +1,7 @@
 <template>
   <div class="article-detail">
-    <TopMenu></TopMenu>
     
+
     <div class="detail-container">
       <div v-if="loading" class="loading-section">
         <el-skeleton :rows="10" animated />
@@ -35,7 +35,7 @@
           </div>
         </div>
         
-        <div class="content-area" ref="contentArea" :style="currentBgStyle" :class="{ 'scrolling': isScrolling }">
+        <div class="content-area" ref="contentArea" :style="[currentBgStyleObject, { marginBottom: '0', paddingBottom: '0' }]" :class="{ 'scrolling': isScrolling }">
           <!-- 工具栏（在文本右侧，垂直居中） -->
           <div class="toolbar-right" :class="{ 'toolbar-hidden': !toolbarVisible }" :style="{ top: toolbarTop + 'px' }">
             <el-tooltip content="导出书摘" placement="left">
@@ -148,14 +148,12 @@
           </div>
           
           <!-- 底部文本 -->
-          <div class="footer-quote" :class="{ 'dark-theme-quote': isDarkTheme }">
-            <p>When I say the word 'you'<br/>
-              it means a hundred universes.</p>
-             
-
-
-
+          <div>
+            <p class="footer-quote-bottom">When I say the word 'you'<br/>it means a hundred universes</p>
           </div>
+          <!-- <div class="footer-quote" :class="{ 'dark-theme-quote': isDarkTheme }">
+            <p>When I say the word 'you'<br/>it means a hundred universes.</p>
+          </div> -->
         </div>
       </div>
     </div>
@@ -307,6 +305,7 @@ const themes = [
 
 const currentTheme = ref('white');
 const currentBgStyle = ref('background-color: #ffffff');
+const currentBgStyleObject = ref({ backgroundColor: '#ffffff' });
 const currentTextColor = ref('#2c3e50');
 
 // 字体选项
@@ -421,6 +420,28 @@ const loadArticle = async () => {
           contentArea.value.addEventListener('scroll', handleScroll);
           contentArea.value.setAttribute('data-scroll-listener', 'true');
         }
+        // 确保内容区域可以正确计算高度
+        nextTick(() => {
+          if (contentArea.value) {
+            // 强制重新计算布局，确保底部内容可见
+            const scrollHeight = contentArea.value.scrollHeight;
+            const clientHeight = contentArea.value.clientHeight;
+            // 如果内容高度小于容器高度，确保可以滚动到底部
+            if (scrollHeight > clientHeight) {
+              // 触发一次滚动事件，确保底部内容可见
+              requestAnimationFrame(() => {
+                if (contentArea.value) {
+                  const currentScrollTop = contentArea.value.scrollTop;
+                  const maxScrollTop = scrollHeight - clientHeight;
+                  // 如果当前不在底部，确保可以滚动到底部
+                  if (currentScrollTop < maxScrollTop - 5) {
+                    // 不需要自动滚动，只是确保可以滚动
+                  }
+                }
+              });
+            }
+          }
+        });
       }
       // 滚动 window 到顶部
       window.scrollTo({
@@ -620,10 +641,17 @@ const handleScroll = () => {
   // 滑动时隐藏工具栏
   toolbarVisible.value = false;
   
-  // 防止继续向下滚动：如果已经到底部，强制滚动位置保持在底部
+  // 检测是否到达底部（允许一定的误差范围，比如 5px）
   const distanceToBottom = scrollHeight - scrollTop - clientHeight;
-  if (distanceToBottom < 0 || scrollTop > scrollHeight - clientHeight) {
-    contentArea.value.scrollTop = scrollHeight - clientHeight;
+  const threshold = 5; // 误差阈值
+  
+  // 如果已经到底部或接近底部，确保内容完全可见
+  if (distanceToBottom <= threshold) {
+    // 确保滚动位置正确，让底部内容完全可见
+    const targetScrollTop = Math.max(0, scrollHeight - clientHeight);
+    if (Math.abs(contentArea.value.scrollTop - targetScrollTop) > threshold) {
+      contentArea.value.scrollTop = targetScrollTop;
+    }
   }
   
   lastScrollTop = scrollTop;
@@ -873,8 +901,10 @@ const changeTheme = (themeName) => {
   if (theme) {
     if (theme.type === 'gradient') {
       currentBgStyle.value = `background: ${theme.bgColor}`;
+      currentBgStyleObject.value = { background: theme.bgColor };
     } else {
       currentBgStyle.value = `background-color: ${theme.bgColor}`;
+      currentBgStyleObject.value = { backgroundColor: theme.bgColor };
     }
     // 设置文字颜色
     currentTextColor.value = theme.textColor;
@@ -909,6 +939,7 @@ const initTheme = () => {
     changeTheme(savedTheme);
   } else {
     // 默认使用白色主题
+    currentBgStyleObject.value = { backgroundColor: '#ffffff' };
     changeTheme('white');
   }
 };
@@ -1253,6 +1284,23 @@ onMounted(() => {
       contentArea.value.setAttribute('data-scroll-listener', 'true');
       // 初始化工具栏位置
       updateToolbarPosition();
+      
+      // 确保内容加载后底部内容可见
+      // 使用 requestAnimationFrame 确保 DOM 完全渲染
+      requestAnimationFrame(() => {
+        if (contentArea.value) {
+          const scrollHeight = contentArea.value.scrollHeight;
+          const clientHeight = contentArea.value.clientHeight;
+          // 如果内容高度大于容器高度，确保可以滚动到底部看到所有内容
+          if (scrollHeight > clientHeight) {
+            // 触发一次布局重新计算
+            void contentArea.value.offsetHeight;
+            // 确保滚动到底部时能看到所有内容
+            const maxScrollTop = scrollHeight - clientHeight;
+            // 不自动滚动，只是确保可以滚动到底部
+          }
+        }
+      });
     }
   });
 });
@@ -1273,17 +1321,29 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped>
+/* 重置全局样式对底部边距的影响 */
+:deep(body),
+:deep(html),
+:deep(#app) {
+  margin-bottom: 0 !important;
+  padding-bottom: 0 !important;
+}
+
 .article-detail {
   min-height: 100vh;
   background: #EBEDF0;
   overflow-x: hidden;
+  margin-bottom: 0 !important;
+  padding-bottom: 0 !important;
 }
 
 .detail-container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 20px;
+  padding: 20px 20px 0 20px !important;
   overflow-x: hidden;
+  margin-bottom: 0 !important;
+  height: 100vh;
 }
 
 .loading-section,
@@ -1301,6 +1361,9 @@ onBeforeUnmount(() => {
   overflow: hidden;
   overflow-x: hidden;
   position: relative;
+  margin-bottom: 0 !important;
+  padding-bottom: 0 !important;
+  height: 100vh;
 }
 
 .toolbar-toggle {
@@ -1490,32 +1553,59 @@ onBeforeUnmount(() => {
 }
 
 .content-area {
-  padding: 40px 40px 20px 40px;
-  max-height: calc(100vh - 200px);
+  padding: 40px 40px 0 40px !important;
+  height: 90vh;
+  max-height: 90vh;
   overflow-y: auto;
   overflow-x: hidden;
   background: #ffffff;
-  transition: background-color 0.3s ease, padding-bottom 0.3s ease, max-height 0.3s ease;
+  transition: background-color 0.3s ease, padding-bottom 0.3s ease, height 0.3s ease;
   overscroll-behavior-y: none;
   position: relative;
+  margin: 0 !important;
+  margin-bottom: 0 !important;
+  padding-bottom: 0 !important;
+  box-sizing: border-box;
+  min-height: 0;
+}
+
+/* 确保 content-area 内部所有元素没有底部边距 */
+.content-area > * {
+  margin-bottom: 0 !important;
+}
+
+.content-area > *:last-child {
+  margin-bottom: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+/* 确保 content-area 本身没有额外的底部空间 */
+.content-area::after {
+  content: '';
+  display: none;
+  height: 0;
+  margin: 0;
+  padding: 0;
 }
 
 .content-area.scrolling {
-  padding-bottom: 10px;
+  padding-bottom: 0 !important;
 }
 
 .content-area.toolbar-hidden {
-  max-height: calc(100vh - 140px);
-  padding-bottom: 10px;
+  height: 100vh;
+  padding-bottom: 0 !important;
 }
 
 .content-area.scrolling.toolbar-hidden {
-  padding-bottom: 5px;
+  padding-bottom: 0 !important;
 }
 
 .markdown-content {
   max-width: 800px;
   margin: 0 auto;
+  margin-bottom: 0 !important;
+  padding-bottom: 0 !important;
   line-height: 1.8;
   color: #2c3e50;
   word-wrap: break-word;
@@ -1525,39 +1615,46 @@ onBeforeUnmount(() => {
 
 .article-navigation {
   max-width: 800px;
-  margin: 30px auto 20px auto;
-  padding: 20px;
+  margin: 10px auto 0 auto !important;
+  padding: 10px 20px 0 20px !important;
   border-top: 1px solid #e4e7ed;
   display: flex;
   justify-content: center;
   gap: 20px;
   transition: margin-bottom 0.3s ease, padding-bottom 0.3s ease;
+  margin-bottom: 0 !important;
+  padding-bottom: 0 !important;
 }
 
 .article-navigation.scrolling {
-  margin-bottom: 10px;
-  padding-bottom: 15px;
+  margin-bottom: 0;
+  padding-bottom: 0;
 }
 
 .content-area.toolbar-hidden .article-navigation {
-  margin-bottom: 10px;
-  padding-bottom: 15px;
+  margin-bottom: 0;
+  padding-bottom: 0;
 }
 
 .content-area.toolbar-hidden.scrolling .article-navigation {
-  margin-bottom: 5px;
-  padding-bottom: 10px;
+  margin-bottom: 0;
+  padding-bottom: 0;
 }
 
 .footer-quote {
   max-width: 800px;
-  margin: 30px auto 60px auto;
-  padding: 20px 0;
+  margin: 60px auto 0 auto !important;
+  padding: 0 !important;
   text-align: center;
+  margin-bottom: 0 !important;
+  padding-bottom: 0 !important;
+  height: auto;
+  min-height: auto;
 }
 
 .footer-quote p {
-  margin: 0;
+  margin: 0 !important;
+  padding: 0 !important;
   font-size: 16px;
   color: #909399;
   font-style: italic;
@@ -1565,26 +1662,40 @@ onBeforeUnmount(() => {
 }
 
 .content-area.scrolling .footer-quote {
-  margin-top: 20px;
-  margin-bottom: 50px;
-  padding: 15px 0;
+  margin-top: 5px !important;
+  margin-bottom: 0 !important;
+  padding: 0 !important;
 }
 
 .content-area.toolbar-hidden .footer-quote {
-  margin-top: 20px;
-  margin-bottom: 50px;
-  padding: 15px 0;
+  margin-top: 5px !important;
+  margin-bottom: 0 !important;
+  padding: 0 !important;
 }
 
 .content-area.toolbar-hidden.scrolling .footer-quote {
-  margin-top: 10px;
-  margin-bottom: 40px;
-  padding: 10px 0;
+  margin-top: 3px !important;
+  margin-bottom: 0 !important;
+  padding: 0 !important;
+}
+
+.footer-quote-bottom {
+  align-items: center;
+  justify-content: center;
+  margin-top: 30px;
+  margin-bottom: 30px;
+  padding: 0;
+  font-size: 16px;
+  color: #909399;
+  font-style: italic;
+  line-height: 1.6;
+  text-align: center;
 }
 
 /* 深色主题下的底部文本 */
 .footer-quote.dark-theme-quote p {
   color: rgba(255, 255, 255, 0.7);
+  margin-top: 30px;
 }
 
 .nav-button {
@@ -2164,17 +2275,21 @@ onBeforeUnmount(() => {
   }
   
   .detail-container {
-    padding: 10px;
+    padding: 10px 10px 0 10px;
+    margin-bottom: 0;
   }
   
   .content-area {
-    padding: 20px;
+    padding: 20px 20px 0 20px !important;
+    margin-bottom: 0 !important;
+    padding-bottom: 0 !important;
   }
   
   .article-navigation {
     flex-direction: column;
-    margin-top: 40px;
-    padding: 15px;
+    margin-top: 20px;
+    margin-bottom: 0;
+    padding: 12px 15px 3px 15px;
     gap: 15px;
   }
   

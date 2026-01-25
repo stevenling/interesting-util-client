@@ -18,6 +18,8 @@ html, body {
   height: 100%;
   overflow-x: hidden;
   overflow-y: auto;
+  margin-bottom: 0 !important;
+  padding-bottom: 0 !important;
 }
 
 #app {
@@ -26,5 +28,7 @@ html, body {
   position: relative;
   height: 100vh;
   overflow: hidden;
+  margin-bottom: 0 !important;
+  padding-bottom: 0 !important;
 }
 </style>
