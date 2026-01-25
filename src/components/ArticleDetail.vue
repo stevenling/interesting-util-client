@@ -20,102 +20,141 @@
       </div>
       
       <div v-else-if="articleContent" class="article-section">
-        <div class="toolbar">
-          <el-button @click="goBack" type="primary" :icon="ArrowLeft" circle plain title="返回"></el-button>
-          <el-button @click="handleExportBookmark" type="primary" :icon="Picture" circle plain title="导出书摘"></el-button>
-          <el-popover
-            placement="bottom-start"
-            :width="320"
-            trigger="click"
-            title="设置"
-          >
-            <template #reference>
-              <el-button type="primary" :icon="Setting" circle plain title="设置"></el-button>
-            </template>
-            <div class="settings-panel">
-              <!-- 字体大小设置 -->
-              <div class="setting-section">
-                <div class="section-title">字体大小</div>
-                <div class="font-size-controls">
-                  <el-button @click="decreaseFontSize" type="default" :icon="Minus" circle size="small"></el-button>
-                  <span class="font-size-display">{{ fontSize }}px</span>
-                  <el-button @click="increaseFontSize" type="default" :icon="Plus" circle size="small"></el-button>
-                </div>
-              </div>
-
-              <!-- 字体选择 -->
-              <div class="setting-section">
-                <div class="section-title">字体</div>
-                <el-select v-model="currentFont" @change="changeFont" style="width: 100%;">
-                  <el-option
-                    v-for="font in fontOptions"
-                    :key="font.value"
-                    :label="font.label"
-                    :value="font.value"
-                    :style="{ fontFamily: font.value }"
-                  />
-                </el-select>
-              </div>
-
-              <!-- 导出功能 -->
-              <div class="setting-section">
-                <div class="section-title">导出</div>
-                <el-button @click="handleExportPDF" type="primary" :loading="exporting" style="width: 100%;">
-                  <el-icon><document /></el-icon>
-                  导出PDF
-                </el-button>
-              </div>
-
-              <!-- 主题设置 -->
-              <div class="setting-section">
-                <div class="section-title">主题背景</div>
-                <div class="theme-options">
-                  <div class="theme-category">
-                    <div class="category-title">纯色背景</div>
-                    <div class="theme-grid">
-                      <div 
-                        v-for="theme in solidThemes" 
-                        :key="theme.name"
-                        class="theme-option"
-                        :class="{ active: currentTheme === theme.name }"
-                        @click="changeTheme(theme.name)"
-                        :title="theme.label"
-                      >
-                        <div class="theme-preview" :style="getPreviewStyle(theme)"></div>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="theme-category">
-                    <div class="category-title">渐变背景</div>
-                    <div class="theme-grid">
-                      <div 
-                        v-for="theme in gradientThemes" 
-                        :key="theme.name"
-                        class="theme-option"
-                        :class="{ active: currentTheme === theme.name }"
-                        @click="changeTheme(theme.name)"
-                        :title="theme.label"
-                      >
-                        <div class="theme-preview" :style="getPreviewStyle(theme)"></div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </el-popover>
+        <!-- 文章标题 -->
+        <div class="article-title-bar">
+          <!-- 返回按钮 -->
+          <el-tooltip content="返回" placement="bottom">
+            <el-button @click="goBack" type="primary" :icon="ArrowLeft" circle plain></el-button>
+          </el-tooltip>
           <span class="article-title-text">{{ articleTitle }}</span>
+          <!-- 工具栏切换按钮 -->
+          <div class="toolbar-toggle">
+            <el-tooltip :content="toolbarVisible ? '隐藏工具栏' : '显示工具栏'" placement="bottom">
+              <el-button type="primary" :icon="toolbarVisible ? Hide : View" circle plain @click="toggleToolbar"></el-button>
+            </el-tooltip>
+          </div>
         </div>
         
-        <div class="content-area" ref="contentArea" :style="currentBgStyle">
-          <div 
-            class="markdown-content" 
-            :class="{ 'dark-theme': isDarkTheme }"
-            v-html="renderedContent"
-            ref="markdownContentRef"
-            :style="{ fontSize: fontSize + 'px', color: currentTextColor, ...getContentStyle() }"
-            @mouseup="handleTextSelection"
-          ></div>
+        <div class="content-area" ref="contentArea" :style="currentBgStyle" :class="{ 'scrolling': isScrolling }">
+          <!-- 工具栏（在文本右侧，垂直居中） -->
+          <div class="toolbar-right" :class="{ 'toolbar-hidden': !toolbarVisible }" :style="{ top: toolbarTop + 'px' }">
+            <el-tooltip content="导出书摘" placement="left">
+              <el-button @click="handleExportBookmark" type="primary" :icon="Picture" circle plain></el-button>
+            </el-tooltip>
+            <el-tooltip content="设置" placement="left">
+              <el-popover
+                placement="left-start"
+                :width="360"
+                trigger="click"
+                title="设置"
+              >
+                <template #reference>
+                  <el-button type="primary" :icon="Setting" circle plain></el-button>
+                </template>
+              <div class="settings-panel">
+                <!-- 字体大小设置 -->
+                <div class="setting-section">
+                  <div class="section-title">字体大小</div>
+                  <div class="font-size-controls">
+                    <el-button @click="decreaseFontSize" type="default" :icon="Minus" circle size="small"></el-button>
+                    <span class="font-size-display">{{ fontSize }}px</span>
+                    <el-button @click="increaseFontSize" type="default" :icon="Plus" circle size="small"></el-button>
+                  </div>
+                </div>
+
+                <!-- 字体选择 -->
+                <div class="setting-section">
+                  <div class="section-title">字体</div>
+                  <el-select v-model="currentFont" @change="changeFont" style="width: 100%;">
+                    <el-option
+                      v-for="font in fontOptions"
+                      :key="font.value"
+                      :label="font.label"
+                      :value="font.value"
+                      :style="{ fontFamily: font.value }"
+                    />
+                  </el-select>
+                </div>
+
+                <!-- 导出功能 -->
+                <div class="setting-section">
+                  <div class="section-title">导出</div>
+                  <el-button @click="handleExportPDF" type="primary" :loading="exporting" style="width: 100%;">
+                    <el-icon><document /></el-icon>
+                    导出PDF
+                  </el-button>
+                </div>
+
+                <!-- 主题设置 -->
+                <div class="setting-section">
+                  <div class="section-title">主题背景</div>
+                  <div class="theme-options">
+                    <div class="theme-category">
+                      <div class="category-title">纯色背景</div>
+                      <div class="theme-grid">
+                        <div 
+                          v-for="theme in solidThemes" 
+                          :key="theme.name"
+                          class="theme-option"
+                          :class="{ active: currentTheme === theme.name }"
+                          @click="changeTheme(theme.name)"
+                          :title="theme.label"
+                        >
+                          <div class="theme-preview" :style="getPreviewStyle(theme)"></div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="theme-category">
+                      <div class="category-title">渐变背景</div>
+                      <div class="theme-grid">
+                        <div 
+                          v-for="theme in gradientThemes" 
+                          :key="theme.name"
+                          class="theme-option"
+                          :class="{ active: currentTheme === theme.name }"
+                          @click="changeTheme(theme.name)"
+                          :title="theme.label"
+                        >
+                          <div class="theme-preview" :style="getPreviewStyle(theme)"></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </el-popover>
+          </el-tooltip>
+        </div>
+        <div 
+          class="markdown-content" 
+          :class="{ 'dark-theme': isDarkTheme }"
+          v-html="renderedContent"
+          ref="markdownContentRef"
+          :style="{ fontSize: fontSize + 'px', color: currentTextColor, ...getContentStyle() }"
+          @mouseup="handleTextSelection"
+        ></div>
+          
+          <!-- 文章导航 -->
+          <div class="article-navigation" v-if="prevArticle || nextArticle" :class="{ 'dark-theme-nav': isDarkTheme, 'scrolling': isScrolling }">
+            <div class="nav-button prev-article" v-if="prevArticle" @click="goToArticle(prevArticle.id)" :style="navButtonStyle">
+              <span class="nav-label">上一篇</span>
+              <span class="nav-title">{{ prevArticle.title }}</span>
+            </div>
+            <div class="nav-button next-article" v-if="nextArticle" @click="goToArticle(nextArticle.id)" :style="navButtonStyle">
+              <span class="nav-label">下一篇</span>
+              <span class="nav-title">{{ nextArticle.title }}</span>
+            </div>
+          </div>
+          
+          <!-- 底部文本 -->
+          <div class="footer-quote" :class="{ 'dark-theme-quote': isDarkTheme }">
+            <p>When I say the word 'you'<br/>
+              it means a hundred universes.</p>
+             
+
+
+
+          </div>
         </div>
       </div>
     </div>
@@ -133,6 +172,24 @@
           ref="bookmarkCardRef"
           :style="bookmarkCardStyle"
         >
+          <!-- 左右箭头按钮 -->
+          <div class="bookmark-theme-nav">
+            <el-button 
+              class="theme-nav-btn theme-nav-left"
+              :icon="ArrowLeft"
+              circle
+              @click="switchBookmarkTheme(-1)"
+              size="small"
+            ></el-button>
+            <el-button 
+              class="theme-nav-btn theme-nav-right"
+              :icon="ArrowRight"
+              circle
+              @click="switchBookmarkTheme(1)"
+              size="small"
+            ></el-button>
+          </div>
+          
           <!-- 日期部分 -->
           <div class="bookmark-date-section">
             <div class="bookmark-day" :style="{ color: bookmarkTextColor, fontFamily: bookmarkFontFamily }">{{ currentDate.day }}</div>
@@ -154,56 +211,33 @@
         </div>
       </div>
       
-      <!-- 模版设置（可展开） -->
-      <div v-show="bookmarkTemplateExpanded" class="bookmark-template-content">
-        <div class="bookmark-setting-item">
-          <div class="setting-label">主题颜色</div>
-          <div class="bookmark-theme-grid">
-            <div
-              v-for="theme in bookmarkThemes"
-              :key="theme.name"
-              class="bookmark-theme-option"
-              :class="{ active: bookmarkCurrentTheme === theme.name }"
-              @click="bookmarkCurrentTheme = theme.name"
-              :title="theme.label"
-            >
-              <div class="bookmark-theme-preview" :style="getBookmarkPreviewStyle(theme)"></div>
-            </div>
-          </div>
-        </div>
-        
-        <div class="bookmark-setting-item">
-          <div class="setting-label">字体</div>
-          <el-select v-model="bookmarkCurrentFont" style="width: 100%;">
-            <el-option
-              v-for="font in bookmarkFontOptions"
-              :key="font.value"
-              :label="font.label"
-              :value="font.value"
-              :style="{ fontFamily: font.value }"
-            />
-          </el-select>
+      <!-- 字体设置 -->
+      <div class="bookmark-font-setting">
+        <div class="setting-label">字体</div>
+        <div class="bookmark-font-buttons">
+          <el-button
+            v-for="font in bookmarkFontOptions"
+            :key="font.value"
+            :type="bookmarkCurrentFont === font.value ? 'primary' : 'default'"
+            size="small"
+            @click="bookmarkCurrentFont = font.value"
+            :style="{ fontFamily: font.value }"
+            class="font-button"
+          >
+            {{ font.label }}
+          </el-button>
         </div>
       </div>
       
       <template #footer>
         <div class="dialog-footer">
           <el-button 
-            @click="bookmarkTemplateExpanded = !bookmarkTemplateExpanded" 
-            type="default"
-          >
-            <el-icon style="margin-right: 8px;">
-              <ArrowDown v-if="bookmarkTemplateExpanded" />
-              <ArrowRight v-else />
-            </el-icon>
-            更换模版
-          </el-button>
-          <el-button 
             type="primary" 
             @click="copyBookmarkToClipboard" 
             :loading="generatingBookmark"
             :icon="generatingBookmark ? undefined : CopyDocument"
             size="default"
+            class="copy-button"
           >
             {{ generatingBookmark ? '生成中...' : '复制' }}
           </el-button>
@@ -214,15 +248,15 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, watch, onBeforeUnmount, nextTick } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { ElMessage } from 'element-plus';
-import { ArrowLeft, Document, Minus, Plus, Setting, Bookmark, CopyDocument, Picture, ArrowDown, ArrowRight } from '@element-plus/icons-vue';
+import { ArrowLeft, Document, Minus, Plus, Setting, Bookmark, CopyDocument, Picture, ArrowDown, ArrowRight, View, Hide } from '@element-plus/icons-vue';
 import TopMenu from './TopMenu.vue';
 import { marked } from 'marked';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
-import { getArticleById } from '@/config/articles';
+import { getArticleById, getAllArticles } from '@/config/articles';
 
 const router = useRouter();
 const route = useRoute();
@@ -234,6 +268,13 @@ const articleTitle = ref('');
 const contentArea = ref(null);
 const markdownContentRef = ref(null);
 const exporting = ref(false);
+const toolbarVisible = ref(true); // 工具栏显示状态
+const manualToolbarControl = ref(false); // 是否手动控制工具栏
+const isScrolling = ref(false); // 是否在滚动状态
+const toolbarTop = ref(0); // 工具栏垂直位置（像素值）
+let lastScrollTop = 0; // 上次滚动位置
+let scrollTimer = null; // 滚动定时器
+let isAtBottom = false; // 是否在底部
 const fontSize = ref(20); // 默认字体大小
 const currentFont = ref('default'); // 当前字体
 const selectedText = ref(''); // 选中的文本
@@ -241,9 +282,8 @@ const bookmarkDialogVisible = ref(false); // 书摘对话框显示状态
 const bookmarkCardRef = ref(null); // 书摘卡片引用
 const generatingBookmark = ref(false); // 生成书摘中
 const articleAuthor = ref(''); // 文章作者
-const bookmarkCurrentTheme = ref('sepia-gradient'); // 书摘当前主题
-const bookmarkCurrentFont = ref('default'); // 书摘当前字体
-const bookmarkTemplateExpanded = ref(false); // 模版设置是否展开
+const bookmarkCurrentTheme = ref('dark-blue-gradient'); // 书摘当前主题
+const bookmarkCurrentFont = ref('"Lantinghei SC", "Lantinghei TC", "Microsoft YaHei", "PingFang SC", sans-serif'); // 书摘当前字体
 
 // 主题设置（基于主流阅读网站常用颜色）
 const themes = [
@@ -281,26 +321,26 @@ const fontOptions = [
   { label: 'Helvetica', value: 'Helvetica, Arial, sans-serif' }
 ];
 
-// 书摘主题选项（渐变式背景）
+// 书摘主题选项（渐变式背景，参考微信读书样式）
 const bookmarkThemes = [
-  { name: 'sepia-gradient', label: '米色', bgColor: 'linear-gradient(180deg, #FBF0D9 0%, #F5E6C8 100%)', textColor: '#2c3e50' },
-  { name: 'white-gradient', label: '白色', bgColor: 'linear-gradient(180deg, #ffffff 0%, #f8f8f8 100%)', textColor: '#2c3e50' },
-  { name: 'gray-gradient', label: '浅灰', bgColor: 'linear-gradient(180deg, #F5F5F5 0%, #E8E8E8 100%)', textColor: '#2c3e50' },
-  { name: 'green-gradient', label: '护眼绿', bgColor: 'linear-gradient(180deg, #E8F5E9 0%, #C8E6C9 100%)', textColor: '#2c3e50' },
-  { name: 'blue-gradient', label: '浅蓝', bgColor: 'linear-gradient(180deg, #E3F2FD 0%, #BBDEFB 100%)', textColor: '#2c3e50' },
-  { name: 'yellow-gradient', label: '暖黄', bgColor: 'linear-gradient(180deg, #FFF8E1 0%, #FFECB3 100%)', textColor: '#2c3e50' },
-  { name: 'dark-gradient', label: '黑色', bgColor: 'linear-gradient(180deg, #2c2c2c 0%, #1a1a1a 100%)', textColor: '#ffffff' }
+  { name: 'white-gradient', label: '白色', bgColor: 'linear-gradient(180deg, #FFFFFF 0%, #F5F5F5 100%)', textColor: '#2c3e50' },
+  { name: 'dark-blue-gradient', label: '深蓝', bgColor: 'linear-gradient(180deg, #263270 0%, #1a2347 100%)', textColor: '#D3DFE9' },
+  { name: 'blue-gray-gradient', label: '蓝灰', bgColor: 'linear-gradient(180deg, #6A7BAA 0%, #5A6B9A 100%)', textColor: '#FFFFFF' },
+  { name: 'pink-beige-gradient', label: '粉米', bgColor: 'linear-gradient(180deg, #FDF5F6 0%, #F8F0F1 100%)', textColor: '#333333' },
+  { name: 'light-gray-gradient', label: '浅灰2', bgColor: 'linear-gradient(180deg, #F7F8FA 0%, #F0F1F3 100%)', textColor: '#333333' },
+  { name: 'warm-beige-gradient', label: '暖米', bgColor: 'linear-gradient(180deg, #FAF8F5 0%, #F5F3F0 100%)', textColor: '#333333' },
+  { name: 'soft-beige-gradient', label: '柔米', bgColor: 'linear-gradient(180deg, #FCFBF8 0%, #F8F7F4 100%)', textColor: '#333333' },
+  { name: 'dark-gradient', label: '黑色', bgColor: 'linear-gradient(180deg, #2C2C2C 0%, #000000 100%)', textColor: '#E4D4BC' }
 ];
 
-// 书摘字体选项（简化版）
+// 书摘字体选项
 const bookmarkFontOptions = [
-  { label: '系统默认', value: 'default' },
-  { label: '苹方', value: 'PingFang SC, -apple-system, BlinkMacSystemFont' },
-  { label: '微软雅黑', value: 'Microsoft YaHei, sans-serif' },
-  { label: '思源黑体', value: 'Source Han Sans CN, sans-serif' },
-  { label: '宋体', value: 'SimSun, serif' },
-  { label: '楷体', value: 'KaiTi, serif' },
-  { label: '仿宋', value: 'FangSong, serif' }
+  { label: '兰亭黑', value: '"Lantinghei SC", "Lantinghei TC", "Microsoft YaHei", "PingFang SC", sans-serif' },
+  { label: '思源宋体', value: '"Source Han Serif SC", "Source Han Serif CN", "Noto Serif SC", "STSong", serif' },
+  { label: '仓耳今楷', value: '"TsangerJinKai05", "TsangerJinKai", "KaiTi", "STKaiti", serif' },
+  { label: '仓耳云黑', value: '"TsangerYunHei05", "TsangerYunHei", "Microsoft YaHei", "PingFang SC", sans-serif' },
+  { label: '方正悠宋', value: '"FZYouSongS", "FZYouSong", "SimSun", "STSong", serif' },
+  { label: '仿宋', value: '"FangSong", "STFangsong", "STFangSong", serif' }
 ];
 
 const currentFontStyle = ref('');
@@ -366,6 +406,39 @@ const loadArticle = async () => {
     const text = await response.text();
     articleContent.value = text;
     loading.value = false;
+    
+    // 等待 DOM 更新和内容渲染后滚动到顶部
+    await nextTick();
+    // 使用 setTimeout 确保内容完全渲染后再滚动
+    setTimeout(() => {
+      // 滚动 contentArea 到顶部
+      if (contentArea.value) {
+        contentArea.value.scrollTop = 0;
+        // 重新添加滚动监听（如果还没有添加）
+        if (!contentArea.value.hasAttribute('data-scroll-listener')) {
+          contentArea.value.addEventListener('scroll', handleScroll);
+          contentArea.value.setAttribute('data-scroll-listener', 'true');
+        }
+      }
+      // 滚动 window 到顶部
+      window.scrollTo({
+        top: 0,
+        left: 0,
+        behavior: 'instant'
+      });
+      // 如果 detail-container 也需要滚动
+      const detailContainer = document.querySelector('.detail-container');
+      if (detailContainer) {
+        detailContainer.scrollTop = 0;
+      }
+      // 重置工具栏状态
+      toolbarVisible.value = true;
+      lastScrollTop = 0;
+      // 更新工具栏位置到当前可视区域中心
+      setTimeout(() => {
+        updateToolbarPosition();
+      }, 200);
+    }, 150);
   } catch (err) {
     console.error('加载文章失败:', err);
     error.value = '文章加载失败，请检查文件是否存在';
@@ -384,6 +457,71 @@ const goBack = () => {
 };
 
 /**
+ * 获取上一篇和下一篇文章
+ */
+const prevArticle = computed(() => {
+  const allArticles = getAllArticles();
+  // 按日期倒序排序（最新的在前）
+  const sortedArticles = [...allArticles].sort((a, b) => {
+    return new Date(b.date) - new Date(a.date);
+  });
+  
+  const currentArticleId = route.query.id;
+  const currentIndex = sortedArticles.findIndex(a => a.id === currentArticleId);
+  
+  if (currentIndex === -1 || currentIndex === 0) {
+    return null; // 没有上一篇文章（已经是最新的一篇）
+  }
+  
+  return sortedArticles[currentIndex - 1];
+});
+
+const nextArticle = computed(() => {
+  const allArticles = getAllArticles();
+  // 按日期倒序排序（最新的在前）
+  const sortedArticles = [...allArticles].sort((a, b) => {
+    return new Date(b.date) - new Date(a.date);
+  });
+  
+  const currentArticleId = route.query.id;
+  const currentIndex = sortedArticles.findIndex(a => a.id === currentArticleId);
+  
+  if (currentIndex === -1 || currentIndex === sortedArticles.length - 1) {
+    return null; // 没有下一篇文章（已经是最旧的一篇）
+  }
+  
+  return sortedArticles[currentIndex + 1];
+});
+
+/**
+ * 跳转到指定文章
+ */
+const goToArticle = (articleId) => {
+  // 立即设置加载状态
+  loading.value = true;
+  articleContent.value = '';
+  error.value = '';
+  
+  // 立即滚动到顶部
+  if (contentArea.value) {
+    contentArea.value.scrollTop = 0;
+  }
+  window.scrollTo({
+    top: 0,
+    left: 0,
+    behavior: 'instant'
+  });
+  
+  // 更新路由，watch 会自动触发 loadArticle
+  router.push({
+    path: '/articleDetail',
+    query: {
+      id: articleId
+    }
+  });
+};
+
+/**
  * 处理文本选择
  */
 const handleTextSelection = () => {
@@ -391,7 +529,140 @@ const handleTextSelection = () => {
   if (selection && selection.toString().trim()) {
     const text = selection.toString().trim();
     selectedText.value = text;
+    // 选中文本时自动显示工具栏
+    updateToolbarPosition(); // 更新到当前可视区域中心
+    toolbarVisible.value = true;
+    manualToolbarControl.value = false; // 选中文本时重置手动控制状态
   }
+};
+
+/**
+ * 更新工具栏位置（根据当前可视区域）
+ */
+const updateToolbarPosition = () => {
+  if (!contentArea.value) return;
+  
+  const scrollTop = contentArea.value.scrollTop;
+  const clientHeight = contentArea.value.clientHeight;
+  const scrollHeight = contentArea.value.scrollHeight;
+  
+  if (scrollHeight === 0 || clientHeight === 0) {
+    // 如果内容区域还没有加载完成，使用默认位置
+    toolbarTop.value = 0;
+    return;
+  }
+  
+  // 计算当前可视区域的中心位置（相对于 content-area 的顶部，单位：像素）
+  // scrollTop 是滚动位置，clientHeight / 2 是可视区域的一半
+  const centerPosition = scrollTop + clientHeight / 2;
+  
+  // 直接使用像素值，限制在合理范围内
+  // 最小距离顶部 50px，最大距离顶部 (scrollHeight - 50)px
+  toolbarTop.value = Math.max(50, Math.min(scrollHeight - 50, centerPosition));
+};
+
+/**
+ * 手动切换工具栏显示/隐藏
+ */
+const toggleToolbar = () => {
+  const willShow = !toolbarVisible.value;
+  
+  if (willShow) {
+    // 先计算并设置位置（在显示前计算，确保位置准确）
+    updateToolbarPosition();
+    // 然后显示工具栏
+    toolbarVisible.value = true;
+    manualToolbarControl.value = true; // 标记为手动控制
+    
+    // 使用 nextTick 和 setTimeout 确保 DOM 完全更新后再次精确计算位置
+    nextTick(() => {
+      setTimeout(() => {
+        if (contentArea.value && toolbarVisible.value) {
+          updateToolbarPosition();
+        }
+      }, 50);
+    });
+  } else {
+    toolbarVisible.value = false;
+    manualToolbarControl.value = true; // 标记为手动控制
+  }
+};
+
+/**
+ * 处理滚动事件
+ */
+const handleScroll = () => {
+  if (!contentArea.value) return;
+  
+  const scrollTop = contentArea.value.scrollTop;
+  const scrollHeight = contentArea.value.scrollHeight;
+  const clientHeight = contentArea.value.clientHeight;
+  
+  // 设置滚动状态
+  isScrolling.value = scrollTop > 10;
+  
+  // 如果工具栏可见且是手动控制，更新其位置到当前可视区域中心
+  if (toolbarVisible.value && manualToolbarControl.value) {
+    // 只在手动控制模式下更新位置，避免自动隐藏/显示时频繁更新
+    // 使用 requestAnimationFrame 优化性能
+    requestAnimationFrame(() => {
+      updateToolbarPosition();
+    });
+  }
+  
+  // 清除之前的定时器
+  if (scrollTimer) {
+    clearTimeout(scrollTimer);
+  }
+  
+  // 滚动停止后恢复非滚动状态
+  scrollTimer = setTimeout(() => {
+    isScrolling.value = false;
+  }, 150);
+  
+  // 如果手动控制工具栏，不自动隐藏
+  if (manualToolbarControl.value) {
+    lastScrollTop = scrollTop;
+    return;
+  }
+  
+  // 滚动到顶部时显示工具栏
+  if (scrollTop <= 10) {
+    toolbarVisible.value = true;
+    isAtBottom = false;
+    lastScrollTop = scrollTop;
+    return;
+  }
+  
+  // 滚动到底部时显示工具栏（距离底部30px以内，增加容差避免抖动）
+  const distanceToBottom = scrollHeight - scrollTop - clientHeight;
+  const nearBottom = distanceToBottom <= 30;
+  
+  if (nearBottom) {
+    // 如果已经在底部状态，保持显示，避免频繁切换
+    if (!isAtBottom) {
+      isAtBottom = true;
+      toolbarVisible.value = true;
+    }
+    
+    // 防止继续向下滚动：如果已经到底部，强制滚动位置保持在底部
+    if (distanceToBottom < 0 || scrollTop > scrollHeight - clientHeight) {
+      contentArea.value.scrollTop = scrollHeight - clientHeight;
+    }
+    
+    lastScrollTop = scrollTop;
+    return;
+  }
+  
+  // 离开底部区域时，重置底部状态并隐藏工具栏
+  if (isAtBottom) {
+    isAtBottom = false;
+  }
+  
+  // 其他情况隐藏工具栏
+  toolbarVisible.value = false;
+  
+  lastScrollTop = scrollTop;
 };
 
 /**
@@ -402,8 +673,25 @@ const handleExportBookmark = () => {
     ElMessage.warning('请先选中要导出的文本');
     return;
   }
-  bookmarkTemplateExpanded.value = false; // 每次打开时默认关闭模版设置
   bookmarkDialogVisible.value = true;
+};
+
+/**
+ * 切换书摘主题
+ * @param {number} direction - 1: 下一个主题, -1: 上一个主题
+ */
+const switchBookmarkTheme = (direction) => {
+  const currentIndex = bookmarkThemes.findIndex(t => t.name === bookmarkCurrentTheme.value);
+  let newIndex = currentIndex + direction;
+  
+  // 循环切换
+  if (newIndex < 0) {
+    newIndex = bookmarkThemes.length - 1;
+  } else if (newIndex >= bookmarkThemes.length) {
+    newIndex = 0;
+  }
+  
+  bookmarkCurrentTheme.value = bookmarkThemes[newIndex].name;
 };
 
 /**
@@ -525,6 +813,11 @@ const decreaseFontSize = () => {
 // 计算纯色和渐变主题
 const solidThemes = computed(() => themes.filter(t => t.type === 'solid'));
 const gradientThemes = computed(() => themes.filter(t => t.type === 'gradient'));
+
+// 获取导航按钮的背景样式（与主题背景色相同）
+const navButtonStyle = computed(() => {
+  return currentBgStyle.value;
+});
 
 // 判断是否为深色主题
 const isDarkTheme = computed(() => currentTheme.value === 'dark' || currentTheme.value === 'dark-gradient');
@@ -682,6 +975,84 @@ const initFont = () => {
     changeFont('default');
   }
 };
+
+/**
+ * 初始化书摘主题
+ */
+const initBookmarkTheme = () => {
+  const savedTheme = localStorage.getItem('bookmarkTheme');
+  if (savedTheme && bookmarkThemes.find(t => t.name === savedTheme)) {
+    bookmarkCurrentTheme.value = savedTheme;
+  } else {
+    // 默认使用深蓝渐变主题
+    bookmarkCurrentTheme.value = 'dark-blue-gradient';
+  }
+};
+
+/**
+ * 初始化书摘字体
+ */
+const initBookmarkFont = () => {
+  const savedFont = localStorage.getItem('bookmarkFont');
+  if (savedFont && bookmarkFontOptions.find(f => f.value === savedFont)) {
+    bookmarkCurrentFont.value = savedFont;
+  } else {
+    // 默认使用兰亭黑
+    bookmarkCurrentFont.value = '"Lantinghei SC", "Lantinghei TC", "Microsoft YaHei", "PingFang SC", sans-serif';
+  }
+};
+
+// 监听书摘主题变化，保存到 localStorage
+watch(bookmarkCurrentTheme, (newTheme) => {
+  localStorage.setItem('bookmarkTheme', newTheme);
+});
+
+// 监听书摘字体变化，保存到 localStorage
+watch(bookmarkCurrentFont, (newFont) => {
+  localStorage.setItem('bookmarkFont', newFont);
+});
+
+// 监听路由变化，重新加载文章
+watch(() => route.query.id, (newId, oldId) => {
+  if (newId && newId !== oldId) {
+    loadArticle();
+  }
+});
+
+/**
+ * 键盘事件处理函数
+ */
+const handleBookmarkKeyboard = (event) => {
+  // 只在对话框打开时处理键盘事件
+  if (!bookmarkDialogVisible.value) return;
+  
+  // 左箭头键：切换到上一个主题
+  if (event.key === 'ArrowLeft') {
+    event.preventDefault();
+    switchBookmarkTheme(-1);
+  }
+  // 右箭头键：切换到下一个主题
+  else if (event.key === 'ArrowRight') {
+    event.preventDefault();
+    switchBookmarkTheme(1);
+  }
+};
+
+// 监听书摘对话框的显示状态，添加/移除键盘事件监听
+watch(bookmarkDialogVisible, (isVisible) => {
+  if (isVisible) {
+    // 对话框打开时，添加键盘事件监听
+    window.addEventListener('keydown', handleBookmarkKeyboard);
+  } else {
+    // 对话框关闭时，移除键盘事件监听
+    window.removeEventListener('keydown', handleBookmarkKeyboard);
+  }
+});
+
+// 组件卸载时确保移除事件监听
+onBeforeUnmount(() => {
+  window.removeEventListener('keydown', handleBookmarkKeyboard);
+});
 
 /**
  * 导出 PDF
@@ -892,7 +1263,31 @@ onMounted(() => {
   initTheme();
   initFontSize();
   initFont();
+  initBookmarkTheme();
+  initBookmarkFont();
   loadArticle();
+  
+  // 等待内容区域加载后添加滚动监听
+  nextTick(() => {
+    if (contentArea.value && !contentArea.value.hasAttribute('data-scroll-listener')) {
+      contentArea.value.addEventListener('scroll', handleScroll);
+      contentArea.value.setAttribute('data-scroll-listener', 'true');
+      // 初始化工具栏位置
+      updateToolbarPosition();
+    }
+  });
+});
+
+// 组件卸载时移除滚动监听
+onBeforeUnmount(() => {
+  if (contentArea.value) {
+    contentArea.value.removeEventListener('scroll', handleScroll);
+    contentArea.value.removeAttribute('data-scroll-listener');
+  }
+  // 清除滚动定时器
+  if (scrollTimer) {
+    clearTimeout(scrollTimer);
+  }
 });
 </script>
 
@@ -900,12 +1295,14 @@ onMounted(() => {
 .article-detail {
   min-height: 100vh;
   background: #EBEDF0;
+  overflow-x: hidden;
 }
 
 .detail-container {
   max-width: 1200px;
   margin: 0 auto;
   padding: 20px;
+  overflow-x: hidden;
 }
 
 .loading-section,
@@ -921,15 +1318,67 @@ onMounted(() => {
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   overflow: hidden;
+  overflow-x: hidden;
+  position: relative;
 }
 
-.toolbar {
+.toolbar-toggle {
   display: flex;
   align-items: center;
+}
+
+.toolbar-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
   gap: 10px;
+  padding: 0;
+  background: transparent;
+  position: absolute;
+  right: 20px;
+  transform: translateY(-50%);
+  z-index: 100;
+  transition: top 0.2s ease, right 0.3s ease, transform 0.3s ease, opacity 0.3s ease, visibility 0.3s ease;
+  opacity: 1;
+  visibility: visible;
+}
+
+.toolbar-right > * {
+  margin-left: 0 !important;
+  margin-right: auto !important;
+  align-self: flex-start;
+}
+
+.toolbar-right.toolbar-hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  /* 不使用 translateX，避免产生横向滚动条 */
+  /* 使用 right 负值来隐藏，但保持在容器内 */
+  right: -100px;
+  transform: translateY(-50%);
+}
+
+.article-title-bar {
   padding: 15px 20px;
   border-bottom: 1px solid #e4e7ed;
   background: #f5f7fa;
+  position: sticky;
+  top: 0;
+  z-index: 99;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+}
+
+.article-title-text {
+  font-size: 18px;
+  font-weight: 600;
+  color: #2c3e50;
+  text-align: left;
+  flex: 1;
+  margin: 0;
 }
 
 .font-size-controls {
@@ -940,8 +1389,27 @@ onMounted(() => {
 }
 
 .settings-panel {
-  max-height: 500px;
+  max-height: 600px;
   overflow-y: auto;
+  padding-right: 4px;
+}
+
+.settings-panel::-webkit-scrollbar {
+  width: 6px;
+}
+
+.settings-panel::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.settings-panel::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+.settings-panel::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
 }
 
 .setting-section {
@@ -1041,21 +1509,156 @@ onMounted(() => {
 }
 
 .content-area {
-  padding: 40px;
+  padding: 40px 40px 20px 40px;
   max-height: calc(100vh - 200px);
   overflow-y: auto;
+  overflow-x: hidden;
   background: #ffffff;
-  transition: background-color 0.3s ease;
+  transition: background-color 0.3s ease, padding-bottom 0.3s ease, max-height 0.3s ease;
+  overscroll-behavior-y: none;
+  position: relative;
+}
+
+.content-area.scrolling {
+  padding-bottom: 10px;
+}
+
+.content-area.toolbar-hidden {
+  max-height: calc(100vh - 140px);
+  padding-bottom: 10px;
+}
+
+.content-area.scrolling.toolbar-hidden {
+  padding-bottom: 5px;
 }
 
 .markdown-content {
   max-width: 800px;
   margin: 0 auto;
+  padding-right: 60px;
   line-height: 1.8;
   color: #2c3e50;
   word-wrap: break-word;
   overflow-wrap: break-word;
   transition: font-size 0.2s ease;
+}
+
+.article-navigation {
+  max-width: 800px;
+  margin: 30px auto 20px auto;
+  padding-top: 20px;
+  padding-bottom: 20px;
+  border-top: 1px solid #e4e7ed;
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  transition: margin-bottom 0.3s ease, padding-bottom 0.3s ease;
+}
+
+.article-navigation.scrolling {
+  margin-bottom: 10px;
+  padding-bottom: 15px;
+}
+
+.content-area.toolbar-hidden .article-navigation {
+  margin-bottom: 10px;
+  padding-bottom: 15px;
+}
+
+.content-area.toolbar-hidden.scrolling .article-navigation {
+  margin-bottom: 5px;
+  padding-bottom: 10px;
+}
+
+.footer-quote {
+  max-width: 800px;
+  margin: 30px auto 60px auto;
+  padding: 20px 0;
+  text-align: center;
+}
+
+.footer-quote p {
+  margin: 0;
+  font-size: 16px;
+  color: #909399;
+  font-style: italic;
+  line-height: 1.6;
+}
+
+.content-area.scrolling .footer-quote {
+  margin-top: 20px;
+  margin-bottom: 50px;
+  padding: 15px 0;
+}
+
+.content-area.toolbar-hidden .footer-quote {
+  margin-top: 20px;
+  margin-bottom: 50px;
+  padding: 15px 0;
+}
+
+.content-area.toolbar-hidden.scrolling .footer-quote {
+  margin-top: 10px;
+  margin-bottom: 40px;
+  padding: 10px 0;
+}
+
+/* 深色主题下的底部文本 */
+.footer-quote.dark-theme-quote p {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.nav-button {
+  flex: 1;
+  padding: 16px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.nav-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border-color: rgba(0, 0, 0, 0.25);
+}
+
+/* 深色主题下的按钮边框 */
+.article-navigation.dark-theme-nav .nav-button {
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.article-navigation.dark-theme-nav .nav-button:hover {
+  border-color: rgba(255, 255, 255, 0.35);
+}
+
+.nav-button.prev-article {
+  text-align: left;
+}
+
+.nav-button.next-article {
+  text-align: right;
+}
+
+.nav-label {
+  font-size: 14px;
+  color: #909399;
+  font-weight: 500;
+}
+
+.nav-title {
+  font-size: 16px;
+  color: #409eff;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.nav-button:hover .nav-title {
+  color: #66b1ff;
 }
 
 /* Markdown 内容样式 */
@@ -1268,12 +1871,22 @@ onMounted(() => {
 }
 
 /* 书摘相关样式 */
+/* 书摘对话框半透明背景 */
+:deep(.el-dialog) {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+}
+
+:deep(.el-dialog__body) {
+  background: transparent;
+}
+
 .bookmark-preview-container {
   display: flex;
   justify-content: center;
   align-items: center;
   padding: 20px;
-  background: #f5f5f5;
+  background: rgba(245, 245, 245, 0.3);
 }
 
 .bookmark-card {
@@ -1285,6 +1898,95 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  position: relative;
+}
+
+.bookmark-theme-nav {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  transform: translateY(-50%);
+  display: flex;
+  justify-content: space-between;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.theme-nav-btn {
+  pointer-events: auto;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s ease;
+}
+
+.theme-nav-btn:hover {
+  background: rgba(255, 255, 255, 1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  transform: scale(1.1);
+}
+
+.theme-nav-left {
+  margin-left: -30px;
+}
+
+.theme-nav-right {
+  margin-right: -30px;
+}
+
+.copy-button {
+  width: auto;
+  min-width: 120px;
+  margin: 0 auto;
+  display: block;
+}
+
+.bookmark-font-setting {
+  margin-top: 20px;
+  padding: 16px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.bookmark-font-setting .setting-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #303133;
+  margin-bottom: 12px;
+  text-align: left;
+}
+
+.bookmark-font-buttons {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  align-items: stretch;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.bookmark-font-buttons .font-button {
+  font-size: 13px;
+  transition: all 0.3s ease;
+  width: 100% !important;
+  min-height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 8px;
+  margin: 0 !important;
+  box-sizing: border-box;
+  flex: 1;
+}
+
+.bookmark-font-buttons .font-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 .bookmark-date-section {
@@ -1365,19 +2067,18 @@ onMounted(() => {
 
 .dialog-footer {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
   gap: 12px;
   padding-top: 10px;
 }
 
 .dialog-footer .el-button {
-  flex: 1;
   font-weight: 500;
 }
 
 .dialog-footer .el-button--primary {
-  flex: 1;
+  flex: none;
 }
 
 .dialog-footer .el-button--primary {
@@ -1480,8 +2181,42 @@ onMounted(() => {
     padding: 20px;
   }
   
-  .toolbar {
-    flex-wrap: wrap;
+  .article-navigation {
+    flex-direction: column;
+    margin-top: 40px;
+    padding-top: 30px;
+  }
+  
+  .nav-button {
+    width: 100%;
+  }
+  
+  .nav-button.next-article {
+    text-align: left;
+  }
+  
+  .toolbar-toggle {
+    top: 80px;
+    right: 10px;
+  }
+  
+  .toolbar-right {
+    top: 50px;
+    right: 10px;
+    padding: 0;
+    gap: 8px;
+  }
+  
+  .markdown-content {
+    padding-right: 50px;
+  }
+  
+  .article-title-bar {
+    padding: 12px 15px;
+  }
+  
+  .article-title-text {
+    font-size: 16px;
   }
   
   .font-size-controls {

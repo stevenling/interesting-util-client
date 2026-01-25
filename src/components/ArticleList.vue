@@ -10,7 +10,7 @@
           <div class="search-section">
             <el-input
               v-model="searchKeyword"
-              placeholder="搜索文章标题..."
+              placeholder="搜索文章..."
               clearable
               class="search-input"
             >
@@ -65,6 +65,11 @@
             <el-button @click="clearSearch" type="primary">清空搜索</el-button>
           </el-empty>
         </div>
+        
+        <!-- 底部文字 -->
+        <div class="footer-text">
+          <p>山与山不相见，人和人会重逢。</p>
+        </div>
       </div>
     </div>
   </div>
@@ -73,6 +78,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
+import { ElMessage } from 'element-plus';
 import { Search, Document, Clock } from '@element-plus/icons-vue';
 import TopMenu from './TopMenu.vue';
 import { getAllArticles } from '@/config/articles';
@@ -161,10 +167,10 @@ const calculateWordCount = (content) => {
 };
 
 /**
- * 估算阅读时间（按每分钟200字计算）
+ * 估算阅读时间（按每分钟225字计算）
  */
 const estimateReadingTime = (wordCount) => {
-  const wordsPerMinute = 200;
+  const wordsPerMinute = 225;
   const minutes = Math.ceil(wordCount / wordsPerMinute);
   return minutes || 1; // 至少1分钟
 };
@@ -372,6 +378,20 @@ onMounted(async () => {
 .article-author {
   color: #409eff;
   font-weight: 500;
+}
+
+.footer-text {
+  text-align: center;
+  padding: 40px 20px;
+  margin-top: 40px;
+  border-top: 1px solid #e4e7ed;
+}
+
+.footer-text p {
+  margin: 0;
+  font-size: 16px;
+  color: #909399;
+  font-style: italic;
 }
 
 /* 响应式设计 */
