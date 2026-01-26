@@ -133,6 +133,7 @@
           ref="markdownContentRef"
           :style="{ fontSize: fontSize + 'px', color: currentTextColor, ...getContentStyle() }"
           @mouseup="handleTextSelection"
+          @touchend="handleTextSelection"
         ></div>
           
           <!-- 文章导航 -->
@@ -158,12 +159,41 @@
       </div>
     </div>
     
-    <!-- 书摘对话框 -->
+    <!-- 隐藏的书摘卡片（用于移动端生成图片） -->
+    <div v-if="isMobileDevice" class="hidden-bookmark-card-container">
+      <div 
+        class="bookmark-card hidden-bookmark-card" 
+        ref="hiddenBookmarkCardRef"
+        :style="bookmarkCardStyle"
+      >
+        <!-- 日期部分 -->
+        <div class="bookmark-date-section">
+          <div class="bookmark-day" :style="{ color: bookmarkTextColor, fontFamily: bookmarkFontFamily }">{{ currentDate.day }}</div>
+          <div class="bookmark-month-year" :style="{ color: bookmarkTextColor, fontFamily: bookmarkFontFamily }">{{ currentDate.monthYear }}</div>
+          <div class="bookmark-weekday" :style="{ color: bookmarkTextColor, fontFamily: bookmarkFontFamily }">{{ currentDate.weekday }}</div>
+          <div class="bookmark-separator" :style="{ background: bookmarkTextColor }"></div>
+        </div>
+        
+        <!-- 书摘内容 -->
+        <div class="bookmark-quote-section">
+          <div class="bookmark-quote-text" :style="{ color: bookmarkTextColor, fontFamily: bookmarkFontFamily }">{{ selectedText }}</div>
+        </div>
+        
+        <!-- 来源信息 -->
+        <div class="bookmark-source-section">
+          <div class="bookmark-book-title" :style="{ color: bookmarkTextColor, fontFamily: bookmarkFontFamily }">《{{ articleTitle }}》</div>
+          <div class="bookmark-author" v-if="articleAuthor" :style="{ color: bookmarkTextColor, fontFamily: bookmarkFontFamily }">{{ articleAuthor }}</div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 书摘对话框（桌面端使用） -->
     <el-dialog
       v-model="bookmarkDialogVisible"
       title="导出书摘"
       width="600px"
       :close-on-click-modal="false"
+      class="bookmark-dialog"
     >
       <div class="bookmark-preview-container">
         <div 
@@ -243,6 +273,44 @@
         </div>
       </template>
     </el-dialog>
+    
+    <!-- 移动端图片预览对话框 -->
+    <el-dialog
+      v-model="bookmarkImagePreviewVisible"
+      title="书摘图片"
+      width="90%"
+      :close-on-click-modal="true"
+      class="bookmark-image-preview-dialog"
+    >
+      <div class="bookmark-image-preview-container">
+        <img 
+          v-if="generatedBookmarkImageUrl" 
+          :src="generatedBookmarkImageUrl" 
+          alt="书摘图片"
+          class="bookmark-preview-image"
+        />
+        <!-- 复制按钮 - 在图片下方，提示文字上方 -->
+        <div class="bookmark-button-container">
+          <el-button
+            type="primary"
+            :icon="CopyDocument"
+            class="bookmark-copy-button"
+            @click.stop="copyBookmarkImageFromPreview"
+            :loading="generatingBookmark"
+            :disabled="generatingBookmark"
+            size="default"
+          >
+            {{ generatingBookmark ? '复制中...' : '复制图片' }}
+          </el-button>
+        </div>
+        <p class="bookmark-preview-tip">请长按图片进行保存或复制</p>
+      </div>
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button @click="bookmarkImagePreviewVisible = false">关闭</el-button>
+        </div>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -279,11 +347,14 @@ const fontSize = ref(20); // 默认字体大小
 const currentFont = ref('default'); // 当前字体
 const selectedText = ref(''); // 选中的文本
 const bookmarkDialogVisible = ref(false); // 书摘对话框显示状态
-const bookmarkCardRef = ref(null); // 书摘卡片引用
+const bookmarkCardRef = ref(null); // 书摘卡片引用（桌面端使用）
+const hiddenBookmarkCardRef = ref(null); // 隐藏的书摘卡片引用（移动端使用）
 const generatingBookmark = ref(false); // 生成书摘中
 const articleAuthor = ref(''); // 文章作者
 const bookmarkCurrentTheme = ref('dark-blue-gradient'); // 书摘当前主题
 const bookmarkCurrentFont = ref('"Lantinghei SC", "Lantinghei TC", "Microsoft YaHei", "PingFang SC", sans-serif'); // 书摘当前字体
+const bookmarkImagePreviewVisible = ref(false); // 移动端图片预览对话框显示状态
+const generatedBookmarkImageUrl = ref(''); // 生成的书摘图片URL
 
 // 主题设置（基于主流阅读网站常用颜色）
 const themes = [
@@ -544,14 +615,38 @@ const goToArticle = (articleId) => {
  * 处理文本选择
  */
 const handleTextSelection = () => {
+  // 使用 setTimeout 确保在移动端选择完成后再获取文本
+  setTimeout(() => {
+    const selection = window.getSelection();
+    if (selection && selection.toString().trim()) {
+      const text = selection.toString().trim();
+      selectedText.value = text;
+      // 选中文本时自动显示工具栏
+      updateToolbarPosition(); // 更新到当前可视区域中心
+      toolbarVisible.value = true;
+      manualToolbarControl.value = false; // 选中文本时重置手动控制状态
+    }
+  }, 100);
+};
+
+/**
+ * 处理选择变化事件（用于移动端和桌面端）
+ */
+const handleSelectionChange = () => {
   const selection = window.getSelection();
   if (selection && selection.toString().trim()) {
     const text = selection.toString().trim();
-    selectedText.value = text;
-    // 选中文本时自动显示工具栏
-    updateToolbarPosition(); // 更新到当前可视区域中心
-    toolbarVisible.value = true;
-    manualToolbarControl.value = false; // 选中文本时重置手动控制状态
+    // 只有当选择的文本发生变化时才更新
+    if (text !== selectedText.value) {
+      selectedText.value = text;
+      // 选中文本时自动显示工具栏
+      updateToolbarPosition();
+      toolbarVisible.value = true;
+      manualToolbarControl.value = false;
+    }
+  } else {
+    // 如果没有选择文本，可以选择隐藏工具栏（可选）
+    // toolbarVisible.value = false;
   }
 };
 
@@ -658,14 +753,116 @@ const handleScroll = () => {
 };
 
 /**
- * 导出书摘
+ * 生成书摘图片（提取的公共函数）
  */
-const handleExportBookmark = () => {
+const generateBookmarkImage = async () => {
   if (!selectedText.value) {
     ElMessage.warning('请先选中要导出的文本');
-    return;
+    return null;
   }
-  bookmarkDialogVisible.value = true;
+  
+  // 检测是否为移动设备，选择对应的卡片引用
+  const isMobileDeviceValue = isMobileDevice.value;
+  const cardRef = isMobileDeviceValue ? hiddenBookmarkCardRef.value : bookmarkCardRef.value;
+  
+  if (!cardRef) {
+    ElMessage.error('书摘卡片未准备好');
+    return null;
+  }
+  
+  generatingBookmark.value = true;
+  
+  try {
+    // 使用 html2canvas 生成图片
+    const theme = bookmarkThemes.find(t => t.name === bookmarkCurrentTheme.value);
+    const bgColor = theme ? theme.bgColor : 'linear-gradient(180deg, #FBF0D9 0%, #F5E6C8 100%)';
+    
+    ElMessage.info('正在生成图片...');
+    
+    const canvas = await html2canvas(cardRef, {
+      scale: 2,
+      useCORS: true,
+      logging: false,
+      backgroundColor: null, // 渐变背景不能使用backgroundColor
+      onclone: (clonedDoc) => {
+        // 确保克隆的文档中样式正确应用
+        const clonedCard = clonedDoc.querySelector('.bookmark-card');
+        if (clonedCard) {
+          clonedCard.style.background = bgColor;
+        }
+      }
+    });
+    
+    return canvas;
+  } catch (err) {
+    console.error('生成书摘失败:', err);
+    ElMessage.error('生成书摘失败，请重试');
+    generatingBookmark.value = false;
+    return null;
+  }
+};
+
+/**
+ * 导出书摘
+ */
+const handleExportBookmark = async () => {
+  try {
+    // 再次检查选中的文本（移动端可能选择状态丢失）
+    const selection = window.getSelection();
+    if (selection && selection.toString().trim()) {
+      selectedText.value = selection.toString().trim();
+    }
+    
+    if (!selectedText.value) {
+      ElMessage.warning('请先选中要导出的文本');
+      return;
+    }
+    
+    // 检测是否为移动设备（使用统一的判断逻辑）
+    const isMobileDeviceValue = isMobileDevice.value;
+    
+    console.log('导出书摘 - 设备检测:', { isMobileDevice: isMobileDeviceValue, isMobile: isMobile.value, selectedText: selectedText.value });
+    
+    if (isMobileDeviceValue) {
+      // 移动端：直接生成图片并显示预览对话框
+      // 等待 DOM 更新，确保隐藏的书摘卡片已渲染
+      await nextTick();
+      
+      // 再次等待，确保隐藏卡片完全渲染
+      await new Promise(resolve => setTimeout(resolve, 200));
+      
+      // 检查隐藏卡片是否存在
+      if (!hiddenBookmarkCardRef.value) {
+        console.error('隐藏卡片不存在', { isMobile: isMobile.value, detectMobile: detectMobile() });
+        ElMessage.error('书摘卡片未准备好，请重试');
+        return;
+      }
+      
+      console.log('开始生成图片...');
+      
+      // 生成图片
+      const canvas = await generateBookmarkImage();
+      
+      if (canvas) {
+        // 移动端：显示图片预览对话框
+        generatedBookmarkImageUrl.value = canvas.toDataURL('image/png', 1.0);
+        bookmarkImagePreviewVisible.value = true;
+        generatingBookmark.value = false;
+        console.log('图片生成成功，显示预览对话框');
+      } else {
+        console.error('生成图片失败，canvas 为 null');
+        ElMessage.error('生成图片失败，请重试');
+        generatingBookmark.value = false;
+      }
+    } else {
+      // 桌面端：显示书摘设置对话框
+      bookmarkDialogVisible.value = true;
+    }
+  } catch (error) {
+    console.error('导出书摘出错:', error);
+    ElMessage.error('导出书摘时发生错误：' + (error.message || '未知错误'));
+    generatingBookmark.value = false;
+  }
 };
 
 /**
@@ -687,95 +884,139 @@ const switchBookmarkTheme = (direction) => {
 };
 
 /**
- * 复制书摘图片到剪贴板
+ * 检测是否为移动设备
+ */
+const detectMobile = () => {
+  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+};
+
+// 计算属性：判断是否为移动设备（用于隐藏卡片渲染）
+const isMobileDevice = computed(() => {
+  return detectMobile() || isMobile.value;
+});
+
+/**
+ * 复制书摘图片到剪贴板（桌面端使用）
  */
 const copyBookmarkToClipboard = async () => {
-  if (!bookmarkCardRef.value) {
-    ElMessage.error('书摘卡片未准备好');
+  try {
+    // 生成图片
+    const canvas = await generateBookmarkImage();
+    
+    if (!canvas) {
+      return;
+    }
+    
+    // 桌面端：尝试复制到剪贴板
+    const isMobileDeviceValue = isMobileDevice.value;
+    
+    if (!isMobileDeviceValue) {
+      // 桌面端：尝试复制到剪贴板
+      canvas.toBlob(async (blob) => {
+        if (!blob) {
+          ElMessage.error('生成图片失败，请重试');
+          generatingBookmark.value = false;
+          return;
+        }
+        
+        try {
+          // 使用 Clipboard API 复制到剪贴板
+          await navigator.clipboard.write([
+            new ClipboardItem({
+              'image/png': blob
+            })
+          ]);
+          
+          ElMessage.success({
+            message: '书摘图片已复制到剪贴板，可直接粘贴使用',
+            duration: 3000
+          });
+          
+          // 延迟关闭对话框，让用户看到成功提示
+          setTimeout(() => {
+            bookmarkDialogVisible.value = false;
+          }, 500);
+        } catch (clipboardErr) {
+          // 如果 Clipboard API 不支持，尝试降级方案
+          console.warn('Clipboard API 不支持，使用降级方案:', clipboardErr);
+          
+          // 降级方案：创建临时链接下载
+          const imgData = canvas.toDataURL('image/png', 1.0);
+          const link = document.createElement('a');
+          link.download = `书摘-${articleTitle.value}-${new Date().getTime()}.png`;
+          link.href = imgData;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          
+          ElMessage.info({
+            message: '已下载书摘图片（浏览器不支持直接复制到剪贴板）',
+            duration: 3000
+          });
+          
+          setTimeout(() => {
+            bookmarkDialogVisible.value = false;
+          }, 500);
+        } finally {
+          generatingBookmark.value = false;
+        }
+      }, 'image/png', 1.0);
+    }
+  } catch (err) {
+    console.error('生成书摘失败:', err);
+    ElMessage.error('生成书摘失败，请重试');
+    generatingBookmark.value = false;
+  }
+};
+
+/**
+ * 从预览对话框复制图片到剪贴板（移动端）
+ */
+const copyBookmarkImageFromPreview = async (event) => {
+  // 阻止事件冒泡，防止触发其他逻辑
+  if (event) {
+    event.stopPropagation();
+    event.preventDefault();
+  }
+  
+  if (!generatedBookmarkImageUrl.value) {
+    ElMessage.warning('图片未准备好');
     return;
   }
   
-  if (!selectedText.value) {
-    ElMessage.warning('请先选中要导出的文本');
+  // 如果正在生成中，直接返回，避免重复调用
+  if (generatingBookmark.value) {
     return;
   }
   
   generatingBookmark.value = true;
   
   try {
-    // 使用 html2canvas 生成图片
-    const theme = bookmarkThemes.find(t => t.name === bookmarkCurrentTheme.value);
-    const bgColor = theme ? theme.bgColor : 'linear-gradient(180deg, #FBF0D9 0%, #F5E6C8 100%)';
+    // 将 base64 数据 URL 转换为 Blob
+    const response = await fetch(generatedBookmarkImageUrl.value);
+    const blob = await response.blob();
     
-    ElMessage.info('正在生成图片...');
-    
-    const canvas = await html2canvas(bookmarkCardRef.value, {
-      scale: 2,
-      useCORS: true,
-      logging: false,
-      backgroundColor: null, // 渐变背景不能使用backgroundColor
-      onclone: (clonedDoc) => {
-        // 确保克隆的文档中样式正确应用
-        const clonedCard = clonedDoc.querySelector('.bookmark-card');
-        if (clonedCard) {
-          clonedCard.style.background = bgColor;
-        }
-      }
-    });
-    
-    // 转换为 Blob
-    canvas.toBlob(async (blob) => {
-      if (!blob) {
-        ElMessage.error('生成图片失败，请重试');
-        generatingBookmark.value = false;
-        return;
-      }
+    try {
+      // 使用 Clipboard API 复制到剪贴板
+      await navigator.clipboard.write([
+        new ClipboardItem({
+          'image/png': blob
+        })
+      ]);
       
-      try {
-        // 使用 Clipboard API 复制到剪贴板
-        await navigator.clipboard.write([
-          new ClipboardItem({
-            'image/png': blob
-          })
-        ]);
-        
-        ElMessage.success({
-          message: '书摘图片已复制到剪贴板，可直接粘贴使用',
-          duration: 3000
-        });
-        
-        // 延迟关闭对话框，让用户看到成功提示
-        setTimeout(() => {
-          bookmarkDialogVisible.value = false;
-        }, 500);
-      } catch (clipboardErr) {
-        // 如果 Clipboard API 不支持，尝试降级方案
-        console.warn('Clipboard API 不支持，使用降级方案:', clipboardErr);
-        
-        // 降级方案：创建临时链接下载
-        const imgData = canvas.toDataURL('image/png', 1.0);
-        const link = document.createElement('a');
-        link.download = `书摘-${articleTitle.value}-${new Date().getTime()}.png`;
-        link.href = imgData;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        
-        ElMessage.info({
-          message: '已下载书摘图片（浏览器不支持直接复制到剪贴板）',
-          duration: 3000
-        });
-        
-        setTimeout(() => {
-          bookmarkDialogVisible.value = false;
-        }, 500);
-      } finally {
-        generatingBookmark.value = false;
-      }
-    }, 'image/png', 1.0);
+      ElMessage.success({
+        message: '书摘图片已复制到剪贴板',
+        duration: 2000
+      });
+    } catch (clipboardErr) {
+      // 如果 Clipboard API 不支持，提示用户手动保存
+      console.warn('Clipboard API 不支持:', clipboardErr);
+      ElMessage.info('请长按图片进行保存或复制');
+    }
   } catch (err) {
-    console.error('生成书摘失败:', err);
-    ElMessage.error('生成书摘失败，请重试');
+    console.error('复制图片失败:', err);
+    ElMessage.error('复制失败，请长按图片进行保存');
+  } finally {
     generatingBookmark.value = false;
   }
 };
@@ -1303,6 +1544,9 @@ onMounted(() => {
       });
     }
   });
+  
+  // 添加全局选择变化监听（用于移动端和桌面端）
+  document.addEventListener('selectionchange', handleSelectionChange);
 });
 
 // 组件卸载时移除滚动监听和窗口大小监听
@@ -1317,6 +1561,8 @@ onBeforeUnmount(() => {
   }
   // 移除窗口大小监听
   window.removeEventListener('resize', handleResize);
+  // 移除选择变化监听
+  document.removeEventListener('selectionchange', handleSelectionChange);
 });
 </script>
 
@@ -1980,6 +2226,30 @@ onBeforeUnmount(() => {
   background: rgba(245, 245, 245, 0.3);
 }
 
+/* 隐藏的书摘卡片容器（移动端用于生成图片） */
+.hidden-bookmark-card-container {
+  position: absolute;
+  left: -9999px;
+  top: -9999px;
+  width: 500px;
+  height: 400px;
+  overflow: hidden;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.hidden-bookmark-card {
+  width: 500px;
+  min-height: 400px;
+  background: #FBF0D9;
+  padding: 60px 50px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+}
+
 .bookmark-card {
   width: 500px;
   min-height: 400px;
@@ -2337,21 +2607,201 @@ onBeforeUnmount(() => {
     margin-top: 10px;
   }
   
+  /* 书摘对话框移动端样式 */
+  :deep(.el-dialog) {
+    width: 95% !important;
+    max-width: 95% !important;
+    margin: 0 auto !important;
+  }
+  
+  :deep(.el-dialog__body) {
+    padding: 15px !important;
+    max-height: 70vh;
+    overflow-y: auto;
+  }
+  
+  .bookmark-preview-container {
+    padding: 10px;
+    background: rgba(245, 245, 245, 0.3);
+  }
+  
   .bookmark-card {
     width: 100%;
-    padding: 40px 30px;
+    min-height: 300px;
+    padding: 30px 20px;
   }
   
   .bookmark-day {
-    font-size: 80px;
+    font-size: 60px;
+    margin-bottom: 8px;
   }
   
   .bookmark-month-year {
-    font-size: 18px;
+    font-size: 16px;
+    margin-bottom: 6px;
+  }
+  
+  .bookmark-weekday {
+    font-size: 14px;
+    margin-bottom: 15px;
+  }
+  
+  .bookmark-separator {
+    width: 30px;
+    margin-bottom: 20px;
+  }
+  
+  .bookmark-quote-section {
+    margin: 20px 0;
   }
   
   .bookmark-quote-text {
-    font-size: 18px;
+    font-size: 16px;
+    line-height: 1.8;
+  }
+  
+  .bookmark-source-section {
+    margin-top: 20px;
+  }
+  
+  .bookmark-book-title {
+    font-size: 16px;
+    margin-bottom: 6px;
+  }
+  
+  .bookmark-author {
+    font-size: 14px;
+  }
+  
+  .bookmark-font-setting {
+    margin-top: 15px;
+    padding: 12px;
+  }
+  
+  .bookmark-font-setting .setting-label {
+    font-size: 13px;
+    margin-bottom: 10px;
+  }
+  
+  .bookmark-font-buttons {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px;
+  }
+  
+  .bookmark-font-buttons .font-button {
+    font-size: 12px;
+    min-height: 32px;
+    padding: 8px 6px;
+  }
+  
+  .theme-nav-left {
+    margin-left: -20px;
+  }
+  
+  .theme-nav-right {
+    margin-right: -20px;
+  }
+  
+  .bookmark-image-preview-dialog {
+    :deep(.el-dialog) {
+      width: 90% !important;
+      max-width: 90% !important;
+    }
+  }
+  
+  .bookmark-preview-image {
+    max-width: 100%;
+    height: auto;
+  }
+}
+
+/* 移动端图片预览样式 */
+.bookmark-image-preview-container {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  padding: 20px !important;
+  background: #f5f5f5 !important;
+  border-radius: 8px !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+.bookmark-preview-image {
+  max-width: 100% !important;
+  width: auto !important;
+  height: auto !important;
+  border-radius: 8px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  -webkit-touch-callout: default !important;
+  display: block !important;
+  margin: 0 auto !important;
+  order: 1 !important;
+}
+
+/* 按钮容器 - 在图片下方，提示文字上方 */
+.bookmark-button-container {
+  display: flex !important;
+  justify-content: flex-end !important;
+  align-items: center !important;
+  width: 100% !important;
+  margin-top: 15px !important;
+  margin-bottom: 10px !important;
+  padding: 0 !important;
+  order: 2 !important;
+  flex-shrink: 0 !important;
+}
+
+/* 复制按钮样式 */
+.bookmark-button-container :deep(.bookmark-copy-button),
+.bookmark-copy-button {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+  transition: all 0.3s ease !important;
+  margin-left: auto !important;
+  margin-right: 0 !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+}
+
+.bookmark-button-container :deep(.bookmark-copy-button:hover),
+.bookmark-copy-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4) !important;
+}
+
+.bookmark-button-container :deep(.bookmark-copy-button:active),
+.bookmark-copy-button:active {
+  transform: translateY(0);
+}
+
+.bookmark-preview-tip {
+  margin-top: 10px !important;
+  margin-bottom: 0 !important;
+  font-size: 14px !important;
+  color: #909399 !important;
+  text-align: center !important;
+  line-height: 1.6 !important;
+  width: 100% !important;
+  order: 3 !important;
+  flex-shrink: 0 !important;
+}
+
+@media (max-width: 768px) {
+  .bookmark-image-preview-container {
+    padding: 15px !important;
+  }
+  
+  .bookmark-button-container {
+    margin-top: 12px !important;
+    margin-bottom: 8px !important;
+  }
+  
+  .bookmark-preview-tip {
+    font-size: 13px !important;
+    margin-top: 8px !important;
   }
 }
 </style>

@@ -7,9 +7,9 @@
         <div class="subtitle">小砂糖，你是我漫山遍野的喜欢～</div>
       </div>
       <div class="content-container">
-        <el-row :gutter="24">
-          <el-col :span="6"></el-col>
-          <el-col :span="12">
+        <el-row :gutter="[24, 24]">
+          <el-col :xs="0" :sm="0" :md="6" :lg="6"></el-col>
+          <el-col :xs="24" :sm="24" :md="12" :lg="12">
             <!-- 云胡矩阵卡片 -->
             <el-card class="tool-card" shadow="hover">
               <template #header>
@@ -108,7 +108,7 @@
               </div>
             </el-card>
           </el-col>
-          <el-col :span="6"></el-col>
+          <el-col :xs="0" :sm="0" :md="6" :lg="6"></el-col>
         </el-row>
       </div>
     </div>
@@ -347,24 +347,106 @@ const gotoArticleList = () => {
 
 /* 响应式设计 */
 @media (max-width: 768px) {
+  .main-container {
+    padding: 10px 0;
+    overflow-y: auto;
+  }
+  
+  .hero-section {
+    padding: 20px 15px 15px;
+  }
+  
   .title {
     font-size: 2rem;
+    margin-bottom: 0.5rem;
   }
   
   .subtitle {
+    font-size: 0.9rem;
+  }
+  
+  .content-container {
+    padding: 0 10px;
+  }
+  
+  .tool-card {
+    margin-bottom: 20px;
+    border-radius: 12px;
+  }
+  
+  .tool-card:last-child {
+    margin-bottom: 30px;
+  }
+  
+  .card-header {
     font-size: 1rem;
+  }
+  
+  .card-header i {
+    font-size: 1.2rem;
   }
   
   .button-group {
     flex-direction: column;
+    gap: 10px;
   }
   
   .tool-button {
     min-width: 100%;
+    height: 45px;
+    font-size: 0.95rem;
+  }
+  
+  .tool-button i {
+    font-size: 1rem;
+  }
+  
+  .footer {
+    padding: 15px 0;
+  }
+  
+  .icp-link {
+    font-size: 0.85rem;
+  }
+}
+
+/* 小屏手机优化 */
+@media (max-width: 480px) {
+  .hero-section {
+    padding: 15px 10px 10px;
+  }
+  
+  .title {
+    font-size: 1.5rem;
+  }
+  
+  .subtitle {
+    font-size: 0.85rem;
   }
   
   .content-container {
-    padding: 0 15px;
+    padding: 0 8px;
+  }
+  
+  .tool-card {
+    margin-bottom: 15px;
+    border-radius: 10px;
+  }
+  
+  .card-header {
+    font-size: 0.95rem;
+    gap: 8px;
+  }
+  
+  .button-group {
+    gap: 8px;
+    padding: 8px 0;
+  }
+  
+  .tool-button {
+    height: 42px;
+    font-size: 0.9rem;
+    border-radius: 10px;
   }
 }
 

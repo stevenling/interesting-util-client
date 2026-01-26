@@ -13,7 +13,7 @@ module.exports = {
 
   // 开发服务器配置（不影响build）
   devServer: {
-    host: 'localhost',
+    host: '0.0.0.0', // 允许局域网访问，改为 'localhost' 则只能本机访问
     port: 8080
   }
 }
