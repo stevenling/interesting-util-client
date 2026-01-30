@@ -34,7 +34,7 @@
             </el-tooltip>
           </div>
         </div>
-        
+
         <div class="content-area" ref="contentArea" :style="[currentBgStyleObject, { marginBottom: '0', paddingBottom: '0' }]" :class="{ 'scrolling': isScrolling }">
           <!-- 工具栏（在文本右侧，垂直居中） -->
           <div class="toolbar-right" :class="{ 'toolbar-hidden': !toolbarVisible }" :style="{ top: toolbarTop + 'px' }">
@@ -324,6 +324,7 @@ import { marked } from 'marked';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import { getArticleById, getAllArticles } from '@/config/articles';
+import { getYunhuEssayArticleById, getAllYunhuEssayArticles } from '@/config/yunhu-essay';
 
 const router = useRouter();
 const route = useRoute();
@@ -440,41 +441,47 @@ const renderedContent = computed(() => {
  */
 const loadArticle = async () => {
   const articleId = route.query.id;
-  
+  const source = route.query.source; // 'yunhu-essay' 表示从 yunhu-essay 文件夹加载
+
   if (!articleId) {
     error.value = '缺少文章ID';
     loading.value = false;
     return;
   }
-  
-  const article = getArticleById(articleId);
+
+  const article = source === 'yunhu-essay'
+    ? getYunhuEssayArticleById(articleId)
+    : getArticleById(articleId);
   if (!article) {
     error.value = '文章不存在';
     loading.value = false;
     return;
   }
-  
+
   articleTitle.value = article.title;
   articleAuthor.value = article.author || '';
-  
+
   try {
-    // 从public/articles目录加载md文件
-    // 动态获取 base URL 以适配 GitHub Pages 的 base path
     const getBaseUrl = () => {
-      // 检查当前路径是否包含 GitHub Pages 的 base path
-      if (window.location.pathname.startsWith('/interesting-util-client/')) {
-        return '/interesting-util-client/';
-      }
+      if (window.location.pathname.startsWith('/interesting-util-client/')) return '/interesting-util-client/';
       return '/';
     };
     const baseUrl = getBaseUrl();
-    const articlePath = `${baseUrl}articles/${article.file}`;
-    const response = await fetch(articlePath);
-    
+    let articlePath;
+    if (source === 'yunhu-essay') {
+      articlePath = `${baseUrl}yunhu-essay/${article.file}`;
+    } else {
+      articlePath = `${baseUrl}云胡选集/${article.file}`;
+    }
+    let response = await fetch(articlePath);
+    if (!response.ok && source !== 'yunhu-essay') {
+      articlePath = `${baseUrl}articles/${article.file}`;
+      response = await fetch(articlePath);
+    }
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
-    
+
     const text = await response.text();
     articleContent.value = text;
     loading.value = false;
@@ -539,76 +546,55 @@ const loadArticle = async () => {
 
 /**
  * 返回文章列表
+ * 如果当前文章来自云胡选集（source = yunhu-essay），
+ * 则返回时切换到列表页的云胡选集标签（tab = anthology）
  */
 const goBack = () => {
+  const query = {};
+  if (route.query.source === 'yunhu-essay') {
+    query.tab = 'anthology';
+  }
   router.push({
-    path: '/articleList'
+    path: '/articleList',
+    query
   });
 };
 
 /**
- * 获取上一篇和下一篇文章
+ * 获取上一篇和下一篇文章（根据 source 使用藏文或云胡选集列表）
  */
 const prevArticle = computed(() => {
-  const allArticles = getAllArticles();
-  // 按日期倒序排序（最新的在前）
-  const sortedArticles = [...allArticles].sort((a, b) => {
-    return new Date(b.date) - new Date(a.date);
-  });
-  
+  const allArticles = route.query.source === 'yunhu-essay'
+    ? [...getAllYunhuEssayArticles()].sort((a, b) => new Date(b.date) - new Date(a.date))
+    : [...getAllArticles()].sort((a, b) => new Date(b.date) - new Date(a.date));
   const currentArticleId = route.query.id;
-  const currentIndex = sortedArticles.findIndex(a => a.id === currentArticleId);
-  
-  if (currentIndex === -1 || currentIndex === 0) {
-    return null; // 没有上一篇文章（已经是最新的一篇）
-  }
-  
-  return sortedArticles[currentIndex - 1];
+  const currentIndex = allArticles.findIndex(a => a.id === currentArticleId);
+  if (currentIndex === -1 || currentIndex === 0) return null;
+  return allArticles[currentIndex - 1];
 });
 
 const nextArticle = computed(() => {
-  const allArticles = getAllArticles();
-  // 按日期倒序排序（最新的在前）
-  const sortedArticles = [...allArticles].sort((a, b) => {
-    return new Date(b.date) - new Date(a.date);
-  });
-  
+  const allArticles = route.query.source === 'yunhu-essay'
+    ? [...getAllYunhuEssayArticles()].sort((a, b) => new Date(b.date) - new Date(a.date))
+    : [...getAllArticles()].sort((a, b) => new Date(b.date) - new Date(a.date));
   const currentArticleId = route.query.id;
-  const currentIndex = sortedArticles.findIndex(a => a.id === currentArticleId);
-  
-  if (currentIndex === -1 || currentIndex === sortedArticles.length - 1) {
-    return null; // 没有下一篇文章（已经是最旧的一篇）
-  }
-  
-  return sortedArticles[currentIndex + 1];
+  const currentIndex = allArticles.findIndex(a => a.id === currentArticleId);
+  if (currentIndex === -1 || currentIndex === allArticles.length - 1) return null;
+  return allArticles[currentIndex + 1];
 });
 
 /**
- * 跳转到指定文章
+ * 跳转到指定文章（保持当前 source，云胡选集内上一篇/下一篇仍为云胡选集）
  */
 const goToArticle = (articleId) => {
-  // 立即设置加载状态
   loading.value = true;
   articleContent.value = '';
   error.value = '';
-  
-  // 立即滚动到顶部
-  if (contentArea.value) {
-    contentArea.value.scrollTop = 0;
-  }
-  window.scrollTo({
-    top: 0,
-    left: 0,
-    behavior: 'instant'
-  });
-  
-  // 更新路由，watch 会自动触发 loadArticle
-  router.push({
-    path: '/articleDetail',
-    query: {
-      id: articleId
-    }
-  });
+  if (contentArea.value) contentArea.value.scrollTop = 0;
+  window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+  const query = { id: articleId };
+  if (route.query.source === 'yunhu-essay') query.source = 'yunhu-essay';
+  router.push({ path: '/articleDetail', query });
 };
 
 /**
@@ -1249,11 +1235,14 @@ watch(bookmarkCurrentFont, (newFont) => {
 });
 
 // 监听路由变化，重新加载文章
-watch(() => route.query.id, (newId, oldId) => {
-  if (newId && newId !== oldId) {
-    loadArticle();
+watch(
+  () => [route.query.id, route.query.source],
+  ([newId, newSource], [oldId, oldSource]) => {
+    if (newId && (newId !== oldId || newSource !== oldSource)) {
+      loadArticle();
+    }
   }
-});
+);
 
 /**
  * 键盘事件处理函数

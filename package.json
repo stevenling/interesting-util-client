@@ -11,7 +11,9 @@
     "lint:md": "lint-md public/articles/*.md --fix",
     "push": "npm run build && scp -r dist/* root@43.142.56.47:/root/vue-project/yunhu-utils/dist",
     "test:unit": "jest",
-    "gen": "node scripts/generate-articles-config.js"
+    "gen": "node scripts/generate-articles-config.js",
+    "gen:yunhu-essay": "node scripts/generate-yunhu-essay-config.js",
+    "copy-collection": "node scripts/copy-articles-to-collection.js"
   },
   "dependencies": {
     "@highlightjs/vue-plugin": "^2.1.0",

@@ -4,71 +4,133 @@
     
     <div class="scrollable-content">
       <div class="list-container">
-        <div class="header-section">
-          <h1>云胡收藏文章集</h1>
-          <p>献给七纱，你是唯一的月亮呀～</p>
-          <div class="search-section">
-            <el-input
-              v-model="searchKeyword"
-              placeholder="搜索文章..."
-              clearable
-              class="search-input"
-            >
-              <template #prefix>
-                <el-icon><search /></el-icon>
-              </template>
-            </el-input>
-            <span v-if="searchKeyword" class="search-result-count">
-              找到 {{ filteredArticles.length }} 篇文章
-            </span>
-          </div>
-        </div>
-        
-        <div class="articles-container">
-          <el-card 
-            v-for="article in filteredArticles" 
-            :key="article.id"
-            class="article-card"
-            shadow="hover"
-            @click="goToArticle(article.id)"
-          >
-            <div class="article-card-content">
-              <h3 class="article-title">{{ article.title }}</h3>
-              <p class="article-description">{{ article.description }}</p>
-              <div class="article-meta">
-                <div class="meta-left">
-                  <span class="article-date">{{ article.date }}</span>
-                  <span class="article-stats" v-if="articleStats[article.id]">
-                    <span class="word-count">
-                      <el-icon class="stat-icon"><document /></el-icon>
-                      <span>{{ articleStats[article.id].wordCount }} 字</span>
-                    </span>
-                    <span class="reading-time">
-                      <el-icon class="stat-icon"><clock /></el-icon>
-                      <span>{{ articleStats[article.id].readingTime }} 分钟</span>
-                    </span>
-                  </span>
-                </div>
-                <span class="article-author" v-if="article.author">{{ article.author }}</span>
+        <!-- 标签页：左侧云胡收藏文章集，右侧云胡选集 -->
+        <el-tabs v-model="activeTab" class="list-tabs">
+          <el-tab-pane label="藏文" name="collection">
+            <div class="header-section">
+              <h1>藏文</h1>
+              <div class="search-section">
+                <el-input
+                  v-model="searchKeyword"
+                  placeholder="搜索文章..."
+                  clearable
+                  class="search-input"
+                >
+                  <template #prefix>
+                    <el-icon><search /></el-icon>
+                  </template>
+                </el-input>
+                <span v-if="searchKeyword" class="search-result-count">
+                  找到 {{ filteredArticles.length }} 篇文章
+                </span>
               </div>
             </div>
-          </el-card>
-          
-          <el-empty 
-            v-if="filteredArticles.length === 0 && !searchKeyword" 
-            description="暂无文章"
-          ></el-empty>
-          <el-empty 
-            v-if="filteredArticles.length === 0 && searchKeyword" 
-            description="未找到相关文章"
-          >
-            <el-button @click="clearSearch" type="primary">清空搜索</el-button>
-          </el-empty>
-        </div>
+            <div class="articles-container">
+              <el-card 
+                v-for="article in filteredArticles" 
+                :key="article.id"
+                class="article-card"
+                shadow="hover"
+                @click="goToArticle(article.id)"
+              >
+                <div class="article-card-content">
+                  <h3 class="article-title">{{ article.title }}</h3>
+                  <p class="article-description">{{ article.description }}</p>
+                  <div class="article-meta">
+                    <div class="meta-left">
+                      <span class="article-date">{{ article.date }}</span>
+                      <span class="article-stats" v-if="articleStats[article.id]">
+                        <span class="word-count">
+                          <el-icon class="stat-icon"><document /></el-icon>
+                          <span>{{ articleStats[article.id].wordCount }} 字</span>
+                        </span>
+                        <span class="reading-time">
+                          <el-icon class="stat-icon"><clock /></el-icon>
+                          <span>{{ articleStats[article.id].readingTime }} 分钟</span>
+                        </span>
+                      </span>
+                    </div>
+                    <span class="article-author" v-if="article.author">{{ article.author }}</span>
+                  </div>
+                </div>
+              </el-card>
+              <el-empty 
+                v-if="filteredArticles.length === 0 && !searchKeyword" 
+                description="暂无文章"
+              ></el-empty>
+              <el-empty 
+                v-if="filteredArticles.length === 0 && searchKeyword" 
+                description="未找到相关文章"
+              >
+                <el-button @click="clearSearch" type="primary">清空搜索</el-button>
+              </el-empty>
+            </div>
+          </el-tab-pane>
+          <el-tab-pane label="云胡选集" name="anthology">
+            <div class="header-section">
+              <h1>云胡选集</h1>
+              <div class="search-section">
+                <el-input
+                  v-model="searchKeyword"
+                  placeholder="搜索文章..."
+                  clearable
+                  class="search-input"
+                >
+                  <template #prefix>
+                    <el-icon><search /></el-icon>
+                  </template>
+                </el-input>
+                <span v-if="searchKeyword" class="search-result-count">
+                  找到 {{ filteredYunhuEssayArticles.length }} 篇
+                </span>
+              </div>
+            </div>
+            <div class="articles-container">
+              <el-card 
+                v-for="article in filteredYunhuEssayArticles" 
+                :key="'anthology-' + article.id"
+                class="article-card"
+                shadow="hover"
+                @click="goToArticle(article.id, 'yunhu-essay')"
+              >
+                <div class="article-card-content">
+                  <h3 class="article-title">{{ article.title }}</h3>
+                  <p class="article-description">{{ article.description }}</p>
+                  <div class="article-meta">
+                    <div class="meta-left">
+                      <span class="article-date">{{ article.date }}</span>
+                      <span class="article-stats" v-if="yunhuEssayStats[article.id]">
+                        <span class="word-count">
+                          <el-icon class="stat-icon"><document /></el-icon>
+                          <span>{{ yunhuEssayStats[article.id].wordCount }} 字</span>
+                        </span>
+                        <span class="reading-time">
+                          <el-icon class="stat-icon"><clock /></el-icon>
+                          <span>{{ yunhuEssayStats[article.id].readingTime }} 分钟</span>
+                        </span>
+                      </span>
+                    </div>
+                    <span class="article-author" v-if="article.author">{{ article.author }}</span>
+                  </div>
+                </div>
+              </el-card>
+              <el-empty 
+                v-if="filteredYunhuEssayArticles.length === 0 && !searchKeyword" 
+                description="暂无文章（将 .md 放入 public/yunhu-essay 后运行 npm run gen:yunhu-essay）"
+              ></el-empty>
+              <el-empty 
+                v-if="filteredYunhuEssayArticles.length === 0 && searchKeyword" 
+                description="未找到相关文章"
+              >
+                <el-button @click="clearSearch" type="primary">清空搜索</el-button>
+              </el-empty>
+            </div>
+          </el-tab-pane>
+        </el-tabs>
         
         <!-- 底部文字 -->
         <div class="footer-text">
-          <p>山与山不相见，人和人会重逢。</p>
+          <p>献给七纱，你是唯一的月亮呀～</p>
         </div>
       </div>
     </div>
@@ -77,16 +139,21 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
+import { useRouter, useRoute } from 'vue-router';
 import { ElMessage } from 'element-plus';
 import { Search, Document, Clock } from '@element-plus/icons-vue';
 import TopMenu from './TopMenu.vue';
 import { getAllArticles } from '@/config/articles';
+import { getAllYunhuEssayArticles } from '@/config/yunhu-essay';
 
 const router = useRouter();
+const route = useRoute();
 const articles = ref([]);
 const searchKeyword = ref('');
-const articleStats = ref({}); // 存储文章统计信息
+const articleStats = ref({}); // 藏文统计
+const yunhuEssayStats = ref({}); // 云胡选集统计（来自 yunhu-essay 文件夹）
+// 根据 URL 中的 tab 参数决定初始标签：anthology=云胡选集，默认藏文
+const activeTab = ref(route.query.tab === 'anthology' ? 'anthology' : 'collection'); // 标签页：collection=藏文，anthology=云胡选集
 
 /**
  * 按日期倒序排序的文章列表（最新的在前）
@@ -101,17 +168,30 @@ const sortedArticles = computed(() => {
 });
 
 /**
- * 过滤后的文章列表
+ * 过滤后的文章列表（藏文）
  */
 const filteredArticles = computed(() => {
   const articlesToFilter = sortedArticles.value;
-  
-  if (!searchKeyword.value.trim()) {
-    return articlesToFilter;
-  }
-  
+  if (!searchKeyword.value.trim()) return articlesToFilter;
   const keyword = searchKeyword.value.trim().toLowerCase();
-  return articlesToFilter.filter(article => 
+  return articlesToFilter.filter(article =>
+    article.title.toLowerCase().includes(keyword) ||
+    (article.description && article.description.toLowerCase().includes(keyword)) ||
+    (article.author && article.author.toLowerCase().includes(keyword))
+  );
+});
+
+/** 云胡选集：来自 yunhu-essay 文件夹，按日期倒序 */
+const sortedYunhuEssayArticles = computed(() => {
+  return [...getAllYunhuEssayArticles()].sort((a, b) => new Date(b.date) - new Date(a.date));
+});
+
+/** 云胡选集过滤后的列表 */
+const filteredYunhuEssayArticles = computed(() => {
+  const list = sortedYunhuEssayArticles.value;
+  if (!searchKeyword.value.trim()) return list;
+  const keyword = searchKeyword.value.trim().toLowerCase();
+  return list.filter(article =>
     article.title.toLowerCase().includes(keyword) ||
     (article.description && article.description.toLowerCase().includes(keyword)) ||
     (article.author && article.author.toLowerCase().includes(keyword))
@@ -120,14 +200,13 @@ const filteredArticles = computed(() => {
 
 /**
  * 跳转到文章详情页
+ * @param {string} articleId - 文章 id
+ * @param {string} [source] - 'yunhu-essay' 表示来自云胡选集，正文从 yunhu-essay 文件夹加载
  */
-const goToArticle = (articleId) => {
-  router.push({
-    path: '/articleDetail',
-    query: {
-      id: articleId
-    }
-  });
+const goToArticle = (articleId, source) => {
+  const query = { id: articleId };
+  if (source === 'yunhu-essay') query.source = 'yunhu-essay';
+  router.push({ path: '/articleDetail', query });
 };
 
 /**
@@ -210,11 +289,37 @@ const loadArticleStats = async () => {
   articleStats.value = stats;
 };
 
+/** 加载云胡选集（yunhu-essay 文件夹）文章统计 */
+const loadYunhuEssayStats = async () => {
+  const getBaseUrl = () => {
+    if (window.location.pathname.startsWith('/interesting-util-client/')) return '/interesting-util-client/';
+    return '/';
+  };
+  const baseUrl = getBaseUrl();
+  const list = getAllYunhuEssayArticles();
+  const stats = {};
+  await Promise.all(list.map(async (article) => {
+    try {
+      const res = await fetch(`${baseUrl}yunhu-essay/${article.file}`);
+      if (res.ok) {
+        const content = await res.text();
+        stats[article.id] = {
+          wordCount: calculateWordCount(content),
+          readingTime: estimateReadingTime(calculateWordCount(content))
+        };
+      }
+    } catch (e) {
+      console.error(`加载云胡选集 ${article.title} 统计失败:`, e);
+    }
+  }));
+  yunhuEssayStats.value = stats;
+};
+
 onMounted(async () => {
   articles.value = getAllArticles();
   document.querySelector('body').setAttribute('style', 'background: #EBEDF0');
-  // 异步加载文章统计信息
   loadArticleStats();
+  loadYunhuEssayStats();
 });
 </script>
 
@@ -241,6 +346,63 @@ onMounted(async () => {
   padding-bottom: 40px;
 }
 
+/* 列表页标签页 - 蓝白色调 */
+.list-tabs {
+  margin-bottom: 0;
+  background: #fff;
+  border-radius: 12px;
+  padding: 0 16px 4px;
+  box-shadow: 0 2px 12px rgba(64, 158, 255, 0.08);
+}
+.list-tabs :deep(.el-tabs__header) {
+  margin: 0 0 20px 0;
+  border-bottom: 1px solid #e8f0fe;
+}
+.list-tabs :deep(.el-tabs__nav-wrap::after) {
+  display: none;
+}
+.list-tabs :deep(.el-tabs__item) {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #606266;
+}
+.list-tabs :deep(.el-tabs__item:hover) {
+  color: #409eff;
+}
+.list-tabs :deep(.el-tabs__item.is-active) {
+  color: #409eff;
+  font-weight: 600;
+}
+.list-tabs :deep(.el-tabs__active-bar) {
+  background: linear-gradient(90deg, #409eff 0%, #66b1ff 100%);
+  height: 3px;
+  border-radius: 3px 3px 0 0;
+}
+.list-tabs :deep(.el-tabs__indicator) {
+  background: linear-gradient(90deg, #409eff 0%, #66b1ff 100%);
+}
+.list-tabs :deep(.el-tabs__ink-bar) {
+  background: linear-gradient(90deg, #409eff 0%, #66b1ff 100%);
+}
+.list-tabs :deep(.el-tabs__nav) {
+  border: none;
+}
+.list-tabs :deep(.el-tabs__item .el-tabs__icon) {
+  color: inherit;
+}
+.list-tabs :deep(.el-tabs__content) {
+  overflow: visible;
+  padding-top: 4px;
+}
+.list-tabs :deep(.el-tabs__nav-wrap) {
+  padding: 0 4px;
+}
+.list-tabs :deep(.el-tabs__item) {
+  padding: 0 20px;
+  height: 44px;
+  line-height: 44px;
+}
+
 .header-section {
   text-align: center;
   margin-bottom: 40px;
@@ -258,6 +420,12 @@ onMounted(async () => {
   font-size: 1.1rem;
   color: #666;
   margin: 0;
+}
+
+.header-section .header-desc {
+  font-size: 0.9rem;
+  color: #909399;
+  margin-top: 4px;
 }
 
 .search-section {
