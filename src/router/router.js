@@ -63,6 +63,11 @@ export const constantRoutes = [
         component: () => import("@/components/ArticleDetail.vue")
     },
     {
+        name: 'EbookConvert',
+        path: '/ebookConvert',
+        component: () => import("@/components/EbookConvert.vue")
+    },
+    {
         path: '/',
         name: 'YunhuMatrix',
         component: YunhuMatrix

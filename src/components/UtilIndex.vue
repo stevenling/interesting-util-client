@@ -70,7 +70,7 @@
               </div>
             </el-card>
             <!-- 实用工具卡片 -->
-            <el-card class="tool-card" shadow="hover">
+            <el-card class="tool-card tool-card--last" shadow="hover">
               <template #header>
                 <div class="card-header">
                   <i class="el-icon-magic-stick"></i>
@@ -104,6 +104,15 @@
                 >
                   <i class="el-icon-document"></i>
                   文章列表
+                </el-button>
+                <el-button 
+                  type="primary" 
+                  @click="gotoEbookConvert"
+                  class="tool-button"
+                  size="large"
+                >
+                  <i class="el-icon-refresh"></i>
+                  电子书格式转换
                 </el-button>
               </div>
             </el-card>
@@ -208,6 +217,15 @@ const gotoArticleList = () => {
     path: "/articleList",
   });
 };
+
+/**
+ * 转到电子书格式转换页面
+ */
+const gotoEbookConvert = () => {
+  router.push({
+    path: "/ebookConvert",
+  });
+};
 </script>
 
 <style scoped>
@@ -221,10 +239,12 @@ const gotoArticleList = () => {
 /* 主容器样式 */
 .main-container {
   flex: 1;
-  overflow-y: hidden;
+  min-height: 0;
+  overflow-y: auto;
   overflow-x: hidden;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   padding: 20px 0;
+  padding-bottom: 24px;
 }
 
 /* 英雄区域样式 */
@@ -253,16 +273,21 @@ const gotoArticleList = () => {
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 20px;
+  padding-bottom: 24px;
 }
 
 /* 工具卡片样式 */
 .tool-card {
   margin-bottom: 30px;
+  margin-left: 0;
+  margin-right: 0;
   border-radius: 16px;
   border: none;
   transition: all 0.3s ease;
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(10px);
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .tool-card:hover {
@@ -270,8 +295,9 @@ const gotoArticleList = () => {
   box-shadow: 0 20px 40px rgba(0,0,0,0.1);
 }
 
-.tool-card:last-child {
-  margin-bottom: 50px;
+.tool-card:last-child,
+.tool-card--last {
+  margin-bottom: 48px;
 }
 
 /* 卡片头部样式 */
@@ -291,16 +317,37 @@ const gotoArticleList = () => {
 
 /* 按钮组样式 */
 .button-group {
-  display: flex;
+  display: flex !important;
   flex-wrap: wrap;
+  justify-content: flex-start !important;
+  align-content: flex-start !important;
+  align-items: flex-start;
   gap: 15px;
   padding: 10px 0;
+  width: 100% !important;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  direction: ltr;
+  margin: 0;
+}
+
+.tool-card :deep(.el-card__body) {
+  display: block;
+  text-align: left;
+  width: 100%;
+}
+
+.tool-card :deep(.el-card__body > *) {
+  margin-left: 0 !important;
+  margin-right: auto !important;
 }
 
 /* 工具按钮样式 */
 .tool-button {
-  flex: 0 1 auto;
+  flex: 0 0 auto;
   min-width: 160px;
+  margin-left: 0;
   height: 50px;
   border-radius: 12px;
   font-weight: 500;
@@ -374,8 +421,9 @@ const gotoArticleList = () => {
     border-radius: 12px;
   }
   
-  .tool-card:last-child {
-    margin-bottom: 30px;
+  .tool-card:last-child,
+  .tool-card--last {
+    margin-bottom: 40px;
   }
   
   .card-header {
