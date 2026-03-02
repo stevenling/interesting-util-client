@@ -1,3 +1,4 @@
+/* eslint-env node */
 module.exports = {
   //  应用部署的基础路径
   // Vercel 使用根路径，GitHub Pages 使用子路径

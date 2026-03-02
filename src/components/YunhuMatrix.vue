@@ -3,8 +3,8 @@
   
   <div class="matrix-container">
     <div class="hero-section">
-      <div class="title">云胡矩阵</div>
-      <div class="subtitle">Welcome to the Matrix</div>
+      <div class="title">Nyx Matrix
+      </div>
     </div>
 
     <div class="content-container">
@@ -46,37 +46,7 @@
                 size="large"
               >
                 <i class="el-icon-chat-dot-round"></i>
-                云胡个人站
-              </el-button>
-
-              <el-button 
-                type="info" 
-                @click="openLink('https://linkedin.com/in/yunhu')"
-                class="matrix-button"
-                size="large"
-              >
-                <i class="el-icon-user"></i>
-                LinkedIn
-              </el-button>
-
-              <el-button 
-                type="danger" 
-                @click="openLink('https://youtube.com/@yunhu')"
-                class="matrix-button"
-                size="large"
-              >
-                <i class="el-icon-video-play"></i>
-                YouTube
-              </el-button>
-
-              <el-button 
-                type="primary" 
-                @click="openLink('https://bilibili.com/space/yunhu')"
-                class="matrix-button"
-                size="large"
-              >
-                <i class="el-icon-video-camera"></i>
-                Bilibili
+                Nyx 小工具
               </el-button>
             </div>
           </el-card>

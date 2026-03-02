@@ -3,43 +3,12 @@
     <TopMenu />
     <div class="main-container">
       <div class="hero-section">
-        <div class="title">云胡个人站</div>
-        <div class="subtitle">小砂糖，你是我漫山遍野的喜欢～</div>
+        <div class="title">Nyx tools</div>
       </div>
       <div class="content-container">
         <el-row :gutter="[24, 24]">
           <el-col :xs="0" :sm="0" :md="6" :lg="6"></el-col>
           <el-col :xs="24" :sm="24" :md="12" :lg="12">
-            <!-- 云胡矩阵卡片 -->
-            <el-card class="tool-card" shadow="hover">
-              <template #header>
-                <div class="card-header">
-                  <i class="el-icon-connection"></i>
-                  <span>云胡</span>
-                </div>
-              </template>
-              <div class="button-group">
-                <el-button 
-                  type="primary" 
-                  @click="gotoYunhuMatrix"
-                  class="tool-button"
-                  size="large"
-                >
-                  <i class="el-icon-grid"></i>
-                  云胡矩阵
-                </el-button>
-
-                <el-button 
-                  type="primary" 
-                  @click="gotoMarkdownReader"
-                  class="tool-button"
-                  size="large"
-                >
-                  <i class="el-icon-reading"></i>
-                  阅读
-                </el-button>
-              </div>
-            </el-card>
             <!-- 程序员工具卡片 -->
             <el-card class="tool-card" shadow="hover">
               <template #header>
@@ -113,6 +82,15 @@
                 >
                   <i class="el-icon-refresh"></i>
                   电子书格式转换
+                </el-button>
+                <el-button 
+                  type="primary" 
+                  @click="gotoMarkdownReader"
+                  class="tool-button"
+                  size="large"
+                >
+                  <i class="el-icon-reading"></i>
+                  Markdown 阅读器
                 </el-button>
               </div>
             </el-card>
