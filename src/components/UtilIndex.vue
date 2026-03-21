@@ -3,7 +3,7 @@
     <TopMenu />
     <div class="main-container">
       <div class="hero-section">
-        <div class="title">Nyx tools</div>
+        <div class="title">Nyx Tools</div>
       </div>
       <div class="content-container">
         <el-row :gutter="[24, 24]">
@@ -58,6 +58,15 @@
                 </el-button>
                 <el-button 
                   type="primary" 
+                  @click="gotoHistoryTimeline"
+                  class="tool-button"
+                  size="large"
+                >
+                  <i class="el-icon-time"></i>
+                  历史年表
+                </el-button>
+                <el-button 
+                  type="primary" 
                   @click="gotoEpubReader"
                   class="tool-button"
                   size="large"
@@ -91,6 +100,15 @@
                 >
                   <i class="el-icon-reading"></i>
                   Markdown 阅读器
+                </el-button>
+                <el-button 
+                  type="primary" 
+                  @click="gotoVocabularyTest"
+                  class="tool-button"
+                  size="large"
+                >
+                  <i class="el-icon-edit-outline"></i>
+                  英语词汇量测试
                 </el-button>
               </div>
             </el-card>
@@ -204,21 +222,37 @@ const gotoEbookConvert = () => {
     path: "/ebookConvert",
   });
 };
+
+/**
+ * 转到历史年表页面
+ */
+const gotoHistoryTimeline = () => {
+  router.push({
+    path: "/historyTimeline",
+  });
+};
+
+/**
+ * 转到英语词汇量测试页面
+ */
+const gotoVocabularyTest = () => {
+  router.push({
+    path: "/vocabularyTest",
+  });
+};
 </script>
 
 <style scoped>
 .util-index-page {
-  height: 100vh;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
 }
 
 /* 主容器样式 */
 .main-container {
   flex: 1;
   min-height: 0;
-  overflow-y: auto;
   overflow-x: hidden;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   padding: 20px 0;

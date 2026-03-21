@@ -2,30 +2,27 @@
   <div class="font-to-image-container">
     <TopMenu />
     <div class="main-content">
-      <!-- 左侧输入区域 -->
+      <!-- 左侧：文本输入 + 样式设置 -->
       <div class="input-section">
         <div class="input-card">
           <div class="input-header">
             <h3 class="input-title">文字输入</h3>
-            <div class="input-subtitle">输入你想生成图片的文字内容</div>
+            <div class="input-subtitle">输入摘录或金句，右侧实时预览</div>
           </div>
           <el-input
             v-model="inputText"
             type="textarea"
             :rows="18"
-            placeholder="在这里输入你的文字..."
+            placeholder="输入或粘贴文字，选择背景与字体后点击「生成图片」即可复制或保存"
             class="input-area"
           />
         </div>
-      </div>
 
-      <!-- 右侧控制和预览区域 -->
-      <div class="right-section">
-        <!-- 控制面板 -->
+        <!-- 控制面板（样式设置） -->
         <div class="control-panel">
           <div class="control-header">
-            <h3 class="control-title">控制面板</h3>
-            <div class="control-subtitle">调整图片样式和效果</div>
+            <h3 class="control-title">样式设置</h3>
+            <div class="control-subtitle">字体、背景与字号</div>
           </div>
           
           <div class="control-content">
@@ -58,25 +55,27 @@
               </el-select>
             </div>
 
-            <el-button type="primary" class="copy-btn" @click="copyImage" size="small">
+            <el-button type="primary" class="copy-btn" @click="copyImage" size="default">
               <span class="btn-text">生成图片</span>
             </el-button>
           </div>
         </div>
+      </div>
 
-        <!-- 预览区域 -->
+      <!-- 右侧：预览区域 -->
+      <div class="right-section">
         <div class="preview-area">
           <div class="preview-header">
-            <h3 class="preview-title">预览效果</h3>
-            <div class="preview-subtitle">实时预览生成的图片</div>
+            <h3 class="preview-title">预览</h3>
+            <div class="preview-subtitle">生成后可直接复制或保存</div>
           </div>
           <div
             ref="imageCardRef"
             class="preview-card"
-            :class="selectedBg"
+            :class="[selectedBg, { 'preview-card--empty': !inputText.trim() }]"
           >
             <div class="preview-text" :style="{ color: computedTextColor, fontFamily: selectedFont || undefined, fontSize: previewFontSize + 'rem' }">
-              {{ inputText || '这里会显示你的文字内容' }}
+              {{ inputText || '此处将显示你的文字' }}
             </div>
           </div>
         </div>
@@ -88,7 +87,7 @@
       <img :src="generatedImageUrl" class="preview-image" alt="生成的图片" />
       <template #footer>
         <span class="dialog-footer">
-          <el-button @click="showImagePreview = false" class="dialog-btn">关闭</el-button>
+          <el-button @click="closeImagePreview" class="dialog-btn">关闭</el-button>
         </span>
       </template>
     </el-dialog>
@@ -96,10 +95,31 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, nextTick } from 'vue';
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
 import html2canvas from 'html2canvas';
 import { ElMessage } from 'element-plus';
 import TopMenu from './TopMenu.vue';
+
+// 用于移动端 / 桌面弹窗预览图片
+const showImagePreview = ref(false);
+const generatedImageUrl = ref('');
+
+// 单屏页：进入时禁止 body 滚动，离开时恢复，避免「能滑一点点」
+onMounted(() => {
+  document.body.style.overflow = 'hidden';
+});
+onUnmounted(() => {
+  document.body.style.overflow = '';
+});
+
+/** 关闭图片预览弹窗，并释放 blob URL */
+function closeImagePreview() {
+  if (generatedImageUrl.value && generatedImageUrl.value.startsWith('blob:')) {
+    URL.revokeObjectURL(generatedImageUrl.value);
+  }
+  generatedImageUrl.value = '';
+  showImagePreview.value = false;
+}
 
 /**
  * @description 背景选项（丰富微信读书风格）
@@ -206,6 +226,14 @@ const currentBgOptions = computed(() => {
   }
 });
 
+// 弹窗关闭时释放 blob URL，避免内存泄漏
+watch(showImagePreview, (visible) => {
+  if (!visible && generatedImageUrl.value && generatedImageUrl.value.startsWith('blob:')) {
+    URL.revokeObjectURL(generatedImageUrl.value);
+    generatedImageUrl.value = '';
+  }
+});
+
 // 监听背景类型变化，重置背景选择
 watch(selectedBgType, (newType) => {
   switch (newType) {
@@ -238,10 +266,7 @@ const imageCardRef = ref(null);
 
 
 
-// 用于移动端图片预览
-const showImagePreview = ref(false);
-const generatedImageUrl = ref('');
-
+// 用于移动端图片预览（缩放字号）
 const previewFontSize = ref(1.18); // rem，初始和原来一样
 
 const increaseFontSize = () => {
@@ -287,7 +312,7 @@ const copyImage = async () => {
       showImagePreview.value = true;
       ElMessage.info('请长按图片进行保存或复制');
     } else {
-      // 桌面端：尝试写入剪贴板
+      // 桌面端：尝试写入剪贴板；失败时弹出图片供右键保存/复制
       canvas.toBlob(async (blob) => {
         if (!blob) {
           ElMessage.error('图片生成失败');
@@ -299,14 +324,21 @@ const copyImage = async () => {
           ]);
           ElMessage.success('图片已复制到剪贴板，可直接粘贴');
         } catch (err) {
-          console.error('复制失败:', err);
-          ElMessage.error('复制图片到剪贴板失败，可能是浏览器不支持或权限问题');
+          const msg = err?.message || err?.name || String(err);
+          console.warn('剪贴板写入失败:', err);
+          generatedImageUrl.value = URL.createObjectURL(blob);
+          showImagePreview.value = true;
+          ElMessage.warning({
+            message: `无法写入剪贴板（${msg}），请在弹出的图片上右键「复制图像」或「图片另存为」`,
+            duration: 5000
+          });
         }
       }, 'image/png', 1.0);
     }
   } catch (err) {
+    const msg = err?.message || err?.name || String(err);
     console.error('截图失败:', err);
-    ElMessage.error('图片生成失败');
+    ElMessage.error(`图片生成失败：${msg}`);
   } finally {
     // 恢复原样式
     card.style.maxHeight = originalMaxHeight;
@@ -421,44 +453,53 @@ const computedTextColor = computed(() => bgTextColorMap[selectedBg.value] || '#2
 </script>
 
 <style scoped>
+/* 单屏布局：禁止整页滚动，内容全部在一屏内 */
 .font-to-image-container {
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 20px;
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-  min-height: 100vh;
+  padding: 16px 20px;
+  background: linear-gradient(160deg, #f0f4f8 0%, #e2e8f0 50%, #cbd5e1 100%);
+  height: 100vh;
+  max-height: 100vh;
+  overflow: hidden;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 }
 
+/* 主内容区：左右分栏，占满剩余高度，不超出视口 */
 .main-content {
   display: flex;
-  gap: 30px;
+  gap: 32px;
   width: 100%;
-  max-width: 1400px;
+  max-width: 1360px;
   margin: 0 auto;
-  align-items: flex-start;
+  align-items: stretch;
   justify-content: center;
-  min-height: calc(100vh - 100px);
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .input-section {
   flex: 1;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  gap: 16px;
+  align-items: center;
+  min-height: 0;
 }
 
 .input-card {
   width: 100%;
-  max-width: 450px;
-  height: 650px;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-  border-radius: 16px;
+  max-width: 460px;
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.04);
+  border-radius: 20px;
   overflow: hidden;
-  transition: all 0.3s ease;
+  transition: box-shadow 0.25s ease, transform 0.25s ease;
   display: flex;
   flex-direction: column;
 }
@@ -480,33 +521,35 @@ const computedTextColor = computed(() => bgTextColorMap[selectedBg.value] || '#2
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  height: 650px;
+  gap: 16px;
+  min-height: 0;
+  max-width: 460px;
 }
 
 .input-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+  transform: translateY(-3px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08), 0 4px 12px rgba(0, 0, 0, 0.04);
 }
 
 .input-header {
-  padding: 20px 25px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 22px 24px;
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
   color: white;
   text-align: center;
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.25);
 }
 
 .input-title {
-  font-size: 1.3rem;
+  font-size: 1.25rem;
   font-weight: 600;
-  margin: 0 0 8px 0;
-  color: white;
+  margin: 0 0 6px 0;
+  letter-spacing: 0.02em;
 }
 
 .input-subtitle {
-  font-size: 0.9rem;
-  opacity: 0.9;
-  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.85rem;
+  opacity: 0.92;
+  color: rgba(255, 255, 255, 0.95);
 }
 
 
@@ -517,51 +560,52 @@ const computedTextColor = computed(() => bgTextColorMap[selectedBg.value] || '#2
 
 .control-panel {
   width: 100%;
-  max-width: 450px;
-  height: 290px;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 16px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  flex-shrink: 0;
+  min-height: 0;
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 20px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.04);
   display: flex;
   flex-direction: column;
-  transition: all 0.3s ease;
+  transition: box-shadow 0.25s ease, transform 0.25s ease;
   overflow: visible;
 }
 
 .control-content {
   flex: 1;
-  padding: 15px 20px;
+  padding: 18px 22px 20px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 12px;
   overflow: visible;
 }
 
 .control-panel:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+  transform: translateY(-3px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08), 0 4px 12px rgba(0, 0, 0, 0.04);
 }
 
 .control-header {
-  padding: 20px 25px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 20px 24px;
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
   color: white;
   text-align: center;
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.25);
 }
 
 .control-title {
-  font-size: 1.3rem;
+  font-size: 1.25rem;
   font-weight: 600;
-  margin: 0 0 8px 0;
-  color: white;
+  margin: 0 0 6px 0;
+  letter-spacing: 0.02em;
 }
 
 .control-subtitle {
-  font-size: 0.9rem;
-  opacity: 0.9;
-  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.85rem;
+  opacity: 0.92;
+  color: rgba(255, 255, 255, 0.95);
 }
 
 .control-group {
@@ -574,10 +618,10 @@ const computedTextColor = computed(() => bgTextColorMap[selectedBg.value] || '#2
 
 .control-label {
   font-size: 0.9rem;
-  color: #555;
+  color: #475569;
   font-weight: 500;
-  min-width: 75px;
-  line-height: 1.3;
+  min-width: 72px;
+  line-height: 1.4;
 }
 
 .font-size-controls {
@@ -586,19 +630,19 @@ const computedTextColor = computed(() => bgTextColorMap[selectedBg.value] || '#2
 }
 
 .control-btn {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
   border: none;
   color: white;
   font-weight: 600;
-  padding: 4px 10px;
-  border-radius: 4px;
+  padding: 6px 12px;
+  border-radius: 8px;
   font-size: 0.8rem;
-  transition: all 0.3s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .control-btn:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
 }
 
 .control-select {
@@ -608,40 +652,41 @@ const computedTextColor = computed(() => bgTextColorMap[selectedBg.value] || '#2
 }
 
 .control-select :deep(.el-input__wrapper) {
-  background: rgba(255, 255, 255, 0.8);
-  border: 1px solid rgba(102, 126, 234, 0.2);
-  border-radius: 4px;
-  padding: 4px 8px;
-  min-height: 28px;
-  transition: all 0.3s ease;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(99, 102, 241, 0.2);
+  border-radius: 8px;
+  padding: 6px 10px;
+  min-height: 32px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .control-select :deep(.el-input__wrapper:hover) {
-  border-color: rgba(102, 126, 234, 0.5);
-  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+  border-color: rgba(99, 102, 241, 0.4);
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.12);
 }
 
 .copy-btn {
   width: 100%;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
   border: none;
   color: white;
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   font-weight: 600;
-  padding: 8px 16px;
-  border-radius: 6px;
+  padding: 12px 20px;
+  border-radius: 12px;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-top: 4px;
-  min-height: 32px;
+  margin-top: 8px;
+  min-height: 44px;
+  box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35);
 }
 
 .copy-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 8px 24px rgba(99, 102, 241, 0.45);
 }
 
 .copy-btn:active {
@@ -654,47 +699,49 @@ const computedTextColor = computed(() => bgTextColorMap[selectedBg.value] || '#2
 
 .preview-area {
   width: 100%;
-  max-width: 450px;
-  height: 320px;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-  border-radius: 16px;
+  flex: 1;
+  min-height: 0;
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 20px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.04);
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  transition: all 0.3s ease;
+  transition: box-shadow 0.25s ease, transform 0.25s ease;
 }
 
 .preview-area:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+  transform: translateY(-3px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08), 0 4px 12px rgba(0, 0, 0, 0.04);
 }
 
 .preview-header {
-  padding: 20px 25px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 20px 24px;
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
   color: white;
   text-align: center;
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.25);
 }
 
 .preview-title {
-  font-size: 1.3rem;
+  font-size: 1.25rem;
   font-weight: 600;
-  margin: 0;
-  color: white;
+  margin: 0 0 6px 0;
+  letter-spacing: 0.02em;
 }
 
 .preview-subtitle {
-  font-size: 0.9rem;
-  opacity: 0.9;
-  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.85rem;
+  opacity: 0.92;
+  color: rgba(255, 255, 255, 0.95);
 }
 
 .preview-card {
   flex: 1;
-  padding: 20px;
+  min-height: 0;
+  padding: 22px;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -705,7 +752,14 @@ const computedTextColor = computed(() => bgTextColorMap[selectedBg.value] || '#2
   background-repeat: no-repeat;
   box-sizing: border-box;
   overflow-y: auto;
-  margin: 15px;
+  margin: 14px;
+  border-radius: 14px;
+  transition: opacity 0.2s ease;
+}
+
+.preview-card--empty .preview-text {
+  color: #94a3b8 !important;
+  font-style: italic;
 }
 
 .preview-text {
@@ -749,13 +803,13 @@ const computedTextColor = computed(() => bgTextColorMap[selectedBg.value] || '#2
 }
 
 .preview-dialog :deep(.el-dialog) {
-  border-radius: 16px;
+  border-radius: 20px;
   overflow: hidden;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12);
 }
 
 .preview-dialog :deep(.el-dialog__header) {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
   color: white;
   padding: 20px 25px;
 }
@@ -778,18 +832,18 @@ const computedTextColor = computed(() => bgTextColorMap[selectedBg.value] || '#2
 }
 
 .preview-dialog .dialog-btn {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
   border: none;
   color: white;
   font-weight: 600;
-  padding: 10px 20px;
-  border-radius: 8px;
-  transition: all 0.3s ease;
+  padding: 10px 24px;
+  border-radius: 10px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .preview-dialog .dialog-btn:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
 }
 
 .preview-image {
@@ -950,11 +1004,6 @@ const computedTextColor = computed(() => bgTextColorMap[selectedBg.value] || '#2
   background-image: 
     repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px) !important;
 }
-.copy-btn {
-  width: 100px;
-  margin-bottom: 0.7rem;
-  align-self: flex-end;
-}
 /* 新增格子背景样式 */
 .bg-grid-white {
   background: #fff !important;
@@ -1067,30 +1116,27 @@ const computedTextColor = computed(() => bgTextColorMap[selectedBg.value] || '#2
 
 @media (max-width: 900px) {
   .font-to-image-container {
-    padding: 15px;
+    padding: 12px 16px;
   }
   
   .main-content {
     flex-direction: column;
     align-items: center;
-    gap: 20px;
-    min-height: auto;
-    padding: 20px 0;
+    gap: 12px;
   }
   
   .input-section, .right-section {
     width: 100%;
     max-width: 600px;
+    min-height: 0;
   }
   
   .input-card {
-    height: auto;
-    min-height: 500px;
+    max-height: 100%;
     max-width: 100%;
   }
   
   .right-section {
-    height: auto;
     order: 1;
   }
   
@@ -1100,15 +1146,10 @@ const computedTextColor = computed(() => bgTextColorMap[selectedBg.value] || '#2
   
   .control-panel, .preview-area {
     max-width: 100%;
-    height: auto;
-  }
-  
-  .control-panel {
-    min-height: 240px;
   }
   
   .preview-area {
-    min-height: 300px;
+    min-height: 120px;
   }
 }
 

@@ -1,25 +1,198 @@
-# interesting-util-client
+# 云胡工具集 (interesting-util-client)
 
-云胡工具集
+> 一个简洁实用的在线工具集合，为你解决日常开发和生活小需求
 
-体验地址：[https://stevenling.github.io/interesting-util-client/](https://stevenling.github.io/interesting-util-client/)
+**🌐 在线体验：** [https://stevenling.github.io/interesting-util-client/](https://stevenling.github.io/interesting-util-client/)
 
-## 工具集合简介
-### 001 Json 格式化
+---
 
-[Json 格式化文档](docs/JsonFormat.md)
+## 📦 工具列表
 
-### 002 颜色进制转换
+### 🛠️ 开发工具
 
-[颜色进制转换文档](docs/ColorConvert.md)
+| 工具名称 | 说明 | 文档 |
+|---------|------|------|
+| **JSON 格式化** | JSON 美化、验证、下载、复制，支持语法高亮 | [查看文档](docs/JsonFormat.md) |
+| **颜色进制转换** | RGB/HEX 双向转换，支持多种 RGB 格式识别，带取色器 | [查看文档](docs/ColorConvert.md) |
+| **文本格式化** | 文本大小写转换、去除空行、压缩空格等 | - |
+| **Markdown 阅读器** | 实时预览 Markdown 内容 | - |
 
-### 003 摘录卡片
+### 📱 生活工具
 
-[摘录卡片文档](docs/fontToImage.md)
+| 工具名称 | 说明 | 文档 |
+|---------|------|------|
+| **摘录卡片生成** | 将文字转为精美卡片图片，支持多种背景和字体 | [查看文档](docs/fontToImage.md) |
+| **天干地支查询** | 阳历转农历，查询天干地支纪年 | [查看文档](docs/HeavenlyStemsAndEarthlyBranches.md) |
+| **距离节假日倒计时** | 计算距离下一个节假日还有多少天 | - |
 
-### 004 epub 在线阅读
-[epub 电子书在线阅读](docs/EpubReader.md)
+### 📚 阅读工具
 
-## 部署
+| 工具名称 | 说明 | 文档 |
+|---------|------|------|
+| **EPUB 在线阅读** | 在线读取 EPUB 电子书，支持目录跳转 | [查看文档](docs/EpubReader.md) |
+| **电子书转换** | EPUB 格式转换工具 | - |
 
-将代码发布到 `github` 上，会自动进行 `action` 部署。
+### 📖 文章系统
+
+- **云胡随笔**：个人文章阅读系统
+- **文章列表/详情**：支持 Markdown 文章展示
+
+---
+
+## 🚀 快速开始
+
+### 环境要求
+
+- Node.js >= 18
+- npm >= 9
+
+### 安装依赖
+
+```bash
+npm install
+```
+
+### 开发模式
+
+```bash
+npm run dev
+```
+
+访问 `http://localhost:5173` 预览
+
+### 构建生产版本
+
+```bash
+npm run build
+```
+
+构建产物在 `dist/` 目录
+
+### 预览生产构建
+
+```bash
+npm run preview
+```
+
+---
+
+## 📁 项目结构
+
+```
+interesting-util-client/
+├── src/
+│   ├── components/          # 工具组件
+│   │   ├── JsonFormat.vue          # JSON 格式化
+│   │   ├── ColorConvert.vue        # 颜色转换
+│   │   ├── fontToImage.vue         # 摘录卡片
+│   │   ├── EpubReader.vue          # EPUB 阅读器
+│   │   ├── HeavenlyStemsAndEarthlyBranches.vue  # 天干地支
+│   │   ├── BetweenNowToHoliday.vue # 节假日倒计时
+│   │   ├── TextFormat.vue          # 文本格式化
+│   │   ├── MarkdownReader.vue      # Markdown 阅读
+│   │   └── ...
+│   ├── router/              # 路由配置
+│   ├── config/              # 配置文件
+│   ├── assets/              # 静态资源
+│   ├── App.vue              # 根组件
+│   └── main.js              # 入口文件
+├── docs/                    # 工具文档
+├── scripts/                 # 脚本工具
+├── public/                  # 公共资源
+├── api/                     # API 服务
+└── ebook-convert-server/   # 电子书转换服务
+```
+
+---
+
+## 🧪 测试
+
+```bash
+# 运行单元测试
+npm run test:unit
+
+# 代码检查
+npm run lint
+
+# Markdown 文档检查
+npm run lint:md
+```
+
+---
+
+## 📦 部署
+
+### GitHub Pages（自动部署）
+
+项目已配置 GitHub Actions，推送到 `main` 分支后自动部署到 GitHub Pages。
+
+### Vercel 部署
+
+1. 在 Vercel 导入项目
+2. 构建配置：
+   - Build Command: `npm run build`
+   - Output Directory: `dist`
+
+详细部署文档：[VERCEL_DEPLOY.md](VERCEL_DEPLOY.md)
+
+### 手动部署到服务器
+
+```bash
+npm run push
+```
+
+会自动构建并 scp 到配置的服务器
+
+---
+
+## 🎨 技术栈
+
+- **框架：** Vue 3.5 + Vite 6
+- **UI 库：** Element Plus
+- **路由：** Vue Router 4
+- **代码高亮：** Highlight.js
+- **PDF 处理：** pdfjs-dist
+- **电子书：** epubjs
+- **图片生成：** html2canvas + jspdf
+- **压缩处理：** jszip
+- **日期处理：** dayjs / moment
+- **视频播放：** DPlayer
+- **Markdown：** marked
+- **测试：** Jest + Vue Test Utils
+- **代码质量：** ESLint + Prettier + Husky + lint-staged
+
+---
+
+## 📝 NPM 脚本说明
+
+| 命令 | 说明 |
+|------|------|
+| `npm run dev` | 启动开发服务器 |
+| `npm run build` | 构建生产版本（自动生成 404.html 和 .nojekyll） |
+| `npm run preview` | 预览生产构建 |
+| `npm run test:unit` | 运行单元测试 |
+| `npm run lint` | ESLint 代码检查 |
+| `npm run lint:md` | Markdown 文档检查 |
+| `npm run push` | 构建并部署到服务器 |
+| `npm run gen` | 生成文章配置 |
+| `npm run gen:yunhu-essay` | 生成云胡随笔配置 |
+| `npm run copy-collection` | 复制文章到合集 |
+
+---
+
+## 📄 许可证
+
+MIT License
+
+---
+
+## 🙋 反馈与建议
+
+如有问题或建议，欢迎提 Issue 或联系开发者。
+
+**开发者：** 云胡 (Steven)  
+**GitHub：** [stevenling](https://github.com/stevenling)
+
+---
+
+_✨ 持续更新中，更多实用工具敬请期待..._

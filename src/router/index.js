@@ -2,9 +2,8 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { constantRoutes, asyncRoutes } from './router'
 
-// Vue CLI 会自动将 vue.config.js 中的 publicPath 注入为 process.env.BASE_URL
-// 如果没有注入，使用默认值
-const baseUrl = process.env.BASE_URL || '/interesting-util-client/';
+// Vite 会根据 vite.config.js 的 base 注入 import.meta.env.BASE_URL
+const baseUrl = import.meta.env.BASE_URL || '/interesting-util-client/';
 
 const router = createRouter({
     history: createWebHistory(baseUrl),

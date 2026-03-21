@@ -35,7 +35,6 @@ module.exports = {
   // 指定需要被统计覆盖率的文件
   collectCoverageFrom: [
     'src/**/*.{js,vue}',
-    '*.js',
     '!**/node_modules/**',
     '!**/__tests__/**',
     '!jest.config.js',

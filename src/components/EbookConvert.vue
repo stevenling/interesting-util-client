@@ -207,9 +207,8 @@ function convertAzw3ToPdf() {
   ElMessage.info("AZW3 转换需服务端安装 Calibre（ebook-convert），暂不支持在浏览器中完成。");
 }
 
-const ebookConvertApiBase = typeof process !== "undefined" && process.env && process.env.VUE_APP_EBOOK_CONVERT_API != null
-  ? process.env.VUE_APP_EBOOK_CONVERT_API
-  : "http://localhost:3001";
+// Vite 仅暴露以 VITE_ 开头的环境变量；可在 .env 中设置 VITE_EBOOK_CONVERT_API
+const ebookConvertApiBase = import.meta.env.VITE_EBOOK_CONVERT_API ?? "http://localhost:3001";
 
 async function convertEpubToPdf() {
   if (!canEpubToPdf.value || !sourceFile.value) return;

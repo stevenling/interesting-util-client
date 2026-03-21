@@ -1,6 +1,6 @@
 import { mount } from '@vue/test-utils';
 import { nextTick } from 'vue';
-import EpubReader from './EpubReader.vue';
+import EpubReader from '../EpubReader.vue';
 import { ElMessage } from 'element-plus';
 import html2canvas from 'html2canvas';
 

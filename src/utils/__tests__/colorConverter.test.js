@@ -1,4 +1,4 @@
-import { hexToRgb } from './colorConverter';
+import { hexToRgb } from '../colorConverter';
 
 describe('hexToRgb', () => {
   test('should convert a full-length hex color to RGB', () => {

@@ -10,27 +10,27 @@ export const constantRoutes = [
     {
         name: 'UtilIndex',
         path: '/utilIndex',
-        component: () => import("@/components/UtilIndex")
+        component: () => import("@/components/UtilIndex.vue")
     },
     {
         name: 'JsonFormat',
         path: '/JsonFormat',
-        component: () => import("@/components/JsonFormat")
+        component: () => import("@/components/JsonFormat.vue")
     },
     {
         name: 'ColorConvert',
         path: '/ColorConvert',
-        component: () => import("@/components/ColorConvert")
+        component: () => import("@/components/ColorConvert.vue")
     },
     {
         name: 'TextFormat',
         path: '/TextFormat',
-        component: () => import("@/components/TextFormat")
+        component: () => import("@/components/TextFormat.vue")
     },
     {
         name: 'BetweenNowToHoliday',
         path: '/BetweenNowToHoliday',
-        component: () => import("@/components/BetweenNowToHoliday")
+        component: () => import("@/components/BetweenNowToHoliday.vue")
     },
     {
         name: 'HeavenlyStemsAndEarthlyBranches',
@@ -68,6 +68,21 @@ export const constantRoutes = [
         component: () => import("@/components/EbookConvert.vue")
     },
     {
+        name: 'HistoryTimeline',
+        path: '/historyTimeline',
+        component: () => import("@/components/HistoryTimeline.vue")
+    },
+    {
+        name: 'HistoryTimelineCountry',
+        path: '/historyTimeline/:country',
+        component: () => import("@/components/HistoryTimeline.vue")
+    },
+    {
+        name: 'VocabularyTest',
+        path: '/vocabularyTest',
+        component: () => import("@/components/VocabularyTest.vue")
+    },
+    {
         path: '/',
         name: 'YunhuMatrix',
         component: YunhuMatrix
@@ -75,7 +90,7 @@ export const constantRoutes = [
     {
         path: '/login',
         name: 'Login',
-        component: import("@/components/UtilIndex")
+        component: () => import("@/components/UtilIndex.vue")
     }
 ];
 

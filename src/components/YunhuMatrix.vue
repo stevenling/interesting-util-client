@@ -15,7 +15,7 @@
             <template #header>
               <div class="card-header">
                 <i class="el-icon-connection"></i>
-                <span>矩阵入口</span>
+                <span>Quick access</span>
               </div>
             </template>
             <div class="button-grid">
@@ -26,7 +26,7 @@
                 size="large"
               >
                 <i class="el-icon-link"></i>
-                文章收藏
+                Articles Collection
               </el-button>
 
               <el-button 
@@ -36,7 +36,17 @@
                 size="large"
               >
                 <i class="el-icon-document"></i>
-                博客
+                Nyx Blog
+              </el-button>
+
+              <el-button 
+                type="info" 
+                @click="openLink('https://stevenling.github.io/chinese-borges-website/')"
+                class="matrix-button"
+                size="large"
+              >
+                <i class="el-icon-reading"></i>
+                博尔赫斯中文站
               </el-button>
 
               <el-button 
@@ -46,7 +56,7 @@
                 size="large"
               >
                 <i class="el-icon-chat-dot-round"></i>
-                Nyx 小工具
+                Nyx Tools
               </el-button>
             </div>
           </el-card>
@@ -158,18 +168,17 @@ function goToUtilIndex() {
   color: #667eea;
 }
 
-/* 按钮网格样式 */
+/* 按钮网格样式 - 使用 Grid 保证上下左右对齐 */
 .button-grid {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
   gap: 15px;
   padding: 10px 0;
 }
 
 /* 矩阵按钮样式 - 与UtilIndex工具按钮保持一致 */
 .matrix-button {
-  flex: 0 1 auto;
-  min-width: 160px;
+  width: 100%;
   height: 50px;
   border-radius: 12px;
   font-weight: 500;
@@ -226,11 +235,7 @@ function goToUtilIndex() {
   }
   
   .button-grid {
-    flex-direction: column;
-  }
-  
-  .matrix-button {
-    min-width: 100%;
+    grid-template-columns: 1fr;
   }
   
   .content-container {

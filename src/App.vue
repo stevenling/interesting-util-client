@@ -26,8 +26,7 @@ html, body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   position: relative;
-  height: 100vh;
-  overflow: hidden;
+  min-height: 100vh;
   margin-bottom: 0 !important;
   padding-bottom: 0 !important;
 }
