@@ -110,6 +110,15 @@
                   <i class="el-icon-edit-outline"></i>
                   英语词汇量测试
                 </el-button>
+                <el-button 
+                  type="primary" 
+                  @click="gotoJztkPractice"
+                  class="tool-button"
+                  size="large"
+                >
+                  <i class="el-icon-place"></i>
+                  驾考刷题王
+                </el-button>
               </div>
             </el-card>
           </el-col>
@@ -238,6 +247,15 @@ const gotoHistoryTimeline = () => {
 const gotoVocabularyTest = () => {
   router.push({
     path: "/vocabularyTest",
+  });
+};
+
+/**
+ * 驾考刷题王（题目 API + 可选 Spring Boot 同步）
+ */
+const gotoJztkPractice = () => {
+  router.push({
+    path: "/jztk",
   });
 };
 </script>

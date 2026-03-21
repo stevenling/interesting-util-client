@@ -83,6 +83,16 @@ export const constantRoutes = [
         component: () => import("@/components/VocabularyTest.vue")
     },
     {
+        name: 'JztkHome',
+        path: '/jztk',
+        component: () => import("@/components/JztkHome.vue")
+    },
+    {
+        name: 'JztkPractice',
+        path: '/jztk/practice',
+        component: () => import("@/components/JztkPractice.vue")
+    },
+    {
         path: '/',
         name: 'YunhuMatrix',
         component: YunhuMatrix
