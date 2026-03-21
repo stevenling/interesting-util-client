@@ -556,4 +556,62 @@ function goUtilIndex() {
     padding: 0 12px;
   }
 }
+
+@media (max-width: 480px) {
+  .title {
+    font-size: 1.35rem;
+  }
+
+  .word-en {
+    font-size: 1.25rem;
+  }
+
+  .word-tip {
+    font-size: 0.8rem;
+    margin-bottom: 14px;
+  }
+
+  .estimate-num {
+    font-size: 2rem;
+  }
+
+  .content-container {
+    padding: 0 10px;
+  }
+
+  .option-radio {
+    padding: 10px 12px;
+    font-size: 0.95rem;
+  }
+
+  .level-box {
+    padding: 12px 12px 6px;
+  }
+
+  .level-note {
+    font-size: 0.72rem;
+  }
+
+  /* 弹窗表格：更小字号 + 允许换行，避免窄屏挤压/横向滚动 */
+  .answer-dialog :deep(.el-dialog__body) {
+    padding: 12px 14px;
+  }
+
+  .answer-dialog :deep(.el-table) {
+    font-size: 12px;
+  }
+
+  .answer-dialog :deep(.el-table th),
+  .answer-dialog :deep(.el-table td),
+  .answer-dialog :deep(.el-table__cell) {
+    padding: 6px 4px;
+    white-space: normal;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+  }
+
+  .answer-dialog :deep(.el-table__header-wrapper th) {
+    font-size: 12px;
+  }
+}
 </style>
