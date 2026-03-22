@@ -5,6 +5,7 @@
   "homepage": "https://stevenling.github.io/github-actions-demo",
   "scripts": {
     "dev": "vite",
+    "dev:remote": "vite --mode remote",
     "build": "vite build && npm run fix-build",
     "preview": "vite preview",
     "fix-build": "node -e \"const fs=require('fs');const path=require('path');const distPath='dist';fs.copyFileSync(path.join(distPath,'index.html'),path.join(distPath,'404.html'));fs.writeFileSync(path.join(distPath,'.nojekyll'),'');\"",
@@ -14,7 +15,7 @@
     "test:unit": "jest",
     "gen": "node scripts/generate-articles-config.js",
     "gen:yunhu-essay": "node scripts/generate-yunhu-essay-config.js",
-    "copy-collection": "node scripts/copy-articles-to-collection.js"
+    "copy-collection":  "node scripts/copy-articles-to-collection.js"
   },
   "dependencies": {
     "@highlightjs/vue-plugin": "^2.1.0",

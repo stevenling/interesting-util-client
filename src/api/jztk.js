@@ -2,8 +2,10 @@
  * 驾考题目 API + Spring Boot 同步
  *
  * 环境变量（Vite）：
- * - VITE_JZTK_API_URL  拉题接口完整 URL（可带 query，如 key=xxx&subject=1）
- * - VITE_JZTK_SYNC_URL  每次拉题成功后 POST 到 Spring Boot 的地址（可为空则不同步）
+ * - VITE_JZTK_API_URL  拉题基址，推荐生产用 Nginx 同源反代时写相对路径 `/api`（见 docs/JZTK_NGINX.md）。
+ *   未包含 …/question/random 时会自动拼接 VITE_JZTK_API_RANDOM_PATH（默认 /jztk/question/random）。
+ *   开发或直连也可写完整 URL：http(s)://host:port/...
+ * - VITE_JZTK_SYNC_URL  同步 POST 地址；同源反代时写 `/api/jztk/sync` 等相对路径（可为空则不同步）
  *   未配置时：前端会将本次接口返回的完整 JSON 触发浏览器下载到本机（下载目录）
  * - VITE_JZTK_SYNC_TOKEN 可选，存在则请求头 Authorization: Bearer <token>
  * - VITE_JZTK_ALSO_DOWNLOAD  已配置同步时仍要本机 JSON 备份：设为 1 或 true
@@ -13,6 +15,11 @@
  */
 
 const API_URL = import.meta.env.VITE_JZTK_API_URL || ""
+/** 拉题路径（拼在基址后）；Nginx 下浏览器请求 /api/jztk/question/random，rewrite 后对应后端 /jztk/question/random */
+const API_RANDOM_PATH =
+  (import.meta.env.VITE_JZTK_API_RANDOM_PATH || "/jztk/question/random").trim() ||
+  "/jztk/question/random"
+
 /** 每批题量参数名，可通过 .env 覆盖，例如 VITE_JZTK_BATCH_SIZE_PARAM=count */
 const BATCH_PARAM =
   (import.meta.env.VITE_JZTK_BATCH_SIZE_PARAM || "size").trim() || "size"
@@ -100,13 +107,41 @@ export function normalizeJztkQuestion(raw) {
 }
 
 /**
+ * 解析拉题 URL：基址 /api 或完整 URL；未含 question/random 时拼接 API_RANDOM_PATH
+ * @returns {string}
+ */
+function getJztkRandomFetchBase() {
+  const raw = (API_URL || "").trim()
+  if (!raw) return ""
+  const suffix = API_RANDOM_PATH.startsWith("/")
+    ? API_RANDOM_PATH
+    : `/${API_RANDOM_PATH}`
+
+  if (/^https?:\/\//i.test(raw)) {
+    try {
+      const u = new URL(raw)
+      if (/question\/random/i.test(u.pathname)) return raw
+      u.pathname = `${u.pathname.replace(/\/+$/, "")}${suffix}`
+      return u.href
+    } catch {
+      return raw
+    }
+  }
+
+  const pathOnly = raw.split(/[?#]/)[0] || raw
+  if (/question\/random/i.test(pathOnly)) return raw
+  const base = raw.replace(/\/+$/, "")
+  return `${base}${suffix}`
+}
+
+/**
  * 在环境变量基址上附带科目、本批题量（覆盖已有同名 query）
  * @param {string|number} [subject=1] 1=科目一，4=科目四
  * @param {number} [batchSize] 本批题目数量；不传则不附加题量参数
  * @returns {string}
  */
 export function resolveJztkApiUrl(subject = "1", batchSize) {
-  const base = (API_URL || "").trim()
+  const base = getJztkRandomFetchBase()
   if (!base) return ""
   const sub = String(subject).replace(/[^\d]/g, "") || "1"
   const n =

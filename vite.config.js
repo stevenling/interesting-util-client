@@ -9,6 +9,12 @@ export default defineConfig(({ mode }) => {
   const isVercel = process.env.VERCEL === '1' || !!process.env.VERCEL_URL || env.VERCEL === '1' || !!env.VERCEL_URL
   const base = isVercel ? '/' : (mode === 'production' ? '/interesting-util-client/' : '/')
 
+  /** 开发代理：默认本机 :10000；--mode remote 时读 .env.remote 的 VITE_DEV_PROXY_TARGET 连远程 */
+  const devProxyTarget = (env.VITE_DEV_PROXY_TARGET || 'http://localhost:10000').replace(
+    /\/$/,
+    ''
+  )
+
   return {
     base,
     plugins: [vue()],
@@ -20,6 +26,12 @@ export default defineConfig(({ mode }) => {
     server: {
       host: '0.0.0.0',
       port: 8080,
+      proxy: {
+        '/api': {
+          target: devProxyTarget,
+          changeOrigin: true,
+        },
+      },
     },
     build: {
       outDir: 'dist',
