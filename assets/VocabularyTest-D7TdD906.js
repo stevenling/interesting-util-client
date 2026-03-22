@@ -1,4 +1,4 @@
-import{_ as ne,h as f,m as B,i as ae,o as T,c as S,a as n,b as l,s as M,w as o,r as b,u as ie,T as re,d as a,t as m,F as ue,q as ce,p as U,k as de,E as O,V as ve}from"./index-Cro7Cb8G.js";const pe=`
+import{_ as ne,h as f,m as B,i as ae,o as T,c as S,a as n,b as l,s as M,w as o,r as b,u as ie,T as re,d as a,t as m,F as ue,q as ce,p as U,k as de,E as O,V as ve}from"./index-ZeqWJnGO.js";const pe=`
 apple|苹果|1
 water|水|1
 book|书|1
