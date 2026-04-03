@@ -1489,7 +1489,6 @@ const handleResize = () => {
 };
 
 onMounted(() => {
-  document.querySelector('body').setAttribute('style', 'background: #EBEDF0');
   // 检测移动端
   isMobile.value = window.innerWidth <= 768;
   // 移动端设置默认字体大小为16px
@@ -1566,7 +1565,7 @@ onBeforeUnmount(() => {
 
 .article-detail {
   min-height: 100vh;
-  background: #EBEDF0;
+  background: var(--site-bg);
   overflow-x: hidden;
   margin-bottom: 0 !important;
   padding-bottom: 0 !important;
@@ -1583,16 +1582,19 @@ onBeforeUnmount(() => {
 
 .loading-section,
 .error-section {
-  background: white;
+  background: var(--site-surface);
+  border: 1px solid var(--site-border);
   border-radius: 12px;
   padding: 40px;
   margin-top: 20px;
+  box-shadow: var(--site-card-shadow);
 }
 
 .article-section {
-  background: white;
+  background: var(--site-surface);
+  border: 1px solid var(--site-border);
   border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--site-card-shadow);
   overflow: hidden;
   overflow-x: hidden;
   position: relative;

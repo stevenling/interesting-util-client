@@ -32,7 +32,7 @@ server {
     # 浏览器请求 /api/xxx → 转发到后端 /xxx
     location ^~ /api/ {
         rewrite ^/api/(.*)$ /$1 break;
-        proxy_pass http://127.0.0.1:8080/;   # 示例：换成 Spring Boot 实际地址（可用内网 IP:端口）
+        proxy_pass http://127.0.0.1:10000/;   # 示例：换成 Spring Boot 实际地址（可用内网 IP:端口）
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;

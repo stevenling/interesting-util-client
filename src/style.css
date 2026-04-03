@@ -1,0 +1,37 @@
+@import 'tailwindcss';
+
+/* 与 Matrix / 工具总览一致的黑白灰 + 蓝点缀（全站工具页复用） */
+:root {
+  --site-bg: rgb(226 232 240);
+  --site-surface: rgb(241 245 249 / 0.94);
+  --site-surface-solid: rgb(241 245 249);
+  --site-border: rgb(203 213 225 / 0.95);
+  --site-heading: rgb(30 41 59);
+  --site-muted: rgb(100 116 139);
+  --site-accent: rgb(37 99 235);
+  --site-card-shadow: 0 1px 3px rgb(15 23 42 / 0.06);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --site-bg: rgb(2 6 23);
+    --site-surface: rgb(15 23 42 / 0.92);
+    --site-surface-solid: rgb(15 23 42);
+    --site-border: rgb(51 65 85 / 0.95);
+    --site-heading: rgb(241 245 249);
+    --site-muted: rgb(148 163 184);
+    --site-accent: rgb(96 165 250);
+    --site-card-shadow: 0 1px 3px rgb(0 0 0 / 0.35);
+  }
+}
+
+html,
+body {
+  background-color: var(--site-bg);
+  color: var(--site-heading);
+}
+
+#app {
+  background-color: var(--site-bg);
+  min-height: 100vh;
+}

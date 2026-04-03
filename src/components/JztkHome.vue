@@ -107,15 +107,15 @@ function goFavorites(subject) {
 
 .main-container {
   flex: 1;
-  /* 与 JztkPractice.vue 刷题页主背景一致 */
-  background: linear-gradient(135deg, #8cc6ff 0%, #74b8fa 45%, #5ca6f0 100%);
+  background: transparent;
   padding: 20px 0 48px;
 }
 
 .hero-section {
   text-align: center;
   padding: 28px 16px 24px;
-  color: #fff;
+  color: var(--site-heading);
+  border-bottom: 1px solid var(--site-border);
 }
 
 .title {
@@ -123,16 +123,16 @@ function goFavorites(subject) {
   font-weight: 700;
   margin: 0 0 0.5rem;
   letter-spacing: 0.02em;
-  color: #fff;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+  color: var(--site-heading);
+  text-shadow: none;
 }
 
 .subtitle {
   margin: 0;
   font-size: 0.9rem;
-  color: rgba(255, 255, 255, 0.92);
+  color: var(--site-muted);
   font-weight: 400;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
+  text-shadow: none;
 }
 
 .content-container {
@@ -162,8 +162,8 @@ function goFavorites(subject) {
     transform 0.2s ease,
     box-shadow 0.2s ease,
     border-color 0.2s ease;
-  border: 1px solid var(--jztk-line);
-  background: #fff;
+  border: 1px solid var(--site-border);
+  background: var(--site-surface);
   --el-card-border-color: var(--jztk-line);
   box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
 }

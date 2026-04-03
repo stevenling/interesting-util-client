@@ -1,331 +1,357 @@
 <template>
-  <TopMenu></TopMenu>
-  <div id="app">
-    <el-card class="box-card">
-      <template #header>
-        <div class="card-header">
-          <div class="title">Json 格式化</div>
-          <div class="el-button-list">
-            <el-button class="button" type="primary" @click="clickDownload"
-              >下载</el-button
+  <div
+    class="json-format-page min-h-screen flex flex-col bg-zinc-100 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100"
+  >
+    <div class="flex-1 min-w-0 px-4 sm:px-6 py-6 sm:py-8">
+      <div class="max-w-6xl mx-auto">
+        <RouterLink
+          to="/utilIndex"
+          class="mb-5 inline-block text-sm text-zinc-500 hover:text-slate-700 dark:text-zinc-400 dark:hover:text-slate-300 transition-colors"
+        >
+          ← 工具列表
+        </RouterLink>
+
+        <div
+          class="rounded-xl border border-zinc-200/90 dark:border-zinc-800 bg-white/90 dark:bg-zinc-900/85 shadow-sm overflow-hidden flex flex-col min-h-[calc(100vh-3rem)]"
+        >
+          <header
+            class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 px-5 py-4 border-b border-zinc-200/90 dark:border-zinc-800"
+          >
+            <h1
+              class="text-2xl font-semibold tracking-tight text-zinc-800 dark:text-zinc-50 border-l-2 border-slate-500 dark:border-slate-400 pl-3"
             >
+              Json 格式化
+            </h1>
+            <el-button
+              class="json-btn json-btn-solid shrink-0"
+              data-testid="json-format-download"
+              @click="clickDownload"
+            >
+              下载
+            </el-button>
+          </header>
+
+          <div class="p-4 sm:p-5 flex-1 flex flex-col min-h-0">
+            <el-row :gutter="24" class="content-row flex-1 min-h-0">
+              <el-col :xs="24" :sm="24" :md="24" :lg="12" class="el-input-content">
+                <div class="json-title">
+                  <span>待格式化 Json</span>
+                  <el-button plain class="json-btn json-btn-line" data-testid="json-format-clear" @click="clickClear">
+                    清空
+                  </el-button>
+                </div>
+                <el-input
+                  v-model="currentJson.oldJson"
+                  type="textarea"
+                  placeholder="请输入待格式化 JSON 字符串"
+                  class="el-input-class"
+                />
+              </el-col>
+
+              <el-col :xs="24" :sm="24" :md="24" :lg="12" class="el-input-content">
+                <div class="json-title">
+                  <span>格式化后的 Json</span>
+                  <el-button
+                    plain
+                    class="json-btn json-btn-line json-btn-line--accent"
+                    data-testid="json-format-copy"
+                    @click="clickCopy"
+                  >
+                    复制到剪贴板
+                  </el-button>
+                </div>
+                <highlightjs
+                  language="json"
+                  :code="currentJson.formatJson"
+                  class="highlight-json"
+                />
+              </el-col>
+            </el-row>
           </div>
         </div>
-      </template>
-      <el-row :gutter="40" class="content-row">
-
-        <el-col :span="12" class="el-input-content">
-          <div class="json-title">
-            待格式化 Json
-            <el-button class="clear-and-copy-button" type="danger" @click="clickClear">清空</el-button>
-          </div>
-          <el-input
-            v-model="currentJson.oldJson"
-            type="textarea"
-            placeholder="请输入待格式化 JSON 字符串"
-            class="el-input-class"
-          />
-        </el-col>
-
-        <el-col :span="12" class="el-input-content">
-          <div class="json-title">
-            格式化后的 Json
-            <el-button class="clear-and-copy-button" type="success" @click="clickCopy">复制到剪贴板</el-button>
-          </div>
-          <highlightjs
-            language="json"
-            :code="currentJson.formatJson"
-            class="highlight-json"
-          />
-        </el-col>
-      </el-row>
-    </el-card>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup>
-import { onMounted, watch, reactive } from "vue";
-import { ElMessage } from "element-plus";
-import moment from "moment";
-import useClipboard from "vue-clipboard3";
-import TopMenu from "./TopMenu.vue";
+import { watch, reactive } from 'vue'
+import { RouterLink } from 'vue-router'
+import { ElMessage } from 'element-plus'
+import moment from 'moment'
+import useClipboard from 'vue-clipboard3'
 
-/**
- * @constant
- * @type {number}
- * @description JSON 格式化的缩进空格数
- */
-const JSON_FORMAT_SPACE = 4;
+const JSON_FORMAT_SPACE = 4
 
-const currentJson = reactive({ oldJson: "", formatJson: "" });
+const currentJson = reactive({ oldJson: '', formatJson: '' })
 
-onMounted(() => {
-  document.querySelector("body").setAttribute("style", "background: #EBEDF0");
-});
+const { toClipboard } = useClipboard()
 
-/**
- * @function debounce
- * @description 防抖函数，避免高频触发
- * @param {Function} fn 需要防抖的函数
- * @param {number} delay 延迟时间（毫秒）
- * @returns {Function}
- */
 function debounce(fn, delay) {
-  let timer = null;
+  let timer = null
   return function (...args) {
-    clearTimeout(timer);
-    timer = setTimeout(() => fn.apply(this, args), delay);
-  };
+    clearTimeout(timer)
+    timer = setTimeout(() => fn.apply(this, args), delay)
+  }
 }
 
-/**
- * @description 监听用户输入的 JSON 字符串，自动格式化
- * @param {string} newValue 用户输入的新值
- */
 watch(
   () => currentJson.oldJson,
   debounce((newValue) => {
-    if (typeof newValue === "string" && newValue.trim() !== "") {
+    if (typeof newValue === 'string' && newValue.trim() !== '') {
       try {
-        const jsonObj = JSON.parse(newValue);
-        currentJson.formatJson = JSON.stringify(jsonObj, null, JSON_FORMAT_SPACE);
+        const jsonObj = JSON.parse(newValue)
+        currentJson.formatJson = JSON.stringify(jsonObj, null, JSON_FORMAT_SPACE)
       } catch (e) {
-        currentJson.formatJson = "";
-        ElMessage.error("待格式化的 Json 有误，请检查");
+        currentJson.formatJson = ''
+        ElMessage.error('待格式化的 Json 有误，请检查')
       }
     } else {
-      currentJson.formatJson = "";
+      currentJson.formatJson = ''
     }
   }, 300)
-);
+)
 
-/**
- * @function clickDownload
- * @description 下载格式化后的 JSON 文件
- * @returns {void}
- */
 function clickDownload() {
   if (!currentJson.formatJson) {
-    ElMessage.error("下载空 Json 没有意义");
-    return;
+    ElMessage.error('下载空 Json 没有意义')
+    return
   }
-  let eleLink = document.createElement("a");
-  const fileName = moment().format("YYYY-MM-DD-hh-mm-ss");
-  eleLink.download = fileName + ".json";
-  eleLink.style.display = "none";
-  let blob = new Blob([currentJson.formatJson], { type: "text/json" });
-  eleLink.href = URL.createObjectURL(blob);
-  document.body.appendChild(eleLink);
-  eleLink.click();
-  document.body.removeChild(eleLink);
+  const eleLink = document.createElement('a')
+  const fileName = moment().format('YYYY-MM-DD-hh-mm-ss')
+  eleLink.download = `${fileName}.json`
+  eleLink.style.display = 'none'
+  const blob = new Blob([currentJson.formatJson], { type: 'text/json' })
+  eleLink.href = URL.createObjectURL(blob)
+  document.body.appendChild(eleLink)
+  eleLink.click()
+  document.body.removeChild(eleLink)
+  if (typeof URL.revokeObjectURL === 'function') {
+    URL.revokeObjectURL(eleLink.href)
+  }
 }
 
-/**
- * @function clickClear
- * @description 清空输入和输出内容
- * @returns {void}
- */
 function clickClear() {
   if (!currentJson.oldJson) {
-    ElMessage.info("已经清空了，没必要再次清空");
-    return;
+    ElMessage.info('已经清空了，没必要再次清空')
+    return
   }
-  currentJson.formatJson = "";
-  currentJson.oldJson = "";
+  currentJson.formatJson = ''
+  currentJson.oldJson = ''
 }
 
-/**
- * @function clickCopy
- * @description 复制格式化后的 JSON 到剪贴板
- * @returns {Promise<void>}
- */
 async function clickCopy() {
-  const { toClipboard } = useClipboard();
   if (!currentJson.formatJson) {
-    ElMessage.error("无法复制空的 json ");
-    return;
+    ElMessage.error('无法复制空的 json ')
+    return
   }
   try {
-    await toClipboard(currentJson.formatJson);
-    ElMessage.success("复制格式化后的 json 到剪贴板成功");
+    await toClipboard(currentJson.formatJson)
+    ElMessage.success('复制格式化后的 json 到剪贴板成功')
   } catch (e) {
-    console.error(e);
-    ElMessage.error("复制格式化后的 json 到剪贴板失败");
+    console.error(e)
+    ElMessage.error('复制格式化后的 json 到剪贴板失败')
   }
 }
 </script>
 
 <style scoped>
-html,
-body {
-  margin: 0;
-  padding: 0;
-  background: #ebedf0;
-  font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', Arial, sans-serif;
-}
-
-#app {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  background: #ebedf0;
-}
-
-.box-card {
-  margin: 1rem auto;
-  width: 80%;
-  flex-grow: 1; /* 关键：让卡片自适应填充父容器的剩余空间，而不是使用固定的计算高度 */
-  min-height: 0; /* 关键：作为 flex item，允许自身收缩，防止内容溢出时布局破坏 */
-  max-width: 1100px;
-  text-align: center;
-  box-shadow: 0 4px 24px 0 rgba(0,0,0,0.08), 0 1.5px 4px 0 rgba(0,0,0,0.03);
-  border-radius: 18px;
-  background: #fff;
-  border: none;
-  padding-bottom: 0.5rem;
-  display: flex;
-  flex-direction: column;
-}
-
-.title {
-  font-size: 2.2rem;
-  font-weight: 700;
-  font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', Arial, sans-serif;
-  margin: 1.2rem 0 0.5rem 0;
-  color: #2d8cf0;
-  letter-spacing: 2px;
-}
-
-.card-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0.7rem 1.2rem 0.3rem 1.2rem;
-  background: transparent;
-  border-bottom: 1px solid #f0f0f0;
-  border-radius: 18px 18px 0 0;
-}
-
-.el-button-list {
-  margin-left: 1rem;
-}
-
-.button {
-  color: #fff;
-  margin-left: 0.7rem;
-  border-radius: 6px;
-  font-weight: 500;
-  box-shadow: 0 2px 8px rgba(45,140,240,0.08);
-  transition: background 0.2s;
-}
-.button:hover {
-  background: #1765ad;
-}
-
-.clear-and-copy-button {
-  margin-left: 1rem;
-  border-radius: 6px;
-  font-weight: 500;
-  box-shadow: 0 2px 8px rgba(45,140,240,0.08);
-  transition: background 0.2s;
-}
-
 .content-row {
   display: flex;
   flex-wrap: wrap;
-  flex-grow: 1; /* 让行填满卡片主体 */
-  min-height: 0; /* 关键：作为 flex item，允许自身收缩，从而将高度限制正确传递给子元素 */
+  flex-grow: 1;
+  min-height: 0;
 }
 
 .el-input-content {
-  font-size: 1.08rem;
-  /* el-col 已经处理了宽度，这里移除固定的宽度限制，让其自适应 */
-  background: #f7f9fc; /* 使用更清爽的背景色 */
-  border-radius: 12px;
-  padding: 1rem; /* 增加内边距，让内容更舒展 */
-  /* min-height: 20px; */
-  min-height: 0; /* 关键：修复 flex 溢出导致滚动条失效的问题 */
+  font-size: 1.05rem;
+  background: rgb(250 250 250 / 0.95);
+  border-radius: 0.75rem;
+  padding: 1rem;
+  min-height: 0;
   display: flex;
   flex-direction: column;
+  border: 1px solid rgb(228 228 231 / 0.95);
+}
+
+@media (prefers-color-scheme: dark) {
+  .el-input-content {
+    background: rgb(24 24 27 / 0.55);
+    border-color: rgb(63 63 70 / 0.85);
+  }
 }
 
 .json-title {
-  font-size: 1.08rem;
-  margin: 0 0 0.3rem 0;
+  font-size: 1.05rem;
+  margin: 0 0 0.5rem 0;
   font-weight: 600;
-  color: #333;
+  color: rgb(63 63 70);
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+@media (prefers-color-scheme: dark) {
+  .json-title {
+    color: rgb(212 212 216);
+  }
+}
+
+/* 按钮：仅黑白灰蓝，冷淡克制 */
+.json-btn.el-button {
+  font-weight: 500;
+  border-radius: 0.375rem;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.json-btn-solid.el-button {
+  background-color: rgb(51 65 85);
+  border-color: rgb(51 65 85);
+  color: rgb(248 250 252);
+}
+
+.json-btn-solid.el-button:hover {
+  background-color: rgb(71 85 105);
+  border-color: rgb(71 85 105);
+  color: rgb(255 255 255);
+}
+
+.json-btn-solid.el-button:focus-visible {
+  outline: 2px solid rgb(100 116 139);
+  outline-offset: 1px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .json-btn-solid.el-button {
+    background-color: rgb(71 85 105);
+    border-color: rgb(100 116 139);
+    color: rgb(244 244 245);
+  }
+
+  .json-btn-solid.el-button:hover {
+    background-color: rgb(100 116 139);
+    border-color: rgb(148 163 184);
+    color: rgb(255 255 255);
+  }
+}
+
+.json-btn-line.el-button.is-plain {
+  --el-button-hover-text-color: rgb(39 39 42);
+  --el-button-hover-bg-color: rgb(244 244 245);
+  --el-button-hover-border-color: rgb(161 161 170);
+  background-color: rgb(255 255 255);
+  border-color: rgb(212 212 216);
+  color: rgb(63 63 70);
+}
+
+.json-btn-line.el-button.is-plain:hover {
+  color: rgb(39 39 42);
+  border-color: rgb(161 161 170);
+  background-color: rgb(244 244 245);
+}
+
+@media (prefers-color-scheme: dark) {
+  .json-btn-line.el-button.is-plain {
+    --el-button-hover-text-color: rgb(250 250 250);
+    --el-button-hover-bg-color: rgb(39 39 42);
+    --el-button-hover-border-color: rgb(113 113 122);
+    background-color: rgb(24 24 27);
+    border-color: rgb(63 63 70);
+    color: rgb(212 212 216);
+  }
+
+  .json-btn-line.el-button.is-plain:hover {
+    color: rgb(250 250 250);
+    border-color: rgb(113 113 122);
+    background-color: rgb(39 39 42);
+  }
+}
+
+.json-btn-line--accent.el-button.is-plain {
+  border-color: rgb(148 163 184);
+  color: rgb(51 65 85);
+}
+
+.json-btn-line--accent.el-button.is-plain:hover {
+  border-color: rgb(100 116 139);
+  color: rgb(30 41 59);
+  background-color: rgb(241 245 249);
+}
+
+@media (prefers-color-scheme: dark) {
+  .json-btn-line--accent.el-button.is-plain {
+    border-color: rgb(100 116 139);
+    color: rgb(203 213 225);
+  }
+
+  .json-btn-line--accent.el-button.is-plain:hover {
+    border-color: rgb(148 163 184);
+    color: rgb(248 250 252);
+    background-color: rgb(30 41 59);
+  }
 }
 
 .el-input-class {
   font-size: 0.98rem;
-  background: #fff;
-  border-radius: 8px;
-  border: 1px solid #e6e8eb;
-  flex-grow: 1; /* 让输入框填满剩余空间 */
-  box-shadow: none; /* 移除阴影，使界面更扁*/
+  flex-grow: 1;
+  min-height: 0;
 }
 
-/* 为 el-input-class 内部的 textarea 设置最小高度，这样选择器更具体，且样式目标明确 */
 .el-input-class :deep(.el-textarea__inner) {
-  /* min-height: 400px; */
-  height: 100% !important; /* 覆盖 element-plus 的内联样式 */
+  height: 100% !important;
+  min-height: 22rem;
+  background: rgb(255 255 255);
+  border-radius: 0.5rem;
+  border: 1px solid rgb(228 228 231);
+  color: rgb(39 39 42);
+  box-shadow: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  .el-input-class :deep(.el-textarea__inner) {
+    background: rgb(24 24 27);
+    border-color: rgb(63 63 70);
+    color: rgb(244 244 245);
+  }
 }
 
 .highlight-json {
   text-align: left;
-  font-size: 1.08rem;
-  background: #f6f8fa;
-  border-radius: 8px;
-  border: 1px solid #e6e8eb;
-  flex-grow: 1; /* 让高亮区域填满剩余空间 */
-  box-shadow: 0 1px 4px rgba(0,0,0,0.02);
-  padding: 0.3rem;
-  overflow-x: auto;
-  overflow-y: auto; /* 内容超出时显示垂直滚动条 */
-  height: 500px; /* 或其他固定/最大高度 */
-  min-height: 0; /* 关键：在 flex 布局中，允许该元素收缩，从而触发 overflow */
-  white-space: pre-wrap; /* 允许长文本换行 */
+  font-size: 0.95rem;
+  background: rgb(255 255 255);
+  border-radius: 0.5rem;
+  border: 1px solid rgb(228 228 231);
+  flex: 1 1 auto;
+  min-height: 22rem;
+  max-height: 70vh;
+  padding: 0.5rem;
+  overflow: auto;
 }
 
-@media (max-width: 900px) {
-  .box-card {
-    width: 98%;
-    padding: 0 0.3rem;
+@media (prefers-color-scheme: dark) {
+  .highlight-json {
+    background: rgb(24 24 27);
+    border-color: rgb(63 63 70);
   }
-  .el-input-content {
-    max-width: 100%;
-    /* min-height: 36px; */
-    padding: 0.2rem 0.1rem 0.1rem 0.1rem;
-  }
-  .el-input-class, .highlight-json {
-    font-size: 0.92rem;
+
+  .highlight-json :deep(pre),
+  .highlight-json :deep(code) {
+    background: transparent !important;
   }
 }
 
-@media (max-width: 600px) {
-  .box-card {
-    width: 100%;
-    margin: 0;
-    border-radius: 0;
-    box-shadow: none;
-  }
-  .card-header {
-    flex-direction: column;
-    align-items: flex-start;
-    padding: 0.5rem 0.2rem 0.2rem 0.2rem;
-  }
-  .title {
-    font-size: 1.1rem;
-    margin: 0.7rem 0 0.3rem 0;
-  }
+@media (max-width: 1023px) {
   .el-input-content {
-    /* min-height: 24px; */
-    padding: 0.1rem 0.05rem 0.05rem 0.05rem;
+    margin-bottom: 1rem;
+  }
+
+  .el-input-content:last-child {
+    margin-bottom: 0;
   }
 }
 </style>

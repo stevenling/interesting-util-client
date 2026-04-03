@@ -317,7 +317,6 @@ const loadYunhuEssayStats = async () => {
 
 onMounted(async () => {
   articles.value = getAllArticles();
-  document.querySelector('body').setAttribute('style', 'background: #EBEDF0');
   loadArticleStats();
   loadYunhuEssayStats();
 });
@@ -327,7 +326,7 @@ onMounted(async () => {
 .article-list {
   width: 100%;
   height: 100vh;
-  background: #EBEDF0;
+  background: var(--site-bg);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -349,14 +348,15 @@ onMounted(async () => {
 /* 列表页标签页 - 蓝白色调 */
 .list-tabs {
   margin-bottom: 0;
-  background: #fff;
+  background: var(--site-surface);
+  border: 1px solid var(--site-border);
   border-radius: 12px;
   padding: 0 16px 4px;
-  box-shadow: 0 2px 12px rgba(64, 158, 255, 0.08);
+  box-shadow: var(--site-card-shadow);
 }
 .list-tabs :deep(.el-tabs__header) {
   margin: 0 0 20px 0;
-  border-bottom: 1px solid #e8f0fe;
+  border-bottom: 1px solid var(--site-border);
 }
 .list-tabs :deep(.el-tabs__nav-wrap::after) {
   display: none;
@@ -367,22 +367,22 @@ onMounted(async () => {
   color: #606266;
 }
 .list-tabs :deep(.el-tabs__item:hover) {
-  color: #409eff;
+  color: var(--site-accent);
 }
 .list-tabs :deep(.el-tabs__item.is-active) {
-  color: #409eff;
+  color: var(--site-accent);
   font-weight: 600;
 }
 .list-tabs :deep(.el-tabs__active-bar) {
-  background: linear-gradient(90deg, #409eff 0%, #66b1ff 100%);
+  background: var(--site-accent);
   height: 3px;
   border-radius: 3px 3px 0 0;
 }
 .list-tabs :deep(.el-tabs__indicator) {
-  background: linear-gradient(90deg, #409eff 0%, #66b1ff 100%);
+  background: var(--site-accent);
 }
 .list-tabs :deep(.el-tabs__ink-bar) {
-  background: linear-gradient(90deg, #409eff 0%, #66b1ff 100%);
+  background: var(--site-accent);
 }
 .list-tabs :deep(.el-tabs__nav) {
   border: none;
@@ -472,8 +472,8 @@ onMounted(async () => {
   cursor: pointer;
   transition: all 0.3s ease;
   border-radius: 12px;
-  border: none;
-  background: white;
+  border: 1px solid var(--site-border);
+  background: var(--site-surface);
 }
 
 .article-card:hover {

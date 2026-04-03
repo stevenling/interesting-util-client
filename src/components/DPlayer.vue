@@ -76,6 +76,11 @@ export default {
 
 <style scoped>
 .dplayer-container {
-  width: 300px;
+  min-height: 100vh;
+  width: 100%;
+  max-width: 100%;
+  padding: 24px;
+  box-sizing: border-box;
+  background: var(--site-bg);
 }
 </style>

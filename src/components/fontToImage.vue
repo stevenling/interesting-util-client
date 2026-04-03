@@ -1,86 +1,213 @@
 <template>
   <div class="font-to-image-container">
     <TopMenu />
+    <header class="page-heading">
+      <div class="page-heading-inner">
+        <div class="page-heading-text">
+          <h1 class="page-title">摘录卡片</h1>
+          <p class="page-desc">
+            输入文字，右侧同步预览；顶部图标可复制或下载图片；「样式设置」调整字号、背景与字体
+          </p>
+        </div>
+        <div class="page-heading-actions">
+          <el-button size="default" class="page-action-btn" @click="openStylePanel">样式设置</el-button>
+          <el-tooltip content="复制到剪贴板" placement="bottom">
+            <el-button
+              circle
+              class="page-icon-btn"
+              aria-label="复制到剪贴板"
+              @click="copyImage"
+            >
+              <el-icon :size="18"><CopyDocument /></el-icon>
+            </el-button>
+          </el-tooltip>
+          <el-tooltip content="下载图片" placement="bottom">
+            <el-button
+              circle
+              type="primary"
+              class="page-icon-btn page-icon-btn--primary"
+              aria-label="下载图片"
+              @click="downloadImage"
+            >
+              <el-icon :size="18"><Download /></el-icon>
+            </el-button>
+          </el-tooltip>
+          <RouterLink to="/utilIndex" class="page-back-link">← 工具列表</RouterLink>
+        </div>
+      </div>
+    </header>
+
     <div class="main-content">
-      <!-- 左侧：文本输入 + 样式设置 -->
       <div class="input-section">
         <div class="input-card">
           <div class="input-header">
-            <h3 class="input-title">文字输入</h3>
-            <div class="input-subtitle">输入摘录或金句，右侧实时预览</div>
+            <span class="card-header-accent" aria-hidden="true" />
+            <div class="card-header-text">
+              <h3 class="input-title">文字输入</h3>
+              <p class="input-subtitle">与右侧预览区域等高，导出与预览一致</p>
+            </div>
           </div>
-          <el-input
-            v-model="inputText"
-            type="textarea"
-            :rows="18"
-            placeholder="输入或粘贴文字，选择背景与字体后点击「生成图片」即可复制或保存"
-            class="input-area"
-          />
-        </div>
-
-        <!-- 控制面板（样式设置） -->
-        <div class="control-panel">
-          <div class="control-header">
-            <h3 class="control-title">样式设置</h3>
-            <div class="control-subtitle">字体、背景与字号</div>
-          </div>
-          
-          <div class="control-content">
-            <div class="control-group">
-              <label class="control-label">字体大小</label>
-              <div class="font-size-controls">
-                <el-button size="small" @click="decreaseFontSize" class="control-btn">A-</el-button>
-                <el-button size="small" @click="increaseFontSize" class="control-btn">A+</el-button>
-              </div>
-            </div>
-
-            <div class="control-group">
-              <label class="control-label">背景类型</label>
-              <el-select v-model="selectedBgType" placeholder="选择背景类型" size="small" class="control-select">
-                <el-option v-for="item in bgTypeOptions" :key="item.value" :label="item.label" :value="item.value" />
-              </el-select>
-            </div>
-
-            <div class="control-group">
-              <label class="control-label">背景样式</label>
-              <el-select v-model="selectedBg" placeholder="选择背景" size="small" class="control-select">
-                <el-option v-for="item in currentBgOptions" :key="item.value" :label="item.label" :value="item.value" />
-              </el-select>
-            </div>
-
-            <div class="control-group">
-              <label class="control-label">字体</label>
-              <el-select v-model="selectedFont" placeholder="选择字体" size="small" class="control-select">
-                <el-option v-for="item in fontOptions" :key="item.value" :label="item.label" :value="item.value" />
-              </el-select>
-            </div>
-
-            <el-button type="primary" class="copy-btn" @click="copyImage" size="default">
-              <span class="btn-text">生成图片</span>
-            </el-button>
+          <div class="input-body">
+            <el-input
+              v-model="inputText"
+              type="textarea"
+              :autosize="false"
+              placeholder="输入或粘贴摘录、金句…"
+              class="input-area-el"
+            />
           </div>
         </div>
       </div>
 
-      <!-- 右侧：预览区域 -->
       <div class="right-section">
         <div class="preview-area">
           <div class="preview-header">
-            <h3 class="preview-title">预览</h3>
-            <div class="preview-subtitle">生成后可直接复制或保存</div>
+            <span class="card-header-accent" aria-hidden="true" />
+            <div class="card-header-text">
+              <h3 class="preview-title">实时预览</h3>
+              <p class="preview-subtitle">生成后将尝试复制到剪贴板；失败时可长按图片保存</p>
+            </div>
           </div>
-          <div
-            ref="imageCardRef"
-            class="preview-card"
-            :class="[selectedBg, { 'preview-card--empty': !inputText.trim() }]"
-          >
-            <div class="preview-text" :style="{ color: computedTextColor, fontFamily: selectedFont || undefined, fontSize: previewFontSize + 'rem' }">
-              {{ inputText || '此处将显示你的文字' }}
+          <div class="preview-body">
+            <div
+              ref="imageCardRef"
+              class="preview-card"
+              :class="[selectedBg, { 'preview-card--empty': !inputText.trim() }]"
+            >
+              <div
+                class="preview-text"
+                :style="{
+                  color: computedTextColor,
+                  fontFamily: selectedFont || undefined,
+                  fontSize: previewFontSize + 'rem',
+                }"
+              >
+                {{ inputText || '预览区域：输入文字后即显示效果' }}
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
+
+    <!-- 样式设置：默认隐藏，点击后遮罩 + 面板 -->
+    <Teleport to="body">
+      <Transition name="style-overlay">
+        <div
+          v-show="showStylePanel"
+          class="style-overlay-root"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="style-panel-title"
+        >
+          <div class="style-mask-bg" @click="closeStylePanel" />
+          <div class="style-drawer-center">
+            <div class="style-drawer" @click.stop>
+              <div class="style-drawer-header">
+                <div class="style-drawer-title-wrap">
+                  <span class="style-drawer-accent" aria-hidden="true" />
+                  <div>
+                    <h2 id="style-panel-title" class="style-drawer-title">样式设置</h2>
+                    <p class="style-drawer-sub">字号、背景与字体</p>
+                  </div>
+                </div>
+                <el-button text type="primary" class="style-drawer-close" @click="closeStylePanel">关闭</el-button>
+              </div>
+              <div class="control-content style-drawer-body">
+                <div class="control-stack">
+                  <label class="control-label">字体大小</label>
+                  <div class="font-size-row">
+                    <el-button size="small" class="control-btn" @click="decreaseFontSize">A−</el-button>
+                    <span class="font-size-pill">{{ previewFontSize.toFixed(1) }} rem</span>
+                    <el-button size="small" class="control-btn" @click="increaseFontSize">A+</el-button>
+                  </div>
+                </div>
+
+                <el-divider class="control-divider" />
+
+                <p class="control-section-label">外观</p>
+                <div class="control-stack">
+                  <label class="control-label">背景类型</label>
+                  <el-select
+                    v-model="selectedBgType"
+                    placeholder="选择背景类型"
+                    size="default"
+                    class="control-select control-select--full"
+                    :popper-class="styleSelectPopperClass"
+                  >
+                    <el-option
+                      v-for="item in bgTypeOptions"
+                      :key="item.value"
+                      :label="item.label"
+                      :value="item.value"
+                    />
+                  </el-select>
+                </div>
+                <div class="control-stack">
+                  <label class="control-label">背景样式</label>
+                  <el-select
+                    v-model="selectedBg"
+                    placeholder="选择背景"
+                    size="default"
+                    class="control-select control-select--full"
+                    filterable
+                    :popper-class="styleSelectPopperClass"
+                  >
+                    <el-option
+                      v-for="item in currentBgOptions"
+                      :key="item.value"
+                      :label="item.label"
+                      :value="item.value"
+                    />
+                  </el-select>
+                </div>
+                <div class="control-stack">
+                  <label class="control-label">字体</label>
+                  <el-select
+                    v-model="selectedFont"
+                    placeholder="选择字体"
+                    size="default"
+                    class="control-select control-select--full"
+                    :popper-class="styleSelectPopperClass"
+                  >
+                    <el-option
+                      v-for="item in fontOptions"
+                      :key="item.value"
+                      :label="item.label"
+                      :value="item.value"
+                    />
+                  </el-select>
+                </div>
+
+                <div class="drawer-export-row">
+                  <el-tooltip content="复制到剪贴板" placement="top">
+                    <el-button
+                      circle
+                      type="primary"
+                      class="drawer-icon-btn"
+                      aria-label="复制到剪贴板"
+                      @click="onCopyFromPanel"
+                    >
+                      <el-icon :size="20"><CopyDocument /></el-icon>
+                    </el-button>
+                  </el-tooltip>
+                  <el-tooltip content="下载图片" placement="top">
+                    <el-button
+                      circle
+                      class="drawer-icon-btn drawer-icon-btn--outline"
+                      aria-label="下载图片"
+                      @click="onDownloadFromPanel"
+                    >
+                      <el-icon :size="20"><Download /></el-icon>
+                    </el-button>
+                  </el-tooltip>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </Transition>
+    </Teleport>
 
     <!-- 移动端图片预览弹窗 -->
     <el-dialog v-model="showImagePreview" title="保存图片" width="90%" center class="preview-dialog">
@@ -95,14 +222,48 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
+import { ref, computed, watch, onMounted, onUnmounted, onBeforeUnmount } from 'vue';
+import { RouterLink } from 'vue-router';
 import html2canvas from 'html2canvas';
 import { ElMessage } from 'element-plus';
+import { CopyDocument, Download } from '@element-plus/icons-vue';
 import TopMenu from './TopMenu.vue';
 
 // 用于移动端 / 桌面弹窗预览图片
 const showImagePreview = ref(false);
 const generatedImageUrl = ref('');
+
+/** 样式设置浮层（默认关闭，点击后遮罩展示） */
+const showStylePanel = ref(false);
+
+/** el-select 下拉 teleport 到 body 时 z-index 需高于 .style-overlay-root(3100) */
+const styleSelectPopperClass = 'font-to-image-style-select-popper';
+
+function openStylePanel() {
+  showStylePanel.value = true;
+}
+
+function closeStylePanel() {
+  showStylePanel.value = false;
+}
+
+function onStylePanelEsc(e) {
+  if (e.key === 'Escape') {
+    closeStylePanel();
+  }
+}
+
+watch(showStylePanel, (open) => {
+  if (open) {
+    document.addEventListener('keydown', onStylePanelEsc);
+  } else {
+    document.removeEventListener('keydown', onStylePanelEsc);
+  }
+});
+
+onBeforeUnmount(() => {
+  document.removeEventListener('keydown', onStylePanelEsc);
+});
 
 // 单屏页：进入时禁止 body 滚动，离开时恢复，避免「能滑一点点」
 onMounted(() => {
@@ -277,74 +438,117 @@ const decreaseFontSize = () => {
 };
 
 /**
- * @function copyImage
- * @description 复制预览区图片到剪贴板
+ * 将预览卡片渲染为 canvas（展开高度以便截全）
+ * @returns {Promise<HTMLCanvasElement | null>}
  */
-const copyImage = async () => {
-  if (!imageCardRef.value) return;
-  // 保存原样式
+async function captureCardToCanvas() {
+  if (!imageCardRef.value) return null;
   const card = imageCardRef.value;
   const originalMaxHeight = card.style.maxHeight;
   const originalOverflowY = card.style.overflowY;
-
-  // 展开内容，确保截图全部内容
   card.style.maxHeight = 'none';
   card.style.overflowY = 'visible';
-
   try {
-    const canvas = await html2canvas(card, {
+    return await html2canvas(card, {
       backgroundColor: '#ffffff',
       useCORS: true,
       scale: 3,
       allowTaint: false,
       foreignObjectRendering: false,
-      logging: false, // 在调试时可以设为 true
+      logging: false,
       imageTimeout: 0,
-      removeContainer: true
+      removeContainer: true,
     });
-
-    // 检测是否为移动设备
-    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-
-    if (isMobile) {
-      // 移动端：显示图片让用户手动保存
-      generatedImageUrl.value = canvas.toDataURL('image/png', 1.0);
-      showImagePreview.value = true;
-      ElMessage.info('请长按图片进行保存或复制');
-    } else {
-      // 桌面端：尝试写入剪贴板；失败时弹出图片供右键保存/复制
-      canvas.toBlob(async (blob) => {
-        if (!blob) {
-          ElMessage.error('图片生成失败');
-          return;
-        }
-        try {
-          await navigator.clipboard.write([
-            new window.ClipboardItem({ 'image/png': blob })
-          ]);
-          ElMessage.success('图片已复制到剪贴板，可直接粘贴');
-        } catch (err) {
-          const msg = err?.message || err?.name || String(err);
-          console.warn('剪贴板写入失败:', err);
-          generatedImageUrl.value = URL.createObjectURL(blob);
-          showImagePreview.value = true;
-          ElMessage.warning({
-            message: `无法写入剪贴板（${msg}），请在弹出的图片上右键「复制图像」或「图片另存为」`,
-            duration: 5000
-          });
-        }
-      }, 'image/png', 1.0);
-    }
   } catch (err) {
     const msg = err?.message || err?.name || String(err);
     console.error('截图失败:', err);
     ElMessage.error(`图片生成失败：${msg}`);
+    return null;
   } finally {
-    // 恢复原样式
     card.style.maxHeight = originalMaxHeight;
     card.style.overflowY = originalOverflowY;
   }
+}
+
+/**
+ * @description 复制预览区图片到剪贴板
+ */
+const copyImage = async () => {
+  const canvas = await captureCardToCanvas();
+  if (!canvas) return;
+
+  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+    navigator.userAgent
+  );
+
+  if (isMobile) {
+    generatedImageUrl.value = canvas.toDataURL('image/png', 1.0);
+    showImagePreview.value = true;
+    ElMessage.info('请长按图片进行保存或复制');
+    return;
+  }
+
+  canvas.toBlob(async (blob) => {
+    if (!blob) {
+      ElMessage.error('图片生成失败');
+      return;
+    }
+    try {
+      await navigator.clipboard.write([new window.ClipboardItem({ 'image/png': blob })]);
+      ElMessage.success('图片已复制到剪贴板，可直接粘贴');
+    } catch (err) {
+      const msg = err?.message || err?.name || String(err);
+      console.warn('剪贴板写入失败:', err);
+      generatedImageUrl.value = URL.createObjectURL(blob);
+      showImagePreview.value = true;
+      ElMessage.warning({
+        message: `无法写入剪贴板（${msg}），请在弹出的图片上右键「复制图像」或「图片另存为」`,
+        duration: 5000,
+      });
+    }
+  }, 'image/png', 1.0);
 };
+
+/**
+ * @description 下载预览区截图为 PNG
+ */
+const downloadImage = async () => {
+  const canvas = await captureCardToCanvas();
+  if (!canvas) return;
+
+  canvas.toBlob(
+    (blob) => {
+      if (!blob) {
+        ElMessage.error('图片生成失败');
+        return;
+      }
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      const t = new Date();
+      const pad = (n) => String(n).padStart(2, '0');
+      a.download = `摘录卡片-${t.getFullYear()}${pad(t.getMonth() + 1)}${pad(t.getDate())}-${pad(t.getHours())}${pad(t.getMinutes())}${pad(t.getSeconds())}.png`;
+      a.href = url;
+      a.style.display = 'none';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      ElMessage.success('已下载图片');
+    },
+    'image/png',
+    1.0
+  );
+};
+
+async function onCopyFromPanel() {
+  await copyImage();
+  closeStylePanel();
+}
+
+async function onDownloadFromPanel() {
+  await downloadImage();
+  closeStylePanel();
+}
 
 /**
  * @description 字体选项
@@ -453,24 +657,95 @@ const computedTextColor = computed(() => bgTextColorMap[selectedBg.value] || '#2
 </script>
 
 <style scoped>
-/* 单屏布局：禁止整页滚动，内容全部在一屏内 */
 .font-to-image-container {
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  padding: 16px 20px;
-  background: linear-gradient(160deg, #f0f4f8 0%, #e2e8f0 50%, #cbd5e1 100%);
+  align-items: stretch;
+  padding: 0 20px 16px;
+  background: var(--site-bg);
   height: 100vh;
   max-height: 100vh;
   overflow: hidden;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial,
+    sans-serif;
 }
 
-/* 主内容区：左右分栏，占满剩余高度，不超出视口 */
+.page-heading {
+  flex-shrink: 0;
+  padding: 12px 0 14px;
+  border-bottom: 1px solid var(--site-border);
+  margin-bottom: 4px;
+}
+
+.page-heading-inner {
+  max-width: 1360px;
+  margin: 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px 20px;
+}
+
+.page-title {
+  margin: 0 0 4px;
+  font-size: 1.35rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--site-heading);
+}
+
+.page-desc {
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--site-muted);
+}
+
+.page-back-link {
+  font-size: 0.875rem;
+  color: var(--site-muted);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color 0.15s ease;
+}
+
+.page-back-link:hover {
+  color: var(--site-accent);
+}
+
+.page-heading-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.page-icon-btn.el-button.is-circle {
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 1px solid var(--site-border);
+  background: var(--site-surface-solid);
+  color: var(--site-heading);
+}
+
+.page-icon-btn.el-button.is-circle:hover {
+  border-color: rgb(37 99 235 / 0.45);
+  color: var(--site-accent);
+  background: var(--site-surface);
+}
+
+.page-icon-btn--primary.el-button.is-circle {
+  border-color: transparent;
+  box-shadow: 0 4px 12px rgb(37 99 235 / 0.28);
+}
+
 .main-content {
   display: flex;
-  gap: 32px;
+  gap: 24px;
   width: 100%;
   max-width: 1360px;
   margin: 0 auto;
@@ -479,269 +754,265 @@ const computedTextColor = computed(() => bgTextColorMap[selectedBg.value] || '#2
   flex: 1;
   min-height: 0;
   overflow: hidden;
-}
-
-.input-section {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  align-items: center;
-  min-height: 0;
-}
-
-.input-card {
-  width: 100%;
-  max-width: 460px;
-  background: rgba(255, 255, 255, 0.98);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.4);
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.04);
-  border-radius: 20px;
-  overflow: hidden;
-  transition: box-shadow 0.25s ease, transform 0.25s ease;
-  display: flex;
-  flex-direction: column;
-}
-
-.input-area {
-  flex: 1;
-  padding: 20px 25px;
-  font-size: 1rem;
-  line-height: 1.6;
-  color: #333;
-  border: none;
-  resize: none;
-  outline: none;
+  padding: 12px 12px 16px;
   box-sizing: border-box;
-  background: transparent;
 }
 
+.input-section,
 .right-section {
-  flex: 1;
+  flex: 1 1 0;
   display: flex;
   flex-direction: column;
-  gap: 16px;
   min-height: 0;
-  max-width: 460px;
+  min-width: 0;
 }
 
-.input-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08), 0 4px 12px rgba(0, 0, 0, 0.04);
-}
-
-.input-header {
-  padding: 22px 24px;
-  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-  color: white;
-  text-align: center;
-  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.25);
-}
-
-.input-title {
-  font-size: 1.25rem;
-  font-weight: 600;
-  margin: 0 0 6px 0;
-  letter-spacing: 0.02em;
-}
-
-.input-subtitle {
-  font-size: 0.85rem;
-  opacity: 0.92;
-  color: rgba(255, 255, 255, 0.95);
-}
-
-
-
-.input-area:focus {
-  background: rgba(255, 255, 255, 0.05);
-}
-
-.control-panel {
-  width: 100%;
-  flex-shrink: 0;
-  min-height: 0;
-  background: rgba(255, 255, 255, 0.98);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.4);
-  border-radius: 20px;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.04);
-  display: flex;
-  flex-direction: column;
-  transition: box-shadow 0.25s ease, transform 0.25s ease;
-  overflow: visible;
-}
-
-.control-content {
-  flex: 1;
-  padding: 18px 22px 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  overflow: visible;
-}
-
-.control-panel:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08), 0 4px 12px rgba(0, 0, 0, 0.04);
-}
-
-.control-header {
-  padding: 20px 24px;
-  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-  color: white;
-  text-align: center;
-  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.25);
-}
-
-.control-title {
-  font-size: 1.25rem;
-  font-weight: 600;
-  margin: 0 0 6px 0;
-  letter-spacing: 0.02em;
-}
-
-.control-subtitle {
-  font-size: 0.85rem;
-  opacity: 0.92;
-  color: rgba(255, 255, 255, 0.95);
-}
-
-.control-group {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-  padding: 2px 0;
-}
-
-.control-label {
-  font-size: 0.9rem;
-  color: #475569;
-  font-weight: 500;
-  min-width: 72px;
-  line-height: 1.4;
-}
-
-.font-size-controls {
-  display: flex;
-  gap: 6px;
-}
-
-.control-btn {
-  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-  border: none;
-  color: white;
-  font-weight: 600;
-  padding: 6px 12px;
-  border-radius: 8px;
-  font-size: 0.8rem;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.control-btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
-}
-
-.control-select {
-  width: 100%;
-  max-width: 160px;
-  min-width: 140px;
-}
-
-.control-select :deep(.el-input__wrapper) {
-  background: rgba(255, 255, 255, 0.9);
-  border: 1px solid rgba(99, 102, 241, 0.2);
-  border-radius: 8px;
-  padding: 6px 10px;
-  min-height: 32px;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
-}
-
-.control-select :deep(.el-input__wrapper:hover) {
-  border-color: rgba(99, 102, 241, 0.4);
-  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.12);
-}
-
-.copy-btn {
-  width: 100%;
-  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-  border: none;
-  color: white;
-  font-size: 0.95rem;
-  font-weight: 600;
-  padding: 12px 20px;
-  border-radius: 12px;
-  cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-top: 8px;
-  min-height: 44px;
-  box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35);
-}
-
-.copy-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(99, 102, 241, 0.45);
-}
-
-.copy-btn:active {
-  transform: translateY(0);
-}
-
-.copy-btn .btn-text {
-  margin-left: 8px;
-}
-
+.input-card,
 .preview-area {
   width: 100%;
   flex: 1;
   min-height: 0;
-  background: rgba(255, 255, 255, 0.98);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.4);
-  border-radius: 20px;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.04);
+  display: flex;
+  flex-direction: column;
+}
+
+.input-card {
+  flex: 1;
+  min-height: 0;
+  margin: 0 10px;
+  background: var(--site-surface);
+  border: 1px solid var(--site-border);
+  box-shadow: var(--site-card-shadow);
+  border-radius: 16px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  transition: box-shadow 0.25s ease, transform 0.25s ease;
+  transition: box-shadow 0.2s ease;
+}
+
+.input-card:hover {
+  box-shadow: 0 4px 20px rgb(15 23 42 / 0.08);
+}
+
+.preview-area {
+  margin: 0 10px;
+  background: var(--site-surface);
+  border: 1px solid var(--site-border);
+  border-radius: 16px;
+  box-shadow: var(--site-card-shadow);
+  overflow: hidden;
+  transition: box-shadow 0.2s ease;
 }
 
 .preview-area:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08), 0 4px 12px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 4px 20px rgb(15 23 42 / 0.08);
 }
 
+.input-header,
 .preview-header {
-  padding: 20px 24px;
-  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-  color: white;
-  text-align: center;
-  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.25);
+  display: flex;
+  align-items: stretch;
+  flex-shrink: 0;
+  background: var(--site-surface-solid);
+  border-bottom: 1px solid var(--site-border);
 }
 
+.card-header-accent {
+  width: 4px;
+  flex-shrink: 0;
+  background: var(--site-accent);
+}
+
+.card-header-text {
+  flex: 1;
+  padding: 14px 16px 14px 14px;
+  text-align: left;
+  min-width: 0;
+}
+
+.input-title,
 .preview-title {
-  font-size: 1.25rem;
+  font-size: 1.05rem;
   font-weight: 600;
-  margin: 0 0 6px 0;
-  letter-spacing: 0.02em;
+  margin: 0 0 4px;
+  color: var(--site-heading);
+  letter-spacing: -0.01em;
 }
 
+.input-subtitle,
 .preview-subtitle {
-  font-size: 0.85rem;
-  opacity: 0.92;
-  color: rgba(255, 255, 255, 0.95);
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  margin: 0;
+  color: var(--site-muted);
+}
+
+.input-body {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 12px 14px 14px;
+}
+
+.input-area-el {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+}
+
+.input-area-el :deep(.el-textarea) {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.input-area-el :deep(.el-textarea__inner) {
+  flex: 1;
+  min-height: 0;
+  height: 100% !important;
+  border-radius: 12px;
+  padding: 12px 14px;
+  font-size: 0.9375rem;
+  line-height: 1.65;
+  color: var(--site-heading);
+  border: 1px solid var(--site-border);
+  background: var(--site-surface-solid);
+  box-shadow: none;
+  resize: none;
+}
+
+.input-area-el :deep(.el-textarea__inner:focus) {
+  border-color: rgb(37 99 235 / 0.45);
+  box-shadow: 0 0 0 1px rgb(37 99 235 / 0.12);
+}
+
+.control-content {
+  padding: 12px 14px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.control-divider {
+  margin: 12px 0;
+}
+
+.control-section-label {
+  margin: 0 0 8px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--site-muted);
+}
+
+.control-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.control-stack:last-of-type {
+  margin-bottom: 4px;
+}
+
+.control-label {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--site-heading);
+  line-height: 1.3;
+}
+
+.font-size-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.font-size-pill {
+  min-width: 4.75rem;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--site-heading);
+  padding: 7px 12px;
+  border-radius: 999px;
+  background: rgb(37 99 235 / 0.09);
+  border: 1px solid rgb(37 99 235 / 0.2);
+}
+
+.control-btn {
+  min-width: 40px;
+  font-weight: 600;
+}
+
+.control-select--full {
+  width: 100%;
+  max-width: 100%;
+}
+
+.control-select :deep(.el-input__wrapper) {
+  border-radius: 10px;
+  border: 1px solid var(--site-border);
+  background: var(--site-surface-solid);
+  box-shadow: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.control-select :deep(.el-input__wrapper:hover) {
+  border-color: rgb(37 99 235 / 0.35);
+}
+
+.control-select :deep(.el-input__wrapper.is-focus) {
+  border-color: var(--site-accent);
+  box-shadow: 0 0 0 1px rgb(37 99 235 / 0.15);
+}
+
+.drawer-export-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 18px;
+  padding-top: 4px;
+}
+
+.drawer-icon-btn.el-button.is-circle {
+  width: 44px;
+  height: 44px;
+  padding: 0;
+}
+
+.drawer-icon-btn--outline.el-button.is-circle {
+  border: 1px solid var(--site-border);
+  background: var(--site-surface-solid);
+  color: var(--site-heading);
+}
+
+.drawer-icon-btn--outline.el-button.is-circle:hover {
+  border-color: rgb(37 99 235 / 0.45);
+  color: var(--site-accent);
+}
+
+.preview-body {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 12px 14px 14px;
+  box-sizing: border-box;
 }
 
 .preview-card {
   flex: 1;
   min-height: 0;
-  padding: 22px;
+  margin: 0;
+  padding: 20px;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -752,8 +1023,8 @@ const computedTextColor = computed(() => bgTextColorMap[selectedBg.value] || '#2
   background-repeat: no-repeat;
   box-sizing: border-box;
   overflow-y: auto;
-  margin: 14px;
-  border-radius: 14px;
+  border-radius: 12px;
+  outline: 1px solid rgb(15 23 42 / 0.06);
   transition: opacity 0.2s ease;
 }
 
@@ -768,11 +1039,130 @@ const computedTextColor = computed(() => bgTextColorMap[selectedBg.value] || '#2
   margin: 0;
   word-break: break-all;
   white-space: pre-wrap;
-  min-height: 120px;
+  min-height: 0;
   width: 100%;
   transition: color 0.2s;
   flex: 1;
   text-align: left;
+}
+
+/* 样式设置：全屏遮罩 + 居中面板 */
+.style-overlay-root {
+  position: fixed;
+  inset: 0;
+  z-index: 3100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right))
+    max(16px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+}
+
+.style-mask-bg {
+  position: absolute;
+  inset: 0;
+  background: rgb(15 23 42 / 0.48);
+  backdrop-filter: blur(4px);
+  cursor: pointer;
+}
+
+.style-drawer-center {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 440px;
+  max-height: min(88vh, 720px);
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.style-drawer {
+  pointer-events: auto;
+  cursor: default;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  max-height: min(88vh, 720px);
+  background: var(--site-surface);
+  border: 1px solid var(--site-border);
+  border-radius: 16px;
+  box-shadow: 0 24px 48px rgb(15 23 42 / 0.2);
+  overflow: hidden;
+}
+
+.style-drawer-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 14px 12px;
+  border-bottom: 1px solid var(--site-border);
+  background: var(--site-surface-solid);
+  flex-shrink: 0;
+}
+
+.style-drawer-title-wrap {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  min-width: 0;
+}
+
+.style-drawer-accent {
+  width: 4px;
+  flex-shrink: 0;
+  background: var(--site-accent);
+  border-radius: 2px;
+  margin-right: 10px;
+}
+
+.style-drawer-title {
+  margin: 0 0 4px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--site-heading);
+  letter-spacing: -0.01em;
+}
+
+.style-drawer-sub {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--site-muted);
+  line-height: 1.45;
+}
+
+.style-drawer-close {
+  flex-shrink: 0;
+}
+
+.style-drawer-body {
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
+  -webkit-overflow-scrolling: touch;
+}
+
+.style-overlay-enter-active,
+.style-overlay-leave-active {
+  transition: opacity 0.22s ease;
+}
+
+.style-overlay-enter-active .style-drawer,
+.style-overlay-leave-active .style-drawer {
+  transition: transform 0.22s ease, opacity 0.22s ease;
+}
+
+.style-overlay-enter-from,
+.style-overlay-leave-to {
+  opacity: 0;
+}
+
+.style-overlay-enter-from .style-drawer,
+.style-overlay-leave-to .style-drawer {
+  opacity: 0;
+  transform: scale(0.96) translateY(8px);
 }
 
 .quote-mark {
@@ -809,30 +1199,31 @@ const computedTextColor = computed(() => bgTextColorMap[selectedBg.value] || '#2
 }
 
 .preview-dialog :deep(.el-dialog__header) {
-  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-  color: white;
+  background: var(--site-surface-solid);
+  color: var(--site-heading);
   padding: 20px 25px;
+  border-bottom: 1px solid var(--site-border);
 }
 
 .preview-dialog :deep(.el-dialog__title) {
-  color: white;
+  color: var(--site-heading);
   font-weight: 600;
   font-size: 1.2rem;
 }
 
 .preview-dialog :deep(.el-dialog__body) {
   padding: 25px;
-  background: #f8f9fa;
+  background: var(--site-bg);
 }
 
 .preview-dialog :deep(.el-dialog__footer) {
-  background: #f8f9fa;
-  border-top: 1px solid #eee;
+  background: var(--site-bg);
+  border-top: 1px solid var(--site-border);
   padding: 20px 25px;
 }
 
 .preview-dialog .dialog-btn {
-  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  background: var(--site-accent);
   border: none;
   color: white;
   font-weight: 600;
@@ -843,7 +1234,7 @@ const computedTextColor = computed(() => bgTextColorMap[selectedBg.value] || '#2
 
 .preview-dialog .dialog-btn:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+  box-shadow: 0 4px 12px rgb(37 99 235 / 0.35);
 }
 
 .preview-image {
@@ -1106,11 +1497,7 @@ const computedTextColor = computed(() => bgTextColorMap[selectedBg.value] || '#2
 @media (max-width: 1200px) {
   .main-content {
     max-width: 1000px;
-    gap: 25px;
-  }
-  
-  .input-card, .control-panel, .preview-area {
-    max-width: 350px;
+    gap: 20px;
   }
 }
 
@@ -1118,74 +1505,89 @@ const computedTextColor = computed(() => bgTextColorMap[selectedBg.value] || '#2
   .font-to-image-container {
     padding: 12px 16px;
   }
-  
+
   .main-content {
     flex-direction: column;
-    align-items: center;
+    align-items: stretch;
     gap: 12px;
   }
-  
-  .input-section, .right-section {
+
+  .input-section,
+  .right-section {
     width: 100%;
-    max-width: 600px;
+    max-width: 640px;
+    margin-left: auto;
+    margin-right: auto;
+    flex: 1 1 0;
     min-height: 0;
   }
-  
-  .input-card {
-    max-height: 100%;
-    max-width: 100%;
+
+  .input-card,
+  .preview-area {
+    flex: 1 1 0;
+    min-height: 200px;
+    margin: 0 8px;
   }
-  
+
   .right-section {
     order: 1;
   }
-  
+
   .input-section {
     order: 2;
-  }
-  
-  .control-panel, .preview-area {
-    max-width: 100%;
-  }
-  
-  .preview-area {
-    min-height: 120px;
   }
 }
 
 @media (max-width: 600px) {
   .font-to-image-container {
-    padding: 10px;
+    padding: 8px 12px 12px;
   }
-  
+
+  .page-heading {
+    padding: 8px 0 10px;
+  }
+
+  .page-title {
+    font-size: 1.2rem;
+  }
+
   .main-content {
-    gap: 15px;
+    gap: 12px;
+    padding: 8px 6px 12px;
   }
-  
-  .input-card, .preview-area, .control-panel {
+
+  .input-card,
+  .preview-area {
+    margin: 0 6px;
     border-radius: 12px;
   }
-  
-  .input-header, .control-header, .preview-header {
-    padding: 15px 20px;
+
+  .card-header-text {
+    padding: 12px 12px 12px 10px;
   }
-  
-  .input-area, .preview-card {
-    padding: 15px 20px;
+
+  .input-body {
+    padding: 10px 12px 12px;
   }
-  
+
+  .preview-card {
+    margin: 10px;
+    padding: 16px;
+  }
+
   .control-content {
-    padding: 15px 20px;
+    padding: 10px 12px 12px;
   }
-  
-  .control-group {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
-  }
-  
+
   .control-select {
     max-width: 100%;
   }
+}
+</style>
+
+<!-- 下拉挂在 body 上，scoped 选不中；z-index 须高于 .style-overlay-root -->
+<style>
+.font-to-image-style-select-popper {
+  z-index: 5000 !important;
 }
 </style>

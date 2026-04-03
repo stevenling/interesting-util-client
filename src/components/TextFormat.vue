@@ -46,17 +46,13 @@
 
 <script>
 import moment from "moment"; // 引入 moment 处理时间
-import { onMounted, watch, reactive } from "vue";
+import { watch, reactive } from "vue";
 import { ElMessage } from "element-plus";
 import useClipboard from "vue-clipboard3"; // 引入剪切板处理
 
 export default {
   setup() {
     let currentText = reactive({ oldText: "", formatText: "" });
-    onMounted(() => {
-      document.querySelector("body").setAttribute("style", "background: #EBEDF0");
-    });
-
     /**
      * 监听原来的未格式化的文本，必须使用 try catch 异常处理，否则会报错
      * 用箭头函数来监听 reactive 中的某个基本数据
@@ -142,7 +138,6 @@ export default {
 
     return {
       currentText,
-      onMounted,
       clickDownload,
       clickClear,
       clickCopy,
@@ -159,7 +154,8 @@ body {
 }
 
 .app {
-  background: #ebedf0;
+  min-height: 100vh;
+  background: var(--site-bg);
 }
 
 .box-card {

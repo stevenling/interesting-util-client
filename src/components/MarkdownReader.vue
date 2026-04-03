@@ -57,7 +57,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed } from 'vue';
 import { ElMessage } from 'element-plus';
 import { UploadFilled, ArrowLeft, Document } from '@element-plus/icons-vue';
 import TopMenu from './TopMenu.vue';
@@ -280,15 +280,12 @@ const handleExportPDF = async () => {
   }
 };
 
-onMounted(() => {
-  document.querySelector('body').setAttribute('style', 'background: #EBEDF0');
-});
 </script>
 
 <style scoped>
 .markdown-reader {
   min-height: 100vh;
-  background: #EBEDF0;
+  background: var(--site-bg);
 }
 
 .reader-container {
@@ -306,10 +303,11 @@ onMounted(() => {
 }
 
 .upload-card {
-  background: white;
+  background: var(--site-surface);
+  border: 1px solid var(--site-border);
   border-radius: 12px;
   padding: 40px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--site-card-shadow);
   text-align: center;
   max-width: 500px;
   width: 100%;
@@ -364,9 +362,10 @@ onMounted(() => {
 
 /* 阅读区域样式 */
 .reading-section {
-  background: white;
+  background: var(--site-surface);
+  border: 1px solid var(--site-border);
   border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--site-card-shadow);
   overflow: hidden;
 }
 
@@ -375,8 +374,8 @@ onMounted(() => {
   align-items: center;
   gap: 10px;
   padding: 15px 20px;
-  border-bottom: 1px solid #e4e7ed;
-  background: #f5f7fa;
+  border-bottom: 1px solid var(--site-border);
+  background: var(--site-surface-solid);
 }
 
 .filename {
@@ -390,7 +389,7 @@ onMounted(() => {
   padding: 40px;
   max-height: calc(100vh - 200px);
   overflow-y: auto;
-  background: #ffffff;
+  background: var(--site-surface-solid);
 }
 
 .markdown-content {

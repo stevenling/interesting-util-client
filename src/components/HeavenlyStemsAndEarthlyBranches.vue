@@ -238,7 +238,8 @@ body {
 }
 
 .app {
-  background: #ebedf0;
+  min-height: 100vh;
+  background: var(--site-bg);
 }
 
 .box-card {

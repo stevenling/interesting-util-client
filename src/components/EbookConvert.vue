@@ -277,7 +277,7 @@ function downloadBlob(blob, filename) {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: transparent;
 }
 
 .main-container {
@@ -288,19 +288,22 @@ function downloadBlob(blob, filename) {
 .hero-section {
   text-align: center;
   padding: 24px 20px 16px;
-  color: white;
+  color: var(--site-heading);
+  border-bottom: 1px solid var(--site-border);
 }
 
 .title {
   font-size: 2rem;
   font-weight: bold;
   margin-bottom: 0.5rem;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+  color: var(--site-heading);
+  text-shadow: none;
 }
 
 .subtitle {
   font-size: 1rem;
-  opacity: 0.9;
+  color: var(--site-muted);
+  opacity: 1;
 }
 
 .content-container {
@@ -313,8 +316,9 @@ function downloadBlob(blob, filename) {
 .options-card {
   margin-bottom: 20px;
   border-radius: 12px;
-  border: none;
-  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid var(--site-border);
+  background: var(--site-surface);
+  box-shadow: var(--site-card-shadow);
 }
 
 .card-header {
@@ -357,8 +361,8 @@ function downloadBlob(blob, filename) {
 }
 
 .option-item:hover:not(.disabled) {
-  border-color: #667eea;
-  background: #f0f2ff;
+  border-color: var(--site-accent);
+  background: rgb(37 99 235 / 0.06);
 }
 
 .option-item.disabled {
@@ -366,8 +370,8 @@ function downloadBlob(blob, filename) {
 }
 
 .option-item.converting {
-  border-color: #667eea;
-  background: #e8ebff;
+  border-color: var(--site-accent);
+  background: rgb(37 99 235 / 0.1);
 }
 
 .option-label {
@@ -385,8 +389,9 @@ function downloadBlob(blob, filename) {
 .progress-card {
   margin-bottom: 20px;
   border-radius: 12px;
-  border: none;
-  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid var(--site-border);
+  background: var(--site-surface);
+  box-shadow: var(--site-card-shadow);
 }
 
 .progress-card--sticky {

@@ -73,6 +73,26 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
+.common-layout {
+  min-height: 100vh;
+  background: var(--site-bg);
+  color: var(--site-heading);
+}
+
+.common-layout :deep(.el-header) {
+  background: var(--site-surface);
+  border-bottom: 1px solid var(--site-border);
+  color: var(--site-heading);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.common-layout :deep(.el-main) {
+  padding: 32px 24px;
+}
+
 .mx-1 {
   justify-content: center;
 }

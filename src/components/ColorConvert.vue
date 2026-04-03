@@ -3,7 +3,6 @@
         <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
         <el-breadcrumb-item :to="{ path: '/ColorConvert' }">颜色进制转换</el-breadcrumb-item>
     </el-breadcrumb> -->
-  <TopMenu></TopMenu>
   <div id="app">
     <el-card class="box-card">
       <template #header>
@@ -99,12 +98,8 @@
 import { watch, ref } from "vue";
 import { ElMessage } from "element-plus";
 import useClipboard from "vue-clipboard3";
-import TopMenu from "./TopMenu.vue";
 
 export default {
-  components: {
-    TopMenu,
-  },
   setup() {
     const selectColor = ref("#FFFFFF");
     const inputHexColor = ref("");
@@ -299,7 +294,8 @@ body {
 }
 
 .app {
-  background: #ebedf0;
+  min-height: 100vh;
+  background: var(--site-bg);
 }
 
 .box-card {

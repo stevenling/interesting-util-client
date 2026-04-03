@@ -1,6 +1,16 @@
 import { mount } from '@vue/test-utils'
+import { createRouter, createMemoryHistory } from 'vue-router'
+import ElementPlus from 'element-plus'
 import JsonFormat from '../JsonFormat.vue'
 import { ElMessage } from 'element-plus'
+
+const router = createRouter({
+  history: createMemoryHistory(),
+  routes: [
+    { path: '/', component: { template: '<div />' } },
+    { path: '/utilIndex', component: { template: '<div />' } },
+  ],
+})
 
 // A custom stub for ElInput to ensure a textarea is rendered for testing v-model
 const ElInputStub = {
@@ -11,14 +21,17 @@ const ElInputStub = {
 // Create a stable mock function for toClipboard
 const mockToClipboard = jest.fn()
 
-// Mock element-plus message
-jest.mock('element-plus', () => ({
-  ElMessage: {
-    error: jest.fn(),
-    success: jest.fn(),
-    info: jest.fn()
+jest.mock('element-plus', () => {
+  const actual = jest.requireActual('element-plus')
+  return {
+    ...actual,
+    ElMessage: {
+      error: jest.fn(),
+      success: jest.fn(),
+      info: jest.fn(),
+    },
   }
-}))
+})
 
 // Mock vue-clipboard3
 jest.mock('vue-clipboard3', () => ({
@@ -38,16 +51,9 @@ describe('JsonFormat.vue', () => {
     jest.useFakeTimers();
     wrapper = mount(JsonFormat, {
       global: {
+        plugins: [router, ElementPlus],
         stubs: {
-          // Stub child components to isolate the test and avoid errors
-          // like "failed to resolve component" or router injection issues.
-          TopMenu: true,
-          ElCard: true,
-          ElRow: true,
-          ElCol: true,
-          ElButton: true,
           highlightjs: true,
-          // Use a custom stub for ElInput to allow finding the textarea
           ElInput: ElInputStub,
         }
       }
@@ -92,15 +98,14 @@ describe('JsonFormat.vue', () => {
       await jest.runAllTimers();
 
       // Click clear button
-      // Find the clear button by its specific type
-      await wrapper.find('.clear-and-copy-button[type="danger"]').trigger('click')
+      await wrapper.find('[data-testid="json-format-clear"]').trigger('click')
 
       expect(wrapper.vm.currentJson.oldJson).toBe('')
       expect(wrapper.vm.currentJson.formatJson).toBe('')
     })
 
     it('should show info message when trying to clear empty input', async () => {
-      await wrapper.find('.clear-and-copy-button[type="danger"]').trigger('click')
+      await wrapper.find('[data-testid="json-format-clear"]').trigger('click')
       expect(ElMessage.info).toHaveBeenCalledWith('已经清空了，没必要再次清空')
     })
   })
@@ -113,14 +118,14 @@ describe('JsonFormat.vue', () => {
       wrapper.vm.currentJson.formatJson = formattedJson
 
       // Click copy button
-      await wrapper.find('.clear-and-copy-button[type="success"]').trigger('click')
+      await wrapper.find('[data-testid="json-format-copy"]').trigger('click')
 
       expect(mockToClipboard).toHaveBeenCalledWith(formattedJson)
       expect(ElMessage.success).toHaveBeenCalledWith('复制格式化后的 json 到剪贴板成功')
     })
 
     it('should show error when trying to copy empty JSON', async () => {
-      await wrapper.find('.clear-and-copy-button[type="success"]').trigger('click')
+      await wrapper.find('[data-testid="json-format-copy"]').trigger('click')
       expect(ElMessage.error).toHaveBeenCalledWith('无法复制空的 json ')
     })
   })
@@ -130,33 +135,37 @@ describe('JsonFormat.vue', () => {
       const formattedJson = '{\n    "test": "value"\n}'
       wrapper.vm.currentJson.formatJson = formattedJson
 
-      // Mock URL.createObjectURL
-      const mockCreateObjectURL = jest.fn()
+      const mockCreateObjectURL = jest.fn().mockReturnValue('blob:mock')
+      const prevCreate = URL.createObjectURL
+      const prevRevoke = URL.revokeObjectURL
       URL.createObjectURL = mockCreateObjectURL
+      URL.revokeObjectURL = jest.fn()
 
-      // Mock document.createElement and appendChild
-      const mockAppendChild = jest.fn()
-      const mockRemoveChild = jest.fn()
       const mockClick = jest.fn()
-      document.createElement = jest.fn(() => ({
-        download: '',
-        style: {},
-        href: '',
-        click: mockClick
-      }))
-      document.body.appendChild = mockAppendChild
-      document.body.removeChild = mockRemoveChild
+      const realCreateElement = document.createElement.bind(document)
+      const createSpy = jest.spyOn(document, 'createElement').mockImplementation((tag) => {
+        if (tag === 'a') {
+          const el = realCreateElement('a')
+          el.click = mockClick
+          return el
+        }
+        return realCreateElement(tag)
+      })
 
-      await wrapper.find('.button[type="primary"]').trigger('click')
+      try {
+        await wrapper.find('[data-testid="json-format-download"]').trigger('click')
 
-      expect(mockCreateObjectURL).toHaveBeenCalled()
-      expect(mockAppendChild).toHaveBeenCalled()
-      expect(mockClick).toHaveBeenCalled()
-      expect(mockRemoveChild).toHaveBeenCalled()
+        expect(mockCreateObjectURL).toHaveBeenCalled()
+        expect(mockClick).toHaveBeenCalled()
+      } finally {
+        createSpy.mockRestore()
+        URL.createObjectURL = prevCreate
+        URL.revokeObjectURL = prevRevoke
+      }
     })
 
     it('should show error when trying to download empty JSON', async () => {
-      await wrapper.find('.button[type="primary"]').trigger('click')
+      await wrapper.find('[data-testid="json-format-download"]').trigger('click')
       expect(ElMessage.error).toHaveBeenCalledWith('下载空 Json 没有意义')
     })
   })

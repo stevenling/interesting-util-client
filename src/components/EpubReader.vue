@@ -1135,6 +1135,7 @@ const showTooltipAtSelection = async () => {
   overflow: hidden;
   margin: 0;
   padding: 0;
+  background: var(--site-bg);
 }
 
 /* 确保TopMenu有固定高度 */
@@ -1172,7 +1173,7 @@ const showTooltipAtSelection = async () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--site-bg);
   padding: 20px;
   overflow: hidden;
   min-height: 0;
@@ -1180,12 +1181,13 @@ const showTooltipAtSelection = async () => {
 }
 
 .upload-card {
-  background: rgba(255, 255, 255, 0.95);
+  background: var(--site-surface);
+  border: 1px solid var(--site-border);
   backdrop-filter: blur(10px);
   border-radius: 16px;
   padding: 40px;
   text-align: center;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+  box-shadow: var(--site-card-shadow);
   max-width: 500px;
   width: 100%;
 }
@@ -1210,7 +1212,7 @@ const showTooltipAtSelection = async () => {
   flex: 1;
   display: flex;
   flex-direction: column;
-  background: #f5f5f5;
+  background: var(--site-bg);
   overflow: hidden;
   min-height: 0;
   margin: 0;

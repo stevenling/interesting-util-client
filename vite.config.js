@@ -1,6 +1,7 @@
 /* eslint-env node */
 import { defineConfig, loadEnv } from 'vite'
 import vue from '@vitejs/plugin-vue'
+import tailwindcss from '@tailwindcss/vite'
 import { resolve } from 'path'
 
 export default defineConfig(({ mode }) => {
@@ -17,7 +18,7 @@ export default defineConfig(({ mode }) => {
 
   return {
     base,
-    plugins: [vue()],
+    plugins: [tailwindcss(), vue()],
     resolve: {
       alias: {
         '@': resolve(__dirname, 'src'),

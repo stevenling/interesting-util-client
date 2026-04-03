@@ -1,261 +1,56 @@
 <template>
-  <TopMenu></TopMenu>
-  
-  <div class="matrix-container">
-    <div class="hero-section">
-      <div class="title">Nyx Matrix
+  <div class="min-h-screen flex flex-col bg-slate-200 text-slate-900 dark:bg-slate-950 dark:text-slate-100">
+    <div class="flex-1 min-h-0">
+      <section class="text-center py-16 sm:py-20 px-6 border-b border-slate-300/70 dark:border-slate-800">
+        <h1 class="text-3xl sm:text-4xl font-semibold mb-4 tracking-tight text-slate-800 dark:text-slate-50">
+          Nyx Matrix
+        </h1>
+        <!-- <p class="text-slate-600 dark:text-slate-400 max-w-xl mx-auto">
+          站点聚合与快速入口
+        </p> -->
+      </section>
+
+      <ToolSection title="Quick access" :list="quickLinks" />
+    </div>
+
+    <footer class="border-t border-slate-300 dark:border-slate-800 py-6 mt-auto bg-slate-200/80 dark:bg-slate-950/80">
+      <div class="text-center">
+        <a
+          href="https://beian.miit.gov.cn/"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="text-sm text-slate-600 hover:text-blue-700 dark:text-slate-400 dark:hover:text-blue-400 transition-colors"
+        >
+          闽ICP备2023011581号
+        </a>
       </div>
-    </div>
-
-    <div class="content-container">
-      <el-row :gutter="24">
-        <el-col :span="6"></el-col>
-        <el-col :span="12">
-          <el-card class="matrix-card" shadow="hover">
-            <template #header>
-              <div class="card-header">
-                <i class="el-icon-connection"></i>
-                <span>Quick access</span>
-              </div>
-            </template>
-            <div class="button-grid">
-              <el-button 
-                type="primary" 
-                @click="openLink('https://stevenling.github.io/yunhu-love-essay-doc/')"
-                class="matrix-button"
-                size="large"
-              >
-                <i class="el-icon-link"></i>
-                Articles Collection
-              </el-button>
-
-              <el-button 
-                type="success" 
-                @click="openLink('https://stevenling.github.io/yunhu-blog/')"
-                class="matrix-button"
-                size="large"
-              >
-                <i class="el-icon-document"></i>
-                Nyx Blog
-              </el-button>
-
-              <el-button 
-                type="info" 
-                @click="openLink('https://stevenling.github.io/chinese-borges-website/')"
-                class="matrix-button"
-                size="large"
-              >
-                <i class="el-icon-reading"></i>
-                博尔赫斯中文站
-              </el-button>
-
-              <el-button 
-                type="warning" 
-                @click="goToUtilIndex"
-                class="matrix-button"
-                size="large"
-              >
-                <i class="el-icon-chat-dot-round"></i>
-                Nyx Tools
-              </el-button>
-            </div>
-          </el-card>
-        </el-col>
-      </el-row>
-    </div>
+    </footer>
   </div>
-
-  <footer class="footer">
-    <div class="footer-content">
-      <a href="https://beian.miit.gov.cn/" target="_blank" class="icp-link">
-        闽ICP备2023011581号
-      </a>
-    </div>
-  </footer>
 </template>
 
 <script setup>
-import { ElMessage } from "element-plus";
-import { useRouter } from "vue-router";
-import TopMenu from "./TopMenu.vue";
+import ToolSection from './ToolSection.vue'
 
-const router = useRouter();
-
-/**
- * 打开外部链接
- * @param {string} url - 要打开的链接
- */
-function openLink(url) {
-  try {
-    window.open(url, '_blank');
-    ElMessage.success('正在打开链接...');
-  } catch (error) {
-    ElMessage.error('打开链接失败');
-  }
-}
-
-/**
- * 跳转到 UtilIndex 页面
- */
-function goToUtilIndex() {
-  router.push('/utilIndex');
-}
+const quickLinks = [
+  {
+    title: 'Articles Collection',
+    desc: '文集与文档站',
+    link: 'https://stevenling.github.io/yunhu-love-essay-doc/',
+  },
+  {
+    title: 'Nyx Blog',
+    desc: '博客',
+    link: 'https://stevenling.github.io/yunhu-blog/',
+  },
+  {
+    title: '博尔赫斯中文站',
+    desc: '博尔赫斯中文资源',
+    link: 'https://stevenling.github.io/chinese-borges-website/',
+  },
+  {
+    title: 'Nyx Tools',
+    desc: '站内工具总览',
+    link: '/utilIndex',
+  },
+]
 </script>
-
-<style scoped>
-/* 主容器样式 - 与UtilIndex保持一致 */
-.matrix-container {
-  min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  padding: 20px 0;
-}
-
-/* 英雄区域样式 - 与UtilIndex保持一致 */
-.hero-section {
-  text-align: center;
-  padding: 60px 20px 40px;
-  color: white;
-}
-
-.title {
-  font-size: 3rem;
-  font-weight: bold;
-  margin-bottom: 1rem;
-  text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-  font-family: 'Monotype Corsiva', cursive;
-}
-
-.subtitle {
-  font-size: 1.2rem;
-  opacity: 0.9;
-  font-weight: 300;
-}
-
-/* 内容容器样式 */
-.content-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 20px;
-}
-
-/* 矩阵卡片样式 - 与UtilIndex工具卡片保持一致 */
-.matrix-card {
-  margin-bottom: 30px;
-  border-radius: 16px;
-  border: none;
-  transition: all 0.3s ease;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-}
-
-.matrix-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-}
-
-/* 卡片头部样式 - 与UtilIndex保持一致 */
-.card-header {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 1.2rem;
-  font-weight: 600;
-  color: #2c3e50;
-}
-
-.card-header i {
-  font-size: 1.4rem;
-  color: #667eea;
-}
-
-/* 按钮网格样式 - 使用 Grid 保证上下左右对齐 */
-.button-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 15px;
-  padding: 10px 0;
-}
-
-/* 矩阵按钮样式 - 与UtilIndex工具按钮保持一致 */
-.matrix-button {
-  width: 100%;
-  height: 50px;
-  border-radius: 12px;
-  font-weight: 500;
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  border: none;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-}
-
-.matrix-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-}
-
-.matrix-button i {
-  font-size: 1.2rem;
-}
-
-/* 页脚样式 - 与UtilIndex保持一致 */
-.footer {
-  background: rgba(0,0,0,0.1);
-  backdrop-filter: blur(10px);
-  padding: 20px 0;
-  margin-top: 40px;
-}
-
-.footer-content {
-  text-align: center;
-}
-
-.icp-link {
-  color: rgba(255,255,255,0.8);
-  text-decoration: none;
-  font-size: 0.9rem;
-  transition: color 0.3s ease;
-}
-
-.icp-link:hover {
-  color: white;
-  text-decoration: underline;
-}
-
-/* 响应式设计 - 与UtilIndex保持一致 */
-@media (max-width: 768px) {
-  .title {
-    font-size: 2rem;
-  }
-  
-  .subtitle {
-    font-size: 1rem;
-  }
-  
-  .button-grid {
-    grid-template-columns: 1fr;
-  }
-  
-  .content-container {
-    padding: 0 15px;
-  }
-}
-
-/* 动画效果 - 与UtilIndex保持一致 */
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.matrix-card {
-  animation: fadeInUp 0.6s ease-out;
-}
-</style> 

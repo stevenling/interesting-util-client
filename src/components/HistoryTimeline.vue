@@ -100,25 +100,28 @@ function goBack() {
 
 .main-container {
   flex: 1;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: transparent;
   padding: 20px 0 40px;
 }
 
 .hero-section {
   text-align: center;
-  padding: 30px 20px 10px;
-  color: #fff;
+  padding: 30px 20px 16px;
+  color: var(--site-heading);
+  border-bottom: 1px solid var(--site-border);
 }
 
 .title {
   font-size: 2.4rem;
   font-weight: bold;
   margin-bottom: 0.6rem;
+  color: var(--site-heading);
 }
 
 .subtitle {
   font-size: 1rem;
-  opacity: 0.9;
+  color: var(--site-muted);
+  opacity: 1;
 }
 
 .content-container {
@@ -129,9 +132,10 @@ function goBack() {
 
 .timeline-card {
   border-radius: 16px;
-  border: none;
-  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid var(--site-border);
+  background: var(--site-surface);
   backdrop-filter: blur(10px);
+  box-shadow: var(--site-card-shadow);
 }
 
 .card-header {
@@ -154,7 +158,7 @@ function goBack() {
 }
 
 .card-header i {
-  color: #667eea;
+  color: var(--site-accent);
 }
 
 /* 国家选择网格 */
@@ -170,16 +174,16 @@ function goBack() {
   align-items: center;
   justify-content: space-between;
   padding: 16px 20px;
-  background: rgba(102, 126, 234, 0.08);
+  background: var(--site-surface-solid);
   border-radius: 12px;
   cursor: pointer;
   transition: all 0.2s ease;
-  border: 1px solid transparent;
+  border: 1px solid var(--site-border);
 }
 
 .country-item:hover {
-  background: rgba(102, 126, 234, 0.15);
-  border-color: rgba(102, 126, 234, 0.3);
+  background: rgb(37 99 235 / 0.08);
+  border-color: rgb(37 99 235 / 0.35);
   transform: translateY(-2px);
 }
 
@@ -190,7 +194,7 @@ function goBack() {
 }
 
 .country-item i {
-  color: #667eea;
+  color: var(--site-accent);
   font-size: 1rem;
 }
 

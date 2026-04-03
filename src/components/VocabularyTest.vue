@@ -335,26 +335,29 @@ function goUtilIndex() {
 
 .main-container {
   flex: 1;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: transparent;
   padding: 20px 0 40px;
 }
 
 .hero-section {
   text-align: center;
   padding: 30px 20px 16px;
-  color: #fff;
+  color: var(--site-heading);
+  border-bottom: 1px solid var(--site-border);
 }
 
 .title {
   font-size: 2.2rem;
   font-weight: bold;
   margin-bottom: 0.5rem;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.25);
+  color: var(--site-heading);
+  text-shadow: none;
 }
 
 .subtitle {
   font-size: 0.95rem;
-  opacity: 0.92;
+  color: var(--site-muted);
+  opacity: 1;
 }
 
 .content-container {
@@ -365,9 +368,10 @@ function goUtilIndex() {
 
 .vocab-card {
   border-radius: 16px;
-  border: none;
-  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid var(--site-border);
+  background: var(--site-surface);
   backdrop-filter: blur(10px);
+  box-shadow: var(--site-card-shadow);
 }
 
 .card-header {
@@ -385,7 +389,7 @@ function goUtilIndex() {
 }
 
 .card-header i {
-  color: #667eea;
+  color: var(--site-accent);
 }
 
 .setup-body {
@@ -460,11 +464,8 @@ function goUtilIndex() {
 .estimate-box {
   text-align: center;
   padding: 20px 16px 24px;
-  background: linear-gradient(
-    135deg,
-    rgba(102, 126, 234, 0.12),
-    rgba(118, 75, 162, 0.1)
-  );
+  background: rgb(37 99 235 / 0.08);
+  border: 1px solid rgb(37 99 235 / 0.2);
   border-radius: 12px;
   margin-bottom: 20px;
 }
@@ -478,7 +479,7 @@ function goUtilIndex() {
 .estimate-num {
   font-size: 2.8rem;
   font-weight: 800;
-  color: #667eea;
+  color: var(--site-accent);
   line-height: 1.1;
 }
 
@@ -491,9 +492,9 @@ function goUtilIndex() {
 .level-box {
   margin-bottom: 20px;
   padding: 14px 14px 8px;
-  background: rgba(102, 126, 234, 0.06);
+  background: rgb(37 99 235 / 0.06);
   border-radius: 12px;
-  border: 1px solid rgba(102, 126, 234, 0.2);
+  border: 1px solid rgb(37 99 235 / 0.22);
 }
 
 .level-box-title {

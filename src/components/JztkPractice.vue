@@ -862,21 +862,23 @@ function goPrev() {
 
 .main-container {
   flex: 1;
-  background: linear-gradient(135deg, #8cc6ff 0%, #74b8fa 45%, #5ca6f0 100%);
+  background: transparent;
   padding: 20px 0 40px;
 }
 
 .hero-section {
   text-align: center;
   padding: 28px 16px 12px;
-  color: #fff;
+  color: var(--site-heading);
+  border-bottom: 1px solid var(--site-border);
 }
 
 .title {
   font-size: 2rem;
   font-weight: bold;
   margin-bottom: 0;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+  color: var(--site-heading);
+  text-shadow: none;
 }
 
 .content-container {
@@ -891,9 +893,10 @@ function goPrev() {
 
 .jztk-card {
   border-radius: 16px;
-  border: none;
-  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid var(--site-border);
+  background: var(--site-surface);
   backdrop-filter: blur(10px);
+  box-shadow: var(--site-card-shadow);
 }
 
 .card-header-stack {
@@ -1029,7 +1032,7 @@ function goPrev() {
 }
 
 .card-header i {
-  color: #667eea;
+  color: var(--site-accent);
 }
 
 .header-right {
@@ -1179,7 +1182,7 @@ function goPrev() {
 .opt-key {
   font-weight: 600;
   margin-right: 4px;
-  color: #667eea;
+  color: var(--site-accent);
   font-size: inherit;
 }
 
@@ -1208,8 +1211,8 @@ function goPrev() {
 /* 未判题时选项悬停：轻微底色与边框变化 */
 .option-radio.el-radio.is-bordered:not(.is-disabled):hover:not(.is-wrong-pick):not(.is-correct-ans) {
   border-color: #b3c7ff;
-  background: rgba(102, 126, 234, 0.07);
-  box-shadow: 0 1px 4px rgba(102, 126, 234, 0.12);
+  background: rgb(37 99 235 / 0.07);
+  box-shadow: 0 1px 4px rgb(37 99 235 / 0.12);
 }
 
 .wrong-collapse {
