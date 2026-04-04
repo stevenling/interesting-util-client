@@ -10,17 +10,18 @@ export const constantRoutes = [
     {
         name: 'UtilIndex',
         path: '/utilIndex',
+        meta: { public: true },
         component: () => import("@/components/UtilIndex.vue")
     },
     {
         name: 'JsonFormat',
         path: '/JsonFormat',
-        component: () => import("@/components/JsonFormat.vue")
+        component: () => import("@/components/programmer-tools/JsonFormat.vue")
     },
     {
         name: 'ColorConvert',
         path: '/ColorConvert',
-        component: () => import("@/components/ColorConvert.vue")
+        component: () => import("@/components/programmer-tools/ColorConvert.vue")
     },
     {
         name: 'TextFormat',
@@ -95,12 +96,20 @@ export const constantRoutes = [
     {
         path: '/',
         name: 'YunhuMatrix',
+        meta: { public: true },
         component: YunhuMatrix
     },
     {
         path: '/login',
         name: 'Login',
-        component: () => import("@/components/UtilIndex.vue")
+        meta: { public: true },
+        component: () => import("@/components/auth/Login.vue")
+    },
+    {
+        path: '/register',
+        name: 'Register',
+        meta: { public: true },
+        component: () => import("@/components/auth/Register.vue")
     }
 ];
 

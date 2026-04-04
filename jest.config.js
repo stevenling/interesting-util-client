@@ -1,4 +1,8 @@
 module.exports = {
+  moduleNameMapper: {
+    '\\.css$': '<rootDir>/jest.css-stub.js',
+  },
+
   // The test environment that will be used for testing.
   // 'jsdom' is a good default for browser-like environment.
   testEnvironment: 'jsdom',

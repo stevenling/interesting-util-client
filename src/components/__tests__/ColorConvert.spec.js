@@ -1,8 +1,17 @@
-import ColorConvert from './ColorConvert.vue'
+import ColorConvert from '../programmer-tools/ColorConvert.vue'
 import { mount } from '@vue/test-utils'
 import { nextTick } from 'vue'
+import { createRouter, createMemoryHistory } from 'vue-router'
 import ElementPlus from 'element-plus'
 import { ElMessage } from 'element-plus'
+
+const router = createRouter({
+  history: createMemoryHistory(),
+  routes: [
+    { path: '/', component: { template: '<div/>' } },
+    { path: '/utilIndex', component: { template: '<div/>' } },
+  ],
+})
 
 jest.mock('element-plus', () => {
   const actual = jest.requireActual('element-plus')
@@ -31,7 +40,7 @@ describe('ColorConvert.vue', () => {
     jest.clearAllMocks()
     wrapper = mount(ColorConvert, {
       global: {
-        plugins: [ElementPlus],
+        plugins: [ElementPlus, router],
         stubs: {
           ElTooltip: true,
           ElColorPicker: true,

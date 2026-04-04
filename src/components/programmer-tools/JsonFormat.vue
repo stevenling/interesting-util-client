@@ -1,64 +1,106 @@
 <template>
   <div
-    class="json-format-page min-h-screen flex flex-col bg-zinc-100 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100"
+    class="matrix-root relative h-screen max-h-screen overflow-hidden flex flex-col text-slate-900 dark:text-neutral-100"
   >
-    <div class="flex-1 min-w-0 px-4 sm:px-6 py-6 sm:py-8">
-      <div class="max-w-6xl mx-auto">
-        <RouterLink
-          to="/utilIndex"
-          class="mb-5 inline-block text-sm text-zinc-500 hover:text-slate-700 dark:text-zinc-400 dark:hover:text-slate-300 transition-colors"
-        >
-          ← 工具列表
-        </RouterLink>
+    <div
+      class="pointer-events-none fixed inset-0 -z-10 matrix-bg-base"
+      aria-hidden="true"
+    />
+    <div
+      class="pointer-events-none fixed -top-32 left-1/2 h-[42rem] w-[42rem] -translate-x-1/2 rounded-full matrix-blob matrix-blob-a blur-3xl opacity-90"
+      aria-hidden="true"
+    />
+    <div
+      class="pointer-events-none fixed top-[28%] -right-24 h-[28rem] w-[28rem] rounded-full matrix-blob matrix-blob-b blur-3xl opacity-80"
+      aria-hidden="true"
+    />
+    <div
+      class="pointer-events-none fixed bottom-0 left-0 h-[22rem] w-[22rem] rounded-full matrix-blob matrix-blob-c blur-3xl opacity-70"
+      aria-hidden="true"
+    />
 
-        <div
-          class="rounded-xl border border-zinc-200/90 dark:border-zinc-800 bg-white/90 dark:bg-zinc-900/85 shadow-sm overflow-hidden flex flex-col min-h-[calc(100vh-3rem)]"
-        >
-          <header
-            class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 px-5 py-4 border-b border-zinc-200/90 dark:border-zinc-800"
+    <div class="relative flex-1 min-h-0 min-w-0 flex flex-col">
+      <div class="flex-1 min-h-0 min-w-0 flex flex-col px-4 sm:px-6 py-3 sm:py-4">
+        <div class="max-w-6xl mx-auto w-full flex-1 min-h-0 flex flex-col">
+          <RouterLink
+            to="/utilIndex"
+            class="mb-2 shrink-0 inline-block text-sm text-slate-500 hover:text-slate-800 dark:text-neutral-500 dark:hover:text-neutral-200 transition-colors duration-300"
           >
-            <h1
-              class="text-2xl font-semibold tracking-tight text-zinc-800 dark:text-zinc-50 border-l-2 border-slate-500 dark:border-slate-400 pl-3"
+            ← 
+          </RouterLink>
+
+          <div
+            class="matrix-tool-panel overflow-hidden flex flex-col flex-1 min-h-0"
+          >
+            <header
+              class="matrix-tool-panel-header shrink-0 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 px-5 py-3 sm:py-4"
             >
-              Json 格式化
-            </h1>
-            <el-button
-              class="json-btn json-btn-solid shrink-0"
-              data-testid="json-format-download"
-              @click="clickDownload"
-            >
-              下载
-            </el-button>
+              <div>
+                <p
+                  class="text-[0.6875rem] sm:text-xs font-medium tracking-[0.22em] uppercase text-slate-500 dark:text-neutral-500 mb-1"
+                >
+                  Utilities
+                </p>
+                <h1
+                  class="text-2xl font-semibold tracking-tight text-slate-900 dark:text-white"
+                >
+                  Json 代码美化
+                </h1>
+              </div>
+            <el-tooltip content="下载" placement="bottom">
+              <el-button
+                circle
+                class="json-btn json-btn-solid json-btn-icon shrink-0"
+                data-testid="json-format-download"
+                aria-label="下载"
+                @click="clickDownload"
+              >
+                <el-icon :size="18"><Download /></el-icon>
+              </el-button>
+            </el-tooltip>
           </header>
 
-          <div class="p-4 sm:p-5 flex-1 flex flex-col min-h-0">
-            <el-row :gutter="24" class="content-row flex-1 min-h-0">
+          <div class="p-3 sm:p-4 flex-1 flex flex-col min-h-0 overflow-hidden">
+            <el-row :gutter="0" class="content-row flex-1 min-h-0">
               <el-col :xs="24" :sm="24" :md="24" :lg="12" class="el-input-content">
                 <div class="json-title">
-                  <span>待格式化 Json</span>
-                  <el-button plain class="json-btn json-btn-line" data-testid="json-format-clear" @click="clickClear">
-                    清空
-                  </el-button>
+                  <span>待格式</span>
+                  <el-tooltip content="清空" placement="bottom">
+                    <el-button
+                      circle
+                      plain
+                      class="json-btn json-btn-line json-btn-icon"
+                      data-testid="json-format-clear"
+                      aria-label="清空"
+                      @click="clickClear"
+                    >
+                      <el-icon :size="18"><Delete /></el-icon>
+                    </el-button>
+                  </el-tooltip>
                 </div>
                 <el-input
                   v-model="currentJson.oldJson"
                   type="textarea"
-                  placeholder="请输入待格式化 JSON 字符串"
+                  placeholder="请输入 JSON"
                   class="el-input-class"
                 />
               </el-col>
 
               <el-col :xs="24" :sm="24" :md="24" :lg="12" class="el-input-content">
                 <div class="json-title">
-                  <span>格式化后的 Json</span>
-                  <el-button
-                    plain
-                    class="json-btn json-btn-line json-btn-line--accent"
-                    data-testid="json-format-copy"
-                    @click="clickCopy"
-                  >
-                    复制到剪贴板
-                  </el-button>
+                  <span>格式化后</span>
+                  <el-tooltip content="复制" placement="bottom">
+                    <el-button
+                      circle
+                      plain
+                      class="json-btn json-btn-line json-btn-line--accent json-btn-icon"
+                      data-testid="json-format-copy"
+                      aria-label="复制"
+                      @click="clickCopy"
+                    >
+                      <el-icon :size="18"><CopyDocument /></el-icon>
+                    </el-button>
+                  </el-tooltip>
                 </div>
                 <highlightjs
                   language="json"
@@ -71,13 +113,31 @@
         </div>
       </div>
     </div>
+
+      <footer
+        class="matrix-footer shrink-0 relative border-t border-black/[0.06] dark:border-white/[0.08] py-6 px-6"
+      >
+        <div class="text-center">
+          <a
+            href="https://beian.miit.gov.cn/"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="text-[13px] text-slate-500 hover:text-slate-800 dark:text-neutral-500 dark:hover:text-neutral-200 transition-colors duration-300"
+          >
+            闽ICP备2023011581号
+          </a>
+        </div>
+      </footer>
+    </div>
   </div>
 </template>
 
 <script setup>
 import { watch, reactive } from 'vue'
 import { RouterLink } from 'vue-router'
+import '../../styles/matrix-page.css'
 import { ElMessage } from 'element-plus'
+import { CopyDocument, Delete, Download } from '@element-plus/icons-vue'
 import moment from 'moment'
 import useClipboard from 'vue-clipboard3'
 
@@ -147,7 +207,7 @@ async function clickCopy() {
   }
   try {
     await toClipboard(currentJson.formatJson)
-    ElMessage.success('复制格式化后的 json 到剪贴板成功')
+    ElMessage.success('复制成功')
   } catch (e) {
     console.error(e)
     ElMessage.error('复制格式化后的 json 到剪贴板失败')
@@ -158,44 +218,77 @@ async function clickCopy() {
 <style scoped>
 .content-row {
   display: flex;
-  flex-wrap: wrap;
   flex-grow: 1;
   min-height: 0;
+  /* 两列之间 / 上下堆叠时 的外间距（替代 gutter，避免与 flex 布局冲突） */
+  gap: 1.25rem;
+}
+
+.content-row :deep(.el-input-content) {
+  min-width: 0;
+}
+
+@media (min-width: 1024px) {
+  .content-row {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .content-row :deep(.el-input-content) {
+    flex: 1 1 calc((100% - 1.25rem) / 2) !important;
+    max-width: calc((100% - 1.25rem) / 2) !important;
+  }
+}
+
+@media (max-width: 1023px) {
+  .content-row {
+    flex-direction: column;
+    flex-wrap: nowrap;
+  }
+
+  .content-row :deep(.el-input-content) {
+    flex: 1 1 0 !important;
+    max-width: 100% !important;
+    min-height: 0 !important;
+  }
 }
 
 .el-input-content {
   font-size: 1.05rem;
-  background: rgb(250 250 250 / 0.95);
+  background: rgb(255 255 255 / 0.45);
   border-radius: 0.75rem;
-  padding: 1rem;
+  padding: 0.75rem;
   min-height: 0;
   display: flex;
   flex-direction: column;
-  border: 1px solid rgb(228 228 231 / 0.95);
+  border: 1px solid rgb(0 0 0 / 0.06);
 }
 
 @media (prefers-color-scheme: dark) {
   .el-input-content {
-    background: rgb(24 24 27 / 0.55);
-    border-color: rgb(63 63 70 / 0.85);
+    background: rgb(0 0 0 / 0.2);
+    border-color: rgb(255 255 255 / 0.08);
   }
 }
 
 .json-title {
-  font-size: 1.05rem;
+  font-size: 0.8125rem;
   margin: 0 0 0.5rem 0;
   font-weight: 600;
-  color: rgb(63 63 70);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgb(100 116 139);
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 0.75rem;
   flex-wrap: wrap;
+  flex-shrink: 0;
 }
 
 @media (prefers-color-scheme: dark) {
   .json-title {
-    color: rgb(212 212 216);
+    color: rgb(163 163 163);
   }
 }
 
@@ -207,6 +300,12 @@ async function clickCopy() {
     background-color 0.15s ease,
     border-color 0.15s ease,
     color 0.15s ease;
+}
+
+.json-btn-icon.el-button.is-circle {
+  width: 2.25rem;
+  height: 2.25rem;
+  padding: 0;
 }
 
 .json-btn-solid.el-button {
@@ -298,13 +397,21 @@ async function clickCopy() {
 
 .el-input-class {
   font-size: 0.98rem;
-  flex-grow: 1;
+  flex: 1 1 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.el-input-class :deep(.el-textarea) {
+  flex: 1 1 0;
   min-height: 0;
 }
 
 .el-input-class :deep(.el-textarea__inner) {
   height: 100% !important;
-  min-height: 22rem;
+  min-height: 0 !important;
+  resize: none;
   background: rgb(255 255 255);
   border-radius: 0.5rem;
   border: 1px solid rgb(228 228 231);
@@ -326,9 +433,8 @@ async function clickCopy() {
   background: rgb(255 255 255);
   border-radius: 0.5rem;
   border: 1px solid rgb(228 228 231);
-  flex: 1 1 auto;
-  min-height: 22rem;
-  max-height: 70vh;
+  flex: 1 1 0;
+  min-height: 0;
   padding: 0.5rem;
   overflow: auto;
 }
@@ -345,13 +451,4 @@ async function clickCopy() {
   }
 }
 
-@media (max-width: 1023px) {
-  .el-input-content {
-    margin-bottom: 1rem;
-  }
-
-  .el-input-content:last-child {
-    margin-bottom: 0;
-  }
-}
 </style>

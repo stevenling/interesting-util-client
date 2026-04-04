@@ -1,7 +1,7 @@
 import { mount } from '@vue/test-utils'
 import { createRouter, createMemoryHistory } from 'vue-router'
 import ElementPlus from 'element-plus'
-import JsonFormat from '../JsonFormat.vue'
+import JsonFormat from '../programmer-tools/JsonFormat.vue'
 import { ElMessage } from 'element-plus'
 
 const router = createRouter({
@@ -121,7 +121,7 @@ describe('JsonFormat.vue', () => {
       await wrapper.find('[data-testid="json-format-copy"]').trigger('click')
 
       expect(mockToClipboard).toHaveBeenCalledWith(formattedJson)
-      expect(ElMessage.success).toHaveBeenCalledWith('复制格式化后的 json 到剪贴板成功')
+      expect(ElMessage.success).toHaveBeenCalledWith('复制成功')
     })
 
     it('should show error when trying to copy empty JSON', async () => {
