@@ -1,27 +1,29 @@
 <template>
   <div class="font-to-image-container">
-    <TopMenu />
+    <el-tooltip content="返回" placement="right">
+      <RouterLink to="/utilIndex" class="fti-back-fab" aria-label="返回小工具集">
+        <el-icon :size="18"><ArrowLeft /></el-icon>
+      </RouterLink>
+    </el-tooltip>
+
     <header class="page-heading">
       <div class="page-heading-inner">
         <div class="page-heading-text">
           <h1 class="page-title">摘录卡片</h1>
-          <p class="page-desc">
-            输入文字，右侧同步预览；顶部图标可复制或下载图片；「样式设置」调整字号、背景与字体
-          </p>
         </div>
         <div class="page-heading-actions">
-          <el-button size="default" class="page-action-btn" @click="openStylePanel">样式设置</el-button>
-          <el-tooltip content="复制到剪贴板" placement="bottom">
+          <el-button size="default" class="page-action-btn" @click="openStylePanel">样式</el-button>
+          <el-tooltip content="复制" placement="bottom">
             <el-button
               circle
               class="page-icon-btn"
-              aria-label="复制到剪贴板"
+              aria-label="复制图片"
               @click="copyImage"
             >
               <el-icon :size="18"><CopyDocument /></el-icon>
             </el-button>
           </el-tooltip>
-          <el-tooltip content="下载图片" placement="bottom">
+          <el-tooltip content="下载" placement="bottom">
             <el-button
               circle
               type="primary"
@@ -32,7 +34,6 @@
               <el-icon :size="18"><Download /></el-icon>
             </el-button>
           </el-tooltip>
-          <RouterLink to="/utilIndex" class="page-back-link">← 工具列表</RouterLink>
         </div>
       </div>
     </header>
@@ -43,8 +44,7 @@
           <div class="input-header">
             <span class="card-header-accent" aria-hidden="true" />
             <div class="card-header-text">
-              <h3 class="input-title">文字输入</h3>
-              <p class="input-subtitle">与右侧预览区域等高，导出与预览一致</p>
+              <h3 class="input-title">输入</h3>
             </div>
           </div>
           <div class="input-body">
@@ -52,7 +52,7 @@
               v-model="inputText"
               type="textarea"
               :autosize="false"
-              placeholder="输入或粘贴摘录、金句…"
+              placeholder="输入文字"
               class="input-area-el"
             />
           </div>
@@ -64,8 +64,7 @@
           <div class="preview-header">
             <span class="card-header-accent" aria-hidden="true" />
             <div class="card-header-text">
-              <h3 class="preview-title">实时预览</h3>
-              <p class="preview-subtitle">生成后将尝试复制到剪贴板；失败时可长按图片保存</p>
+              <h3 class="preview-title">预览</h3>
             </div>
           </div>
           <div class="preview-body">
@@ -82,7 +81,7 @@
                   fontSize: previewFontSize + 'rem',
                 }"
               >
-                {{ inputText || '预览区域：输入文字后即显示效果' }}
+                {{ inputText || '预览' }}
               </div>
             </div>
           </div>
@@ -107,15 +106,14 @@
                 <div class="style-drawer-title-wrap">
                   <span class="style-drawer-accent" aria-hidden="true" />
                   <div>
-                    <h2 id="style-panel-title" class="style-drawer-title">样式设置</h2>
-                    <p class="style-drawer-sub">字号、背景与字体</p>
+                    <h2 id="style-panel-title" class="style-drawer-title">样式</h2>
                   </div>
                 </div>
-                <el-button text type="primary" class="style-drawer-close" @click="closeStylePanel">关闭</el-button>
+                <el-button text type="primary" class="style-drawer-close" @click="closeStylePanel">完成</el-button>
               </div>
               <div class="control-content style-drawer-body">
                 <div class="control-stack">
-                  <label class="control-label">字体大小</label>
+                  <label class="control-label">字号</label>
                   <div class="font-size-row">
                     <el-button size="small" class="control-btn" @click="decreaseFontSize">A−</el-button>
                     <span class="font-size-pill">{{ previewFontSize.toFixed(1) }} rem</span>
@@ -125,12 +123,11 @@
 
                 <el-divider class="control-divider" />
 
-                <p class="control-section-label">外观</p>
                 <div class="control-stack">
-                  <label class="control-label">背景类型</label>
+                  <label class="control-label">类型</label>
                   <el-select
                     v-model="selectedBgType"
-                    placeholder="选择背景类型"
+                    placeholder="类型"
                     size="default"
                     class="control-select control-select--full"
                     :popper-class="styleSelectPopperClass"
@@ -144,10 +141,10 @@
                   </el-select>
                 </div>
                 <div class="control-stack">
-                  <label class="control-label">背景样式</label>
+                  <label class="control-label">背景</label>
                   <el-select
                     v-model="selectedBg"
-                    placeholder="选择背景"
+                    placeholder="背景"
                     size="default"
                     class="control-select control-select--full"
                     filterable
@@ -165,7 +162,7 @@
                   <label class="control-label">字体</label>
                   <el-select
                     v-model="selectedFont"
-                    placeholder="选择字体"
+                    placeholder="字体"
                     size="default"
                     class="control-select control-select--full"
                     :popper-class="styleSelectPopperClass"
@@ -180,7 +177,7 @@
                 </div>
 
                 <div class="drawer-export-row">
-                  <el-tooltip content="复制到剪贴板" placement="top">
+                  <el-tooltip content="复制" placement="top">
                     <el-button
                       circle
                       type="primary"
@@ -191,11 +188,11 @@
                       <el-icon :size="20"><CopyDocument /></el-icon>
                     </el-button>
                   </el-tooltip>
-                  <el-tooltip content="下载图片" placement="top">
+                  <el-tooltip content="下载" placement="top">
                     <el-button
                       circle
                       class="drawer-icon-btn drawer-icon-btn--outline"
-                      aria-label="下载图片"
+                      aria-label="下载"
                       @click="onDownloadFromPanel"
                     >
                       <el-icon :size="20"><Download /></el-icon>
@@ -210,11 +207,11 @@
     </Teleport>
 
     <!-- 移动端图片预览弹窗 -->
-    <el-dialog v-model="showImagePreview" title="保存图片" width="90%" center class="preview-dialog">
+    <el-dialog v-model="showImagePreview" title="图片" width="90%" center class="preview-dialog">
       <img :src="generatedImageUrl" class="preview-image" alt="生成的图片" />
       <template #footer>
         <span class="dialog-footer">
-          <el-button @click="closeImagePreview" class="dialog-btn">关闭</el-button>
+          <el-button @click="closeImagePreview" class="dialog-btn">好</el-button>
         </span>
       </template>
     </el-dialog>
@@ -226,8 +223,7 @@ import { ref, computed, watch, onMounted, onUnmounted, onBeforeUnmount } from 'v
 import { RouterLink } from 'vue-router';
 import html2canvas from 'html2canvas';
 import { ElMessage } from 'element-plus';
-import { CopyDocument, Download } from '@element-plus/icons-vue';
-import TopMenu from './TopMenu.vue';
+import { CopyDocument, Download, ArrowLeft } from '@element-plus/icons-vue';
 
 // 用于移动端 / 桌面弹窗预览图片
 const showImagePreview = ref(false);
@@ -460,9 +456,8 @@ async function captureCardToCanvas() {
       removeContainer: true,
     });
   } catch (err) {
-    const msg = err?.message || err?.name || String(err);
     console.error('截图失败:', err);
-    ElMessage.error(`图片生成失败：${msg}`);
+    ElMessage.error('生成失败');
     return null;
   } finally {
     card.style.maxHeight = originalMaxHeight;
@@ -484,26 +479,25 @@ const copyImage = async () => {
   if (isMobile) {
     generatedImageUrl.value = canvas.toDataURL('image/png', 1.0);
     showImagePreview.value = true;
-    ElMessage.info('请长按图片进行保存或复制');
+    ElMessage.info('长按图片保存');
     return;
   }
 
   canvas.toBlob(async (blob) => {
     if (!blob) {
-      ElMessage.error('图片生成失败');
+      ElMessage.error('生成失败');
       return;
     }
     try {
       await navigator.clipboard.write([new window.ClipboardItem({ 'image/png': blob })]);
-      ElMessage.success('图片已复制到剪贴板，可直接粘贴');
+      ElMessage.success('已复制');
     } catch (err) {
-      const msg = err?.message || err?.name || String(err);
       console.warn('剪贴板写入失败:', err);
       generatedImageUrl.value = URL.createObjectURL(blob);
       showImagePreview.value = true;
       ElMessage.warning({
-        message: `无法写入剪贴板（${msg}），请在弹出的图片上右键「复制图像」或「图片另存为」`,
-        duration: 5000,
+        message: '请右键图片复制或另存',
+        duration: 4000,
       });
     }
   }, 'image/png', 1.0);
@@ -519,7 +513,7 @@ const downloadImage = async () => {
   canvas.toBlob(
     (blob) => {
       if (!blob) {
-        ElMessage.error('图片生成失败');
+        ElMessage.error('生成失败');
         return;
       }
       const url = URL.createObjectURL(blob);
@@ -533,7 +527,7 @@ const downloadImage = async () => {
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
-      ElMessage.success('已下载图片');
+      ElMessage.success('已下载');
     },
     'image/png',
     1.0
@@ -662,13 +656,46 @@ const computedTextColor = computed(() => bgTextColorMap[selectedBg.value] || '#2
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  padding: 0 20px 16px;
+  padding: 52px 20px 16px;
   background: var(--site-bg);
   height: 100vh;
   max-height: 100vh;
   overflow: hidden;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial,
     sans-serif;
+}
+
+.fti-back-fab {
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  z-index: 2500;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--site-surface-solid);
+  border: 1px solid var(--site-border);
+  color: var(--site-heading);
+  box-shadow: var(--site-card-shadow);
+  text-decoration: none;
+  transition:
+    color 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.15s ease;
+}
+
+.fti-back-fab:hover {
+  color: var(--site-accent);
+  border-color: var(--site-accent);
+  box-shadow: 0 2px 12px rgb(15 23 42 / 0.08);
+}
+
+.fti-back-fab:active {
+  transform: scale(0.96);
 }
 
 .page-heading {
@@ -701,18 +728,6 @@ const computedTextColor = computed(() => bgTextColorMap[selectedBg.value] || '#2
   font-size: 0.875rem;
   line-height: 1.5;
   color: var(--site-muted);
-}
-
-.page-back-link {
-  font-size: 0.875rem;
-  color: var(--site-muted);
-  text-decoration: none;
-  white-space: nowrap;
-  transition: color 0.15s ease;
-}
-
-.page-back-link:hover {
-  color: var(--site-accent);
 }
 
 .page-heading-actions {
@@ -839,14 +854,6 @@ const computedTextColor = computed(() => bgTextColorMap[selectedBg.value] || '#2
   letter-spacing: -0.01em;
 }
 
-.input-subtitle,
-.preview-subtitle {
-  font-size: 0.8125rem;
-  line-height: 1.45;
-  margin: 0;
-  color: var(--site-muted);
-}
-
 .input-body {
   flex: 1;
   min-height: 0;
@@ -896,15 +903,6 @@ const computedTextColor = computed(() => bgTextColorMap[selectedBg.value] || '#2
 
 .control-divider {
   margin: 12px 0;
-}
-
-.control-section-label {
-  margin: 0 0 8px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--site-muted);
 }
 
 .control-stack {
@@ -1124,13 +1122,6 @@ const computedTextColor = computed(() => bgTextColorMap[selectedBg.value] || '#2
   font-weight: 600;
   color: var(--site-heading);
   letter-spacing: -0.01em;
-}
-
-.style-drawer-sub {
-  margin: 0;
-  font-size: 0.8125rem;
-  color: var(--site-muted);
-  line-height: 1.45;
 }
 
 .style-drawer-close {

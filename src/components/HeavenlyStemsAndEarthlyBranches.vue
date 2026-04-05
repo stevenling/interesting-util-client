@@ -1,60 +1,66 @@
 <template>
-  <TopMenu></TopMenu>
-  <div id="app">
-    <el-card class="box-card">
-      <template #header>
-        <div class="card-header">
-          <div class="title">天干地支纪年</div>
-        </div>
-      </template>
-      <el-row :gutter="120" :span="12">
-        <el-col :span="24" class="el-input-content">
-          <div class="calendar-year-title-class">
-            <p>公历年</p>
-            <div class="calendar-year-div-class">
-              <el-input
-                class="el-input-class"
-                v-model="calendarYear"
-                placeholder="请输入公历年"
-                clearable
-              />
-              <p>{{ currentDynasty }}</p>
-            </div>
-          </div>
+  <div class="hs-page">
+    <el-tooltip content="返回小工具集" placement="right">
+      <RouterLink to="/utilIndex" class="hs-back-fab" aria-label="返回小工具集">
+        <el-icon :size="18"><ArrowLeft /></el-icon>
+      </RouterLink>
+    </el-tooltip>
 
-          <div class="hex-title-class">
-            <p>天干地支</p>
-            <div class="calendar-year-div-class">
-              <el-input
-                class="input-hex-color-class"
-                v-model="heavenlyStemsEarthlyBranchesYear"
-                placeholder="请输入天干地支年"
-                clearable
-              />
-              <el-button type="primary" @click="clickCopyHexColor"
-                >复制</el-button
-              >
+    <div class="hs-main">
+      <el-card class="box-card">
+        <template #header>
+          <div class="card-header">
+            <div class="title">天干地支纪年</div>
+          </div>
+        </template>
+        <el-row :gutter="120" :span="12">
+          <el-col :span="24" class="el-input-content">
+            <div class="calendar-year-title-class">
+              <p>公历年</p>
+              <div class="calendar-year-div-class">
+                <el-input
+                  class="el-input-class"
+                  v-model="calendarYear"
+                  placeholder="请输入公历年"
+                  clearable
+                />
+                <p>{{ currentDynasty }}</p>
+              </div>
             </div>
-          </div>
 
-          <div class="select-color-title-class">
-            <p>所有年份</p>
-          </div>
-          <el-table :data="yearData" style="width: 30%">
-            <el-table-column prop="year" label="公历年" />
-            <el-table-column prop="dynasty" label="朝代" />
-          </el-table>
-        </el-col>
-      </el-row>
-    </el-card>
+            <div class="hex-title-class">
+              <p>天干地支</p>
+              <div class="calendar-year-div-class">
+                <el-input
+                  class="input-hex-color-class"
+                  v-model="heavenlyStemsEarthlyBranchesYear"
+                  placeholder="请输入天干地支年"
+                  clearable
+                />
+                <el-button type="primary" @click="clickCopyHexColor">复制</el-button>
+              </div>
+            </div>
+
+            <div class="select-color-title-class">
+              <p>所有年份</p>
+            </div>
+            <el-table :data="yearData" style="width: 30%">
+              <el-table-column prop="year" label="公历年" />
+              <el-table-column prop="dynasty" label="朝代" />
+            </el-table>
+          </el-col>
+        </el-row>
+      </el-card>
+    </div>
   </div>
 </template>
 
 <script setup>
 import { watch, ref } from "vue";
+import { RouterLink } from "vue-router";
 import { ElMessage } from "element-plus";
+import { ArrowLeft } from "@element-plus/icons-vue";
 import useClipboard from "vue-clipboard3";
-import TopMenu from "./TopMenu.vue";
 
 // 公历年
 const calendarYear = ref();
@@ -231,15 +237,46 @@ const clickCopyHexColor = async () => {
 </script>
 
 <style scoped>
-html,
-body {
-  width: 100%;
-  height: 100%;
-}
-
-.app {
+.hs-page {
   min-height: 100vh;
   background: var(--site-bg);
+}
+
+.hs-back-fab {
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  z-index: 2000;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--site-surface-solid);
+  border: 1px solid var(--site-border);
+  color: var(--site-heading);
+  box-shadow: var(--site-card-shadow);
+  text-decoration: none;
+  transition:
+    color 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.15s ease;
+}
+
+.hs-back-fab:hover {
+  color: var(--site-accent);
+  border-color: var(--site-accent);
+  box-shadow: 0 2px 12px rgb(15 23 42 / 0.08);
+}
+
+.hs-back-fab:active {
+  transform: scale(0.96);
+}
+
+.hs-main {
+  padding-top: 56px;
 }
 
 .box-card {

@@ -1,15 +1,61 @@
 <template>
-  <div class="vocab-page">
-    <TopMenu />
-    <div class="main-container">
-      <div class="hero-section">
-        <div class="title">英语词汇量测试</div>
-        <div class="subtitle">选择题 · 根据难度粗估被动阅读词汇量（仅供学习参考）</div>
-      </div>
+  <div
+    class="matrix-root relative min-h-screen flex flex-col overflow-hidden text-slate-900 dark:text-neutral-100"
+  >
+    <div
+      class="pointer-events-none fixed inset-0 -z-10 matrix-bg-base"
+      aria-hidden="true"
+    />
+    <div
+      class="pointer-events-none fixed -top-32 left-1/2 h-[42rem] w-[42rem] -translate-x-1/2 rounded-full matrix-blob matrix-blob-a blur-3xl opacity-90"
+      aria-hidden="true"
+    />
+    <div
+      class="pointer-events-none fixed top-[28%] -right-24 h-[28rem] w-[28rem] rounded-full matrix-blob matrix-blob-b blur-3xl opacity-80"
+      aria-hidden="true"
+    />
+    <div
+      class="pointer-events-none fixed bottom-0 left-0 h-[22rem] w-[22rem] rounded-full matrix-blob matrix-blob-c blur-3xl opacity-70"
+      aria-hidden="true"
+    />
 
-      <div class="content-container">
+    <el-tooltip content="返回小工具集" placement="right">
+      <RouterLink
+        to="/utilIndex"
+        class="fixed left-5 top-5 z-[2100] flex h-10 w-10 items-center justify-center rounded-full border border-black/[0.08] bg-white/80 text-slate-600 no-underline shadow-sm backdrop-blur-md transition-colors duration-200 hover:bg-white/95 hover:text-slate-900 dark:border-white/[0.12] dark:bg-zinc-900/70 dark:text-neutral-300 dark:hover:bg-zinc-800/80 dark:hover:text-white"
+        aria-label="返回小工具集"
+      >
+        <el-icon :size="18"><ArrowLeft /></el-icon>
+      </RouterLink>
+    </el-tooltip>
+
+    <div class="relative flex min-h-0 flex-1 flex-col">
+      <section class="text-center px-6 pb-8 pt-14 sm:pb-10 sm:pt-20">
+        <p
+          class="mb-4 text-[0.6875rem] font-medium uppercase tracking-[0.22em] text-slate-500 dark:text-neutral-500 sm:text-xs"
+        >
+          Utilities
+        </p>
+        <h1
+          class="mx-auto max-w-lg text-[1.75rem] font-semibold leading-[1.1] tracking-[-0.03em] text-slate-900 dark:text-white sm:text-4xl"
+        >
+          英语词汇量测试
+        </h1>
+        <p
+          class="mx-auto mt-3 max-w-md text-[15px] font-normal leading-relaxed text-slate-600 dark:text-neutral-400 sm:text-base"
+        >
+          选择题 · 粗估被动阅读词汇量（仅供学习参考）
+        </p>
+        <div
+          class="mx-auto mt-8 h-px w-12 rounded-full matrix-divider"
+          aria-hidden="true"
+        />
+      </section>
+
+      <div class="main-container relative flex-1 px-6 pb-12 sm:px-6">
+        <div class="content-container mx-auto w-full max-w-2xl">
         <!-- 选题量 -->
-        <el-card v-if="phase === 'setup'" class="vocab-card" shadow="hover">
+        <el-card v-if="phase === 'setup'" class="vocab-matrix-card" shadow="never">
           <template #header>
             <div class="card-header">
               <i class="el-icon-edit-outline"></i>
@@ -32,7 +78,7 @@
         </el-card>
 
         <!-- 答题 -->
-        <el-card v-else-if="phase === 'quiz'" class="vocab-card" shadow="hover">
+        <el-card v-else-if="phase === 'quiz'" class="vocab-matrix-card" shadow="never">
           <template #header>
             <div class="card-header card-header-row">
               <span>
@@ -78,7 +124,7 @@
         </el-card>
 
         <!-- 结果 -->
-        <el-card v-else class="vocab-card result-card" shadow="hover">
+        <el-card v-else class="vocab-matrix-card result-card" shadow="never">
           <template #header>
             <div class="card-header">
               <i class="el-icon-trophy"></i>
@@ -124,6 +170,7 @@
             </div>
           </div>
         </el-card>
+        </div>
       </div>
     </div>
 
@@ -154,9 +201,9 @@
 
 <script setup>
 import { ref, computed, onUnmounted } from "vue";
-import { useRouter } from "vue-router";
+import { useRouter, RouterLink } from "vue-router";
 import { ElMessage, ElMessageBox } from "element-plus";
-import TopMenu from "./TopMenu.vue";
+import { ArrowLeft } from "@element-plus/icons-vue";
 import {
   VOCAB_POOL,
   pickQuestions,
@@ -166,6 +213,7 @@ import {
   getVocabLevelDescriptors,
   OPTION_DONT_KNOW,
 } from "@/data/vocabularyTest.js";
+import "../styles/matrix-page.css";
 
 const router = useRouter();
 
@@ -327,60 +375,65 @@ function goUtilIndex() {
 </script>
 
 <style scoped>
-.vocab-page {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
+/* 与 UtilIndex：磨砂卡 + slate 语义色，暗色随系统 */
+
+.vocab-matrix-card {
+  border-radius: 0.75rem;
+  border: 1px solid rgb(203 213 225 / 0.9);
+  background: rgb(241 245 249 / 0.9);
+  box-shadow: 0 1px 2px rgb(15 23 42 / 0.04);
+  transition:
+    box-shadow 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
 }
 
-.main-container {
-  flex: 1;
+.vocab-matrix-card:hover {
+  border-color: rgb(100 116 139 / 0.55);
+  box-shadow: 0 4px 14px rgb(15 23 42 / 0.08);
+}
+
+@media (prefers-color-scheme: dark) {
+  .vocab-matrix-card {
+    border-color: rgb(51 65 85 / 0.95);
+    background: rgb(15 23 42 / 0.82);
+  }
+
+  .vocab-matrix-card:hover {
+    border-color: rgb(148 163 184 / 0.45);
+    box-shadow: 0 4px 20px rgb(0 0 0 / 0.35);
+  }
+}
+
+.vocab-matrix-card :deep(.el-card__header) {
+  border-bottom: 1px solid rgb(203 213 225 / 0.55);
   background: transparent;
-  padding: 20px 0 40px;
+  padding: 14px 18px;
 }
 
-.hero-section {
-  text-align: center;
-  padding: 30px 20px 16px;
-  color: var(--site-heading);
-  border-bottom: 1px solid var(--site-border);
+@media (prefers-color-scheme: dark) {
+  .vocab-matrix-card :deep(.el-card__header) {
+    border-bottom-color: rgb(51 65 85 / 0.85);
+  }
 }
 
-.title {
-  font-size: 2.2rem;
-  font-weight: bold;
-  margin-bottom: 0.5rem;
-  color: var(--site-heading);
-  text-shadow: none;
-}
-
-.subtitle {
-  font-size: 0.95rem;
-  color: var(--site-muted);
-  opacity: 1;
-}
-
-.content-container {
-  max-width: 680px;
-  margin: 0 auto;
-  padding: 0 20px;
-}
-
-.vocab-card {
-  border-radius: 16px;
-  border: 1px solid var(--site-border);
-  background: var(--site-surface);
-  backdrop-filter: blur(10px);
-  box-shadow: var(--site-card-shadow);
+.vocab-matrix-card :deep(.el-card__body) {
+  padding: 18px 20px 22px;
 }
 
 .card-header {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 1.1rem;
+  font-size: 1.05rem;
   font-weight: 600;
-  color: #2c3e50;
+  color: rgb(30 41 59);
+}
+
+@media (prefers-color-scheme: dark) {
+  .card-header {
+    color: rgb(248 250 252);
+  }
 }
 
 .card-header-row {
@@ -389,7 +442,13 @@ function goUtilIndex() {
 }
 
 .card-header i {
-  color: var(--site-accent);
+  color: rgb(71 85 105);
+}
+
+@media (prefers-color-scheme: dark) {
+  .card-header i {
+    color: rgb(203 213 225);
+  }
 }
 
 .setup-body {
@@ -403,13 +462,19 @@ function goUtilIndex() {
 .hint {
   margin: 0;
   font-size: 0.9rem;
-  color: #606266;
-  line-height: 1.5;
+  color: rgb(71 85 105);
+  line-height: 1.55;
+}
+
+@media (prefers-color-scheme: dark) {
+  .hint {
+    color: rgb(163 163 163);
+  }
 }
 
 .start-btn {
   align-self: stretch;
-  border-radius: 12px;
+  border-radius: 9999px;
 }
 
 .progress-bar {
@@ -423,16 +488,28 @@ function goUtilIndex() {
 .word-en {
   font-size: 2rem;
   font-weight: 700;
-  color: #303133;
+  color: rgb(15 23 42);
   letter-spacing: 0.02em;
   margin-bottom: 8px;
   font-family: Georgia, "Times New Roman", serif;
 }
 
+@media (prefers-color-scheme: dark) {
+  .word-en {
+    color: rgb(248 250 252);
+  }
+}
+
 .word-tip {
   font-size: 0.9rem;
-  color: #909399;
+  color: rgb(100 116 139);
   margin: 0 0 20px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .word-tip {
+    color: rgb(163 163 163);
+  }
 }
 
 .options-group {
@@ -454,7 +531,25 @@ function goUtilIndex() {
 
 .option-dont-know {
   border-style: dashed !important;
-  color: #909399;
+  color: rgb(100 116 139);
+}
+
+@media (prefers-color-scheme: dark) {
+  .option-dont-know {
+    color: rgb(163 163 163);
+  }
+}
+
+.vocab-matrix-card :deep(.el-radio.is-bordered) {
+  border-color: rgb(203 213 225 / 0.9);
+  background: rgb(255 255 255 / 0.5);
+}
+
+@media (prefers-color-scheme: dark) {
+  .vocab-matrix-card :deep(.el-radio.is-bordered) {
+    border-color: rgb(51 65 85 / 0.9);
+    background: rgb(30 41 59 / 0.35);
+  }
 }
 
 .result-body {
@@ -464,44 +559,82 @@ function goUtilIndex() {
 .estimate-box {
   text-align: center;
   padding: 20px 16px 24px;
-  background: rgb(37 99 235 / 0.08);
-  border: 1px solid rgb(37 99 235 / 0.2);
-  border-radius: 12px;
+  background: rgb(100 116 139 / 0.1);
+  border: 1px solid rgb(100 116 139 / 0.28);
+  border-radius: 0.75rem;
   margin-bottom: 20px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .estimate-box {
+    background: rgb(148 163 184 / 0.12);
+    border-color: rgb(148 163 184 / 0.28);
+  }
 }
 
 .estimate-label {
   font-size: 0.95rem;
-  color: #606266;
+  color: rgb(71 85 105);
   margin-bottom: 8px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .estimate-label {
+    color: rgb(163 163 163);
+  }
 }
 
 .estimate-num {
   font-size: 2.8rem;
   font-weight: 800;
-  color: var(--site-accent);
+  color: rgb(51 65 85);
   line-height: 1.1;
+}
+
+@media (prefers-color-scheme: dark) {
+  .estimate-num {
+    color: rgb(226 232 240);
+  }
 }
 
 .estimate-unit {
   font-size: 0.85rem;
-  color: #909399;
+  color: rgb(100 116 139);
   margin-top: 4px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .estimate-unit {
+    color: rgb(163 163 163);
+  }
 }
 
 .level-box {
   margin-bottom: 20px;
   padding: 14px 14px 8px;
-  background: rgb(37 99 235 / 0.06);
-  border-radius: 12px;
-  border: 1px solid rgb(37 99 235 / 0.22);
+  background: rgb(100 116 139 / 0.08);
+  border-radius: 0.75rem;
+  border: 1px solid rgb(100 116 139 / 0.22);
+}
+
+@media (prefers-color-scheme: dark) {
+  .level-box {
+    background: rgb(148 163 184 / 0.1);
+    border-color: rgb(148 163 184 / 0.22);
+  }
 }
 
 .level-box-title {
   font-size: 0.95rem;
   font-weight: 600;
-  color: #303133;
+  color: rgb(30 41 59);
   margin-bottom: 10px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .level-box-title {
+    color: rgb(248 250 252);
+  }
 }
 
 .level-desc {
@@ -510,10 +643,16 @@ function goUtilIndex() {
 
 .level-note {
   font-size: 0.78rem;
-  color: #909399;
+  color: rgb(100 116 139);
   line-height: 1.5;
   margin: 0;
   padding-top: 4px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .level-note {
+    color: rgb(163 163 163);
+  }
 }
 
 .result-desc {
@@ -532,9 +671,15 @@ function goUtilIndex() {
 
 .disclaimer {
   font-size: 0.82rem;
-  color: #909399;
+  color: rgb(100 116 139);
   line-height: 1.55;
   margin: 0 0 20px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .disclaimer {
+    color: rgb(163 163 163);
+  }
 }
 
 .result-actions {
@@ -543,26 +688,116 @@ function goUtilIndex() {
   gap: 12px;
 }
 
-@media (max-width: 768px) {
-  .title {
-    font-size: 1.65rem;
+/* 按钮与题量选项：主色用 slate，不用蓝 */
+.matrix-root :deep(.el-button--primary) {
+  --el-button-bg-color: rgb(51 65 85);
+  --el-button-border-color: rgb(51 65 85);
+  --el-button-hover-bg-color: rgb(71 85 105);
+  --el-button-hover-border-color: rgb(71 85 105);
+  --el-button-active-bg-color: rgb(30 41 59);
+  --el-button-active-border-color: rgb(30 41 59);
+  --el-button-text-color: #fff;
+  --el-button-hover-text-color: #fff;
+  --el-button-active-text-color: #fff;
+}
+
+.matrix-root :deep(.el-button--primary.is-plain) {
+  --el-button-bg-color: transparent;
+  --el-button-border-color: rgb(100 116 139);
+  --el-button-text-color: rgb(51 65 85);
+  --el-button-hover-bg-color: rgb(241 245 249);
+  --el-button-hover-border-color: rgb(71 85 105);
+  --el-button-hover-text-color: rgb(51 65 85);
+  --el-button-active-text-color: rgb(51 65 85);
+}
+
+.matrix-root :deep(.el-button.is-link.el-button--primary) {
+  --el-button-text-color: rgb(71 85 105);
+  --el-button-hover-text-color: rgb(51 65 85);
+}
+
+.matrix-root :deep(.el-radio-button__original-radio:checked + .el-radio-button__inner) {
+  background-color: rgb(51 65 85);
+  border-color: rgb(51 65 85);
+  color: #fff;
+  box-shadow: -1px 0 0 0 rgb(51 65 85);
+}
+
+.matrix-root :deep(.el-radio-button:first-child .el-radio-button__original-radio:checked + .el-radio-button__inner) {
+  box-shadow: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  .matrix-root :deep(.el-button--primary) {
+    --el-button-bg-color: rgb(226 232 240);
+    --el-button-border-color: rgb(226 232 240);
+    --el-button-hover-bg-color: rgb(248 250 252);
+    --el-button-hover-border-color: rgb(248 250 252);
+    --el-button-active-bg-color: rgb(203 213 225);
+    --el-button-active-border-color: rgb(203 213 225);
+    --el-button-text-color: rgb(15 23 42);
+    --el-button-hover-text-color: rgb(15 23 42);
+    --el-button-active-text-color: rgb(15 23 42);
   }
+
+  .matrix-root :deep(.el-button--primary.is-plain) {
+    --el-button-bg-color: transparent;
+    --el-button-border-color: rgb(148 163 184);
+    --el-button-text-color: rgb(226 232 240);
+    --el-button-hover-bg-color: rgb(51 65 85);
+    --el-button-hover-border-color: rgb(203 213 225);
+    --el-button-hover-text-color: rgb(248 250 252);
+    --el-button-active-text-color: rgb(248 250 252);
+  }
+
+  .matrix-root :deep(.el-button.is-link.el-button--primary) {
+    --el-button-text-color: rgb(203 213 225);
+    --el-button-hover-text-color: rgb(248 250 252);
+  }
+
+  .matrix-root :deep(.el-radio-button__original-radio:checked + .el-radio-button__inner) {
+    background-color: rgb(226 232 240);
+    border-color: rgb(226 232 240);
+    color: rgb(15 23 42);
+    box-shadow: -1px 0 0 0 rgb(226 232 240);
+  }
+
+  .matrix-root :deep(.el-radio-button:first-child .el-radio-button__original-radio:checked + .el-radio-button__inner) {
+    box-shadow: none;
+  }
+}
+
+/* 进度条与选项圆点：与按钮同色 slate，避免残留品牌蓝 */
+.matrix-root :deep(.el-progress-bar__inner) {
+  background-color: rgb(71 85 105);
+}
+
+.matrix-root :deep(.el-radio__input.is-checked .el-radio__inner) {
+  background-color: rgb(51 65 85);
+  border-color: rgb(51 65 85);
+}
+
+@media (prefers-color-scheme: dark) {
+  .matrix-root :deep(.el-progress-bar__inner) {
+    background-color: rgb(203 213 225);
+  }
+
+  .matrix-root :deep(.el-radio__input.is-checked .el-radio__inner) {
+    background-color: rgb(226 232 240);
+    border-color: rgb(226 232 240);
+  }
+}
+
+@media (max-width: 768px) {
   .word-en {
     font-size: 1.55rem;
   }
   .estimate-num {
     font-size: 2.2rem;
   }
-  .content-container {
-    padding: 0 12px;
-  }
 }
 
 @media (max-width: 480px) {
-  .title {
-    font-size: 1.35rem;
-  }
-
   .word-en {
     font-size: 1.25rem;
   }
@@ -574,10 +809,6 @@ function goUtilIndex() {
 
   .estimate-num {
     font-size: 2rem;
-  }
-
-  .content-container {
-    padding: 0 10px;
   }
 
   .option-radio {

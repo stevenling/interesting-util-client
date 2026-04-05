@@ -1,10 +1,15 @@
 <template>
   <div class="ebook-convert-page">
-    <TopMenu />
+    <el-tooltip content="返回小工具集" placement="right">
+      <RouterLink to="/utilIndex" class="ebook-back-fab" aria-label="返回小工具集">
+        <el-icon :size="18"><ArrowLeft /></el-icon>
+      </RouterLink>
+    </el-tooltip>
+
     <div class="main-container">
       <div class="hero-section">
         <div class="title">电子书格式转换</div>
-        <div class="subtitle">支持 EPUB、AZW3 与 PDF 之间的转换</div>
+        <div class="subtitle">EPUB 转 PDF（需本地转换服务）</div>
       </div>
 
       <div class="content-container">
@@ -35,7 +40,7 @@
           <el-upload
             class="upload-area"
             drag
-            accept=".epub,.azw3"
+            accept=".epub"
             :auto-upload="false"
             :show-file-list="true"
             :limit="1"
@@ -45,10 +50,10 @@
           >
             <el-icon class="el-icon--upload"><upload-filled /></el-icon>
             <div class="el-upload__text">
-              将 EPUB 或 AZW3 文件拖到此处，或<em>点击上传</em>
+              将 EPUB 文件拖到此处，或<em>点击上传</em>
             </div>
             <template #tip>
-              <div class="el-upload__tip">仅支持 .epub、.azw3 文件</div>
+              <div class="el-upload__tip">仅支持 .epub</div>
             </template>
           </el-upload>
         </el-card>
@@ -61,14 +66,14 @@
             </div>
           </template>
           <el-row :gutter="[16, 16]">
-            <el-col :xs="24" :sm="12">
+            <el-col :span="24">
               <div
                 class="option-item"
                 :class="{ disabled: !canEpubToPdf, converting: converting === 'epub2pdf' }"
                 @click="convertEpubToPdf"
               >
                 <div class="option-label">EPUB → PDF</div>
-                <div class="option-desc">服务端 Puppeteer 渲染（推荐）</div>
+                <div class="option-desc">本地 Node + Puppeteer；开发时经当前站点 /ebook-convert 代理到 :3001</div>
                 <el-button
                   type="primary"
                   size="small"
@@ -79,57 +84,17 @@
                 </el-button>
               </div>
             </el-col>
-            <el-col :xs="24" :sm="12">
-              <div
-                class="option-item"
-                :class="{ disabled: !hasEpubFile }"
-                @click="convertEpubToAzw3"
-              >
-                <div class="option-label">EPUB → AZW3</div>
-                <div class="option-desc">需服务端安装 Calibre</div>
-                <el-button type="primary" size="small" :disabled="!hasEpubFile">
-                  转换为 AZW3
-                </el-button>
-              </div>
-            </el-col>
-            <el-col :xs="24" :sm="12">
-              <div
-                class="option-item"
-                :class="{ disabled: !hasAzw3File }"
-                @click="convertAzw3ToEpub"
-              >
-                <div class="option-label">AZW3 → EPUB</div>
-                <div class="option-desc">需服务端安装 Calibre</div>
-                <el-button type="primary" size="small" :disabled="!hasAzw3File">
-                  转换为 EPUB
-                </el-button>
-              </div>
-            </el-col>
-            <el-col :xs="24" :sm="12">
-              <div
-                class="option-item"
-                :class="{ disabled: !hasAzw3File }"
-                @click="convertAzw3ToPdf"
-              >
-                <div class="option-label">AZW3 → PDF</div>
-                <div class="option-desc">需服务端安装 Calibre</div>
-                <el-button type="primary" size="small" :disabled="!hasAzw3File">
-                  转换为 PDF
-                </el-button>
-              </div>
-            </el-col>
           </el-row>
         </el-card>
 
-        <!-- AZW3 说明 -->
         <el-alert
-          class="azw3-tip"
-          title="关于 AZW3 转换"
+          class="ebook-convert-tip"
+          title="使用说明"
           type="info"
           :closable="false"
           show-icon
         >
-          AZW3 为 Kindle 专有格式，EPUB↔AZW3、AZW3→PDF 需在服务端使用 Calibre 的 ebook-convert 完成。<strong>EPUB 转 PDF</strong> 由本地的 Node.js + Puppeteer 转换服务完成，请先运行 <code>ebook-convert-server</code>（默认 http://localhost:3001）。
+          请先启动 <code>ebook-convert-server</code>（默认监听 <code>:3001</code>）。开发环境下请求走 <code>/ebook-convert</code> 由 Vite 转发，无需处理 CORS。若仍失败，可在 <code>.env</code> 中设置 <code>VITE_EBOOK_CONVERT_PROXY_TARGET</code>（手机访问 dev 时常需改为电脑局域网 IP）；仅当需要直连时才设 <code>VITE_EBOOK_CONVERT_API</code>（须服务端允许跨域）。
         </el-alert>
       </div>
     </div>
@@ -139,9 +104,9 @@
 
 <script setup>
 import { ref, computed } from "vue";
+import { RouterLink } from "vue-router";
 import { ElMessage } from "element-plus";
-import { UploadFilled, CircleCheckFilled } from "@element-plus/icons-vue";
-import TopMenu from "./TopMenu.vue";
+import { UploadFilled, CircleCheckFilled, ArrowLeft } from "@element-plus/icons-vue";
 
 const fileList = ref([]);
 const sourceFile = ref(null);
@@ -160,8 +125,6 @@ function formatTime(seconds) {
   return sec > 0 ? `${m}分${sec}秒` : `${m}分`;
 }
 
-const hasEpubFile = computed(() => sourceType.value === "epub");
-const hasAzw3File = computed(() => sourceType.value === "azw3");
 const canEpubToPdf = computed(() => sourceType.value === "epub" && sourceFile.value);
 
 function handleFileChange(file) {
@@ -169,19 +132,16 @@ function handleFileChange(file) {
   const name = (raw && raw.name) || "";
   const isEpub =
     (raw && raw.type === "application/epub+zip") || name.toLowerCase().endsWith(".epub");
-  const isAzw3 =
-    (raw && raw.name && raw.name.toLowerCase().endsWith(".azw3")) ||
-    (raw && raw.type && raw.type.indexOf("octet-stream") >= 0 && raw.name && raw.name.toLowerCase().endsWith(".azw3"));
 
-  if (!isEpub && !isAzw3) {
-    ElMessage.warning("请上传 .epub 或 .azw3 文件");
+  if (!isEpub) {
+    ElMessage.warning("请上传 .epub 文件");
     fileList.value = [];
     sourceFile.value = null;
     sourceType.value = null;
     return;
   }
   sourceFile.value = raw;
-  sourceType.value = isEpub ? "epub" : "azw3";
+  sourceType.value = "epub";
   fileList.value = [{ name: raw.name, status: "ready", uid: Date.now(), raw }];
   ElMessage.success(`已选择文件：${raw.name}`);
 }
@@ -192,23 +152,31 @@ function handleFileRemove() {
   sourceType.value = null;
 }
 
-function convertEpubToAzw3() {
-  if (!hasEpubFile.value) return;
-  ElMessage.info("AZW3 转换需服务端安装 Calibre（ebook-convert），暂不支持在浏览器中完成。");
+/**
+ * EPUB→PDF 接口地址：
+ * - 若设置 VITE_EBOOK_CONVERT_API（完整 URL），则直连（需服务端允许 CORS）
+ * - 否则走同源路径 /{base}ebook-convert/convert/epub2pdf，由 Vite 开发代理或线上 Nginx 转发到 :3001
+ */
+function getEpub2PdfUrl() {
+  const fromEnv = (import.meta.env.VITE_EBOOK_CONVERT_API || "").trim();
+  if (fromEnv) {
+    return `${fromEnv.replace(/\/$/, "")}/convert/epub2pdf`;
+  }
+  const base = import.meta.env.BASE_URL || "/";
+  const root = base.endsWith("/") ? base : `${base}/`;
+  return `${root}ebook-convert/convert/epub2pdf`.replace(/([^:])\/{2,}/g, "$1/");
 }
 
-function convertAzw3ToEpub() {
-  if (!hasAzw3File.value) return;
-  ElMessage.info("AZW3 转换需服务端安装 Calibre（ebook-convert），暂不支持在浏览器中完成。");
+function formatFetchError(err) {
+  const msg = err && err.message ? String(err.message) : String(err);
+  if (msg === "Failed to fetch" || msg.includes("NetworkError") || msg.includes("Load failed")) {
+    console.warn(
+      "[EbookConvert] 网络错误：请确认 ebook-convert-server 已启动；开发环境应删除 .env 中的 VITE_EBOOK_CONVERT_API 以走 /ebook-convert 代理；手机访问 dev 时设置 VITE_EBOOK_CONVERT_PROXY_TARGET 为电脑局域网 IP。"
+    );
+    return "无法连接转换服务（请确认 :3001 已启动，并优先使用 Vite 代理而非直连跨域）";
+  }
+  return msg;
 }
-
-function convertAzw3ToPdf() {
-  if (!hasAzw3File.value) return;
-  ElMessage.info("AZW3 转换需服务端安装 Calibre（ebook-convert），暂不支持在浏览器中完成。");
-}
-
-// Vite 仅暴露以 VITE_ 开头的环境变量；可在 .env 中设置 VITE_EBOOK_CONVERT_API
-const ebookConvertApiBase = import.meta.env.VITE_EBOOK_CONVERT_API ?? "http://localhost:3001";
 
 async function convertEpubToPdf() {
   if (!canEpubToPdf.value || !sourceFile.value) return;
@@ -221,7 +189,7 @@ async function convertEpubToPdf() {
     convertElapsed.value = (Date.now() - startTime) / 1000;
   }, 500);
   try {
-    const apiUrl = `${ebookConvertApiBase.replace(/\/$/, "")}/convert/epub2pdf`;
+    const apiUrl = getEpub2PdfUrl();
     convertProgress.value = 20;
     const form = new FormData();
     form.append("epub", sourceFile.value);
@@ -247,7 +215,7 @@ async function convertEpubToPdf() {
     ElMessage.success("EPUB 已转换为 PDF，已开始下载。");
   } catch (e) {
     console.error("epub to pdf error:", e);
-    ElMessage.error("转换失败：" + (e && e.message ? e.message : String(e)));
+    ElMessage.error("转换失败：" + formatFetchError(e));
   } finally {
     converting.value = null;
     if (convertTimer) {
@@ -280,9 +248,42 @@ function downloadBlob(blob, filename) {
   background: transparent;
 }
 
+.ebook-back-fab {
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  z-index: 2000;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--site-surface-solid);
+  border: 1px solid var(--site-border);
+  color: var(--site-heading);
+  box-shadow: var(--site-card-shadow);
+  text-decoration: none;
+  transition:
+    color 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.15s ease;
+}
+
+.ebook-back-fab:hover {
+  color: var(--site-accent);
+  border-color: var(--site-accent);
+  box-shadow: 0 2px 12px rgb(15 23 42 / 0.08);
+}
+
+.ebook-back-fab:active {
+  transform: scale(0.96);
+}
+
 .main-container {
   flex: 1;
-  padding: 20px 0 40px;
+  padding: 56px 0 40px;
 }
 
 .hero-section {
@@ -420,7 +421,7 @@ function downloadBlob(blob, filename) {
   color: #999;
 }
 
-.azw3-tip {
+.ebook-convert-tip {
   margin-top: 16px;
   border-radius: 8px;
 }

@@ -176,8 +176,15 @@ function startCooldown(seconds) {
   }, 1000)
 }
 
+/**
+ * 点击发送验证码
+ */
 async function onSendCode() {
-  if (sendingCode.value || sendCooldown.value > 0) return
+  if (sendingCode.value || sendCooldown.value > 0) {
+    return
+  }
+  
+  // 校验邮箱格式
   const e = String(email.value || '').trim()
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)) {
     ElMessage.warning('请先填写有效邮箱')
@@ -217,13 +224,12 @@ async function onSubmit() {
   }
   loading.value = true
   try {
-    try {
-      await authEmailApi.verifyRegisterCode(e, code)
-    } catch (err) {
-      ElMessage.error(err?.message || '验证码校验失败')
-      return
-    }
-    const res = demoAuth.register(username.value, password.value, e)
+    const res = await demoAuth.registerWithServer(
+      username.value,
+      password.value,
+      e,
+      code
+    )
     if (!res.ok) {
       ElMessage.error(res.message)
       return

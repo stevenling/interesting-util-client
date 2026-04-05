@@ -56,11 +56,13 @@ export const constantRoutes = [
     {
         name: 'ArticleList',
         path: '/articleList',
+        meta: { public: true },
         component: () => import("@/components/ArticleList.vue")
     },
     {
         name: 'ArticleDetail',
         path: '/articleDetail',
+        meta: { public: true },
         component: () => import("@/components/ArticleDetail.vue")
     },
     {

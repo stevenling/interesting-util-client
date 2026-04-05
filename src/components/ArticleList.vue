@@ -1,9 +1,13 @@
 <template>
   <div class="article-list">
-    <TopMenu></TopMenu>
-    
     <div class="scrollable-content">
       <div class="list-container">
+        <RouterLink
+          to="/utilIndex"
+          class="mb-2 shrink-0 inline-block text-sm text-slate-500 hover:text-slate-800 dark:text-neutral-500 dark:hover:text-neutral-200 transition-colors duration-300"
+        >
+          ← 
+        </RouterLink>
         <!-- 标签页：左侧云胡收藏文章集，右侧云胡选集 -->
         <el-tabs v-model="activeTab" class="list-tabs">
           <el-tab-pane label="藏文" name="collection">
@@ -139,10 +143,9 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
-import { useRouter, useRoute } from 'vue-router';
+import { useRouter, useRoute, RouterLink } from 'vue-router';
 import { ElMessage } from 'element-plus';
 import { Search, Document, Clock } from '@element-plus/icons-vue';
-import TopMenu from './TopMenu.vue';
 import { getAllArticles } from '@/config/articles';
 import { getAllYunhuEssayArticles } from '@/config/yunhu-essay';
 

@@ -19,6 +19,54 @@
       aria-hidden="true"
     />
 
+    <div
+      class="fixed top-5 right-5 z-20 sm:top-7 sm:right-8 flex items-center gap-2 pointer-events-auto"
+      aria-live="polite"
+    >
+      <template v-if="isLoggedIn">
+        <span
+          class="inline-flex items-center rounded-full border border-black/[0.08] dark:border-white/[0.12] bg-white/80 dark:bg-zinc-900/70 backdrop-blur-md px-3.5 py-1.5 text-[13px] font-medium text-slate-900 dark:text-white truncate max-w-[10rem] sm:max-w-[14rem] shadow-sm"
+        >
+          {{ loggedInName || '用户' }}
+        </span>
+        <button
+          type="button"
+          class="shrink-0 rounded-full border border-black/[0.08] dark:border-white/[0.12] bg-white/80 dark:bg-zinc-900/70 backdrop-blur-md px-3 py-1.5 text-[13px] font-medium text-slate-600 hover:text-slate-900 hover:bg-white/95 dark:text-neutral-300 dark:hover:text-white dark:hover:bg-zinc-800/80 shadow-sm transition-colors duration-200"
+          @click="onLogout"
+        >
+          退出
+        </button>
+      </template>
+      <el-popover
+        v-else
+        placement="bottom-end"
+        :width="280"
+        trigger="click"
+        popper-class="util-index-auth-hint-popper"
+      >
+        <template #reference>
+          <button
+            type="button"
+            class="shrink-0 rounded-full border border-black/[0.08] dark:border-white/[0.12] bg-white/80 dark:bg-zinc-900/70 backdrop-blur-md px-3.5 py-1.5 text-[13px] font-medium text-slate-600 hover:text-slate-900 hover:bg-white/95 dark:text-neutral-300 dark:hover:text-white dark:hover:bg-zinc-800/80 shadow-sm transition-colors duration-200"
+          >
+            未登录
+          </button>
+        </template>
+        <p class="text-sm text-slate-600 dark:text-neutral-300 leading-relaxed m-0">
+          使用下方工具前请先
+          <router-link
+            to="/register"
+            class="text-slate-800 dark:text-neutral-100 font-medium hover:underline underline-offset-2"
+          >注册</router-link>
+          或
+          <router-link
+            :to="{ path: '/login', query: { redirect: route.fullPath } }"
+            class="text-slate-800 dark:text-neutral-100 font-medium hover:underline underline-offset-2"
+          >登录</router-link>
+        </p>
+      </el-popover>
+    </div>
+
     <div class="relative flex-1 min-h-0 flex flex-col">
       <section
         class="matrix-hero text-center px-6 pt-20 pb-12 sm:pt-28 sm:pb-16"
@@ -42,36 +90,50 @@
           class="mt-10 h-px w-12 mx-auto matrix-divider rounded-full"
           aria-hidden="true"
         />
-        <p class="mt-8 text-sm text-slate-600 dark:text-neutral-400">
-          使用下方工具前请先
-          <router-link
-            to="/register"
-            class="text-slate-800 dark:text-neutral-200 font-medium hover:underline underline-offset-2"
-          >注册</router-link>
-          或
-          <router-link
-            to="/login"
-            class="text-slate-800 dark:text-neutral-200 font-medium hover:underline underline-offset-2"
-          >登录</router-link>
-        </p>
       </section>
 
       <ToolSection
         class="matrix-links !pt-4 sm:!pt-6"
         title="程序员工具"
         :list="devTools"
+        :require-login="!isLoggedIn"
+        @require-auth="onToolRequireAuth"
       />
       <ToolSection
         class="matrix-links !pt-4 sm:!pt-6"
         title="阅读与文档"
         :list="readingTools"
+        :require-login="!isLoggedIn"
+        @require-auth="onToolRequireAuth"
       />
       <ToolSection
         class="matrix-links !pt-4 sm:!pt-6 pb-12 sm:pb-14"
         title="其他实用工具"
         :list="otherTools"
+        :require-login="!isLoggedIn"
+        @require-auth="onToolRequireAuth"
       />
     </div>
+
+    <el-dialog
+      v-model="toolAuthDialogVisible"
+      title="需要登录"
+      width="400px"
+      align-center
+      append-to-body
+      class="util-index-tool-auth-dialog"
+      @closed="pendingToolPath = ''"
+    >
+      <p class="text-sm text-slate-600 dark:text-neutral-400 leading-relaxed m-0">
+        使用工具前需要先登录。登录成功后会自动打开你刚才选择的工具。
+      </p>
+      <template #footer>
+        <div class="flex flex-wrap justify-end gap-2">
+          <el-button @click="toolAuthDialogVisible = false">稍后再说</el-button>
+          <el-button type="primary" @click="goLoginForTool">去登录</el-button>
+        </div>
+      </template>
+    </el-dialog>
 
     <footer
       class="matrix-footer relative mt-auto border-t border-black/[0.06] dark:border-white/[0.08] py-8 px-6"
@@ -91,8 +153,48 @@
 </template>
 
 <script setup>
+import { computed, ref } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { ElMessage } from 'element-plus'
 import ToolSection from './ToolSection.vue'
 import '../styles/matrix-page.css'
+import * as demoAuth from '@/utils/demoAuth'
+
+const route = useRoute()
+const router = useRouter()
+/** localStorage 非响应式，登出后 bump 以刷新 isLoggedIn / 注册提示 */
+const authTick = ref(0)
+
+const isLoggedIn = computed(() => {
+  authTick.value
+  return !!demoAuth.getToken()
+})
+const loggedInName = computed(() => {
+  authTick.value
+  return demoAuth.getStoredUsername().trim()
+})
+
+function onLogout() {
+  demoAuth.clearSession()
+  authTick.value += 1
+  ElMessage.success('已退出')
+  router.replace({ path: '/utilIndex', query: {} })
+}
+
+const toolAuthDialogVisible = ref(false)
+const pendingToolPath = ref('')
+
+function onToolRequireAuth(path) {
+  pendingToolPath.value =
+    typeof path === 'string' && path.startsWith('/') ? path : '/utilIndex'
+  toolAuthDialogVisible.value = true
+}
+
+function goLoginForTool() {
+  const redirect = pendingToolPath.value || route.fullPath
+  toolAuthDialogVisible.value = false
+  router.push({ path: '/login', query: { redirect } })
+}
 
 const devTools = [
   { title: 'Json 代码美化', desc: '格式化与高亮 JSON', link: '/JsonFormat' },
@@ -110,7 +212,6 @@ const readingTools = [
 
 const otherTools = [
   { title: '历史年表', desc: '按国别浏览历史时间线', link: '/historyTimeline' },
-  { title: '假期倒计时', desc: '距离节假日还有多久', link: '/BetweenNowToHoliday' },
   { title: '天干地支纪年', desc: '传统干支换算', link: '/heavenlyStemsAndEarthlyBranches' },
   { title: '英语词汇量测试', desc: '自测词汇量', link: '/vocabularyTest' },
   { title: '驾考刷题王', desc: '题库练习与同步', link: '/jztk' },

@@ -16,6 +16,12 @@ export default defineConfig(({ mode }) => {
     ''
   )
 
+  /** EPUB→PDF（ebook-convert-server）避免浏览器直连 :3001 触发 CORS */
+  const ebookConvertProxyTarget = (env.VITE_EBOOK_CONVERT_PROXY_TARGET || 'http://localhost:3001').replace(
+    /\/$/,
+    ''
+  )
+
   return {
     base,
     plugins: [tailwindcss(), vue()],
@@ -31,6 +37,11 @@ export default defineConfig(({ mode }) => {
         '/api': {
           target: devProxyTarget,
           changeOrigin: true,
+        },
+        '/ebook-convert': {
+          target: ebookConvertProxyTarget,
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/ebook-convert/, '') || '/',
         },
       },
     },

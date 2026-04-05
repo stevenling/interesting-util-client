@@ -130,7 +130,7 @@ async function onSubmit() {
   if (loading.value) return
   loading.value = true
   try {
-    const res = demoAuth.login(username.value, password.value)
+    const res = await demoAuth.login(username.value, password.value)
     if (!res.ok) {
       ElMessage.error(res.message)
       return

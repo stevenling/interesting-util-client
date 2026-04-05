@@ -1,6 +1,11 @@
 <template>
   <div class="jztk-home-page">
-    <TopMenu />
+    <el-tooltip content="返回小工具集" placement="right">
+      <RouterLink to="/utilIndex" class="jztk-back-fab" aria-label="返回小工具集">
+        <el-icon :size="18"><ArrowLeft /></el-icon>
+      </RouterLink>
+    </el-tooltip>
+
     <div class="main-container">
       <div class="hero-section">
         <div class="title">驾考刷题王</div>
@@ -63,8 +68,8 @@
 </template>
 
 <script setup>
-import { useRouter } from "vue-router";
-import TopMenu from "./TopMenu.vue";
+import { useRouter, RouterLink } from "vue-router";
+import { ArrowLeft } from "@element-plus/icons-vue";
 
 const router = useRouter();
 
@@ -97,18 +102,47 @@ function goFavorites(subject) {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  --jztk-blue: #2563eb;
-  --jztk-blue-soft: #eff6ff;
-  --jztk-blue-border: #bfdbfe;
-  --jztk-text: #1e293b;
-  --jztk-muted: #64748b;
-  --jztk-line: #e2e8f0;
+  background: var(--site-bg);
+  --jztk-line: var(--site-border);
+}
+
+.jztk-back-fab {
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  z-index: 2000;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--site-surface-solid);
+  border: 1px solid var(--site-border);
+  color: var(--site-heading);
+  box-shadow: var(--site-card-shadow);
+  text-decoration: none;
+  transition:
+    color 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.15s ease;
+}
+
+.jztk-back-fab:hover {
+  color: var(--site-accent);
+  border-color: var(--site-accent);
+  box-shadow: 0 2px 12px rgb(15 23 42 / 0.08);
+}
+
+.jztk-back-fab:active {
+  transform: scale(0.96);
 }
 
 .main-container {
   flex: 1;
   background: transparent;
-  padding: 20px 0 48px;
+  padding: 56px 0 48px;
 }
 
 .hero-section {
@@ -170,8 +204,8 @@ function goFavorites(subject) {
 
 .subject-card:hover {
   transform: translateY(-2px);
-  border-color: #cbd5e1;
-  box-shadow: 0 10px 28px rgba(15, 23, 42, 0.07);
+  border-color: var(--site-border);
+  box-shadow: var(--site-card-shadow), 0 10px 28px rgb(15 23 42 / 0.06);
 }
 
 .subject-icon {
@@ -184,23 +218,23 @@ function goFavorites(subject) {
   justify-content: center;
   font-size: 1.35rem;
   font-weight: 700;
-  color: var(--jztk-blue);
-  background: var(--jztk-blue-soft);
-  border: 1px solid var(--jztk-blue-border);
+  color: var(--site-accent);
+  background: color-mix(in srgb, var(--site-accent) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--site-accent) 28%, transparent);
 }
 
 .subject-title {
   margin: 0 0 10px;
   font-size: 1.2rem;
   font-weight: 600;
-  color: var(--jztk-text);
+  color: var(--site-heading);
 }
 
 .subject-desc {
   margin: 0 0 18px;
   font-size: 0.86rem;
   line-height: 1.65;
-  color: var(--jztk-muted);
+  color: var(--site-muted);
   padding: 0 14px;
   min-height: 4.5em;
 }
@@ -225,34 +259,35 @@ function goFavorites(subject) {
   width: 3px;
   height: 3px;
   border-radius: 50%;
-  background: #cbd5e1;
+  background: var(--site-border);
   flex-shrink: 0;
 }
 
 .subject-card :deep(.jztk-sub-link) {
-  color: var(--jztk-muted);
+  color: var(--site-muted);
   font-size: 0.8125rem;
   font-weight: 400;
   padding: 4px 6px;
 }
 
 .subject-card :deep(.jztk-sub-link:hover) {
-  color: var(--jztk-blue);
+  color: var(--site-accent);
 }
 
 .hint {
   margin-top: 24px;
   font-size: 0.82rem;
   line-height: 1.55;
-  color: var(--jztk-muted);
+  color: var(--site-muted);
   text-align: center;
 }
 
 .hint code {
   padding: 2px 6px;
   border-radius: 4px;
-  background: #f1f5f9;
+  background: var(--site-surface-solid);
+  border: 1px solid var(--site-border);
   font-size: 0.8rem;
-  color: var(--jztk-text);
+  color: var(--site-heading);
 }
 </style>

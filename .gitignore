@@ -25,3 +25,9 @@ pnpm-debug.log*
 .env
 .vercel
 .env*.local
+
+# FastAPI
+server/.env
+server/.venv/
+**/__pycache__/
+*.py[cod]

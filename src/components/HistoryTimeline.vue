@@ -1,6 +1,11 @@
 <template>
   <div class="history-timeline-page">
-    <TopMenu />
+    <el-tooltip content="返回小工具集" placement="right">
+      <RouterLink to="/utilIndex" class="ht-back-fab" aria-label="返回小工具集">
+        <el-icon :size="18"><ArrowLeft /></el-icon>
+      </RouterLink>
+    </el-tooltip>
+
     <div class="main-container">
       <div class="hero-section">
         <div class="title">历史年表</div>
@@ -62,8 +67,8 @@
 
 <script setup>
 import { computed } from "vue";
-import { useRoute, useRouter } from "vue-router";
-import TopMenu from "./TopMenu.vue";
+import { useRoute, useRouter, RouterLink } from "vue-router";
+import { ArrowLeft } from "@element-plus/icons-vue";
 import {
   countryList,
   getTimelineForCountry,
@@ -96,12 +101,46 @@ function goBack() {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  background: var(--site-bg);
+}
+
+.ht-back-fab {
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  z-index: 2000;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--site-surface-solid);
+  border: 1px solid var(--site-border);
+  color: var(--site-heading);
+  box-shadow: var(--site-card-shadow);
+  text-decoration: none;
+  transition:
+    color 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.15s ease;
+}
+
+.ht-back-fab:hover {
+  color: var(--site-accent);
+  border-color: var(--site-accent);
+  box-shadow: 0 2px 12px rgb(15 23 42 / 0.08);
+}
+
+.ht-back-fab:active {
+  transform: scale(0.96);
 }
 
 .main-container {
   flex: 1;
   background: transparent;
-  padding: 20px 0 40px;
+  padding: 56px 0 40px;
 }
 
 .hero-section {

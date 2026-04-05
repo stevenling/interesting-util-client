@@ -1,16 +1,21 @@
 <template>
-  <div class="epub-reader">
-    <TopMenu></TopMenu>
-    
+  <div class="epub-reader apple-epub">
+    <RouterLink
+      to="/utilIndex"
+      class="apple-back-link mb-2 shrink-0 inline-block pl-4 sm:pl-6 pt-3 sm:pt-4 text-sm transition-colors duration-200"
+    >
+      ← 
+    </RouterLink>
+
     <div class="reader-container">
       <!-- 文件上传区域 -->
       <div v-if="!book" class="upload-section">
-        <div class="upload-card">
-          <h2>EPUB 在线阅读器</h2>
-          <p>上传您的EPUB文件开始阅读</p>
+        <div class="upload-card apple-upload-card">
+          <h2 class="apple-upload-title">EPUB 阅读</h2>
+          <p class="apple-upload-sub">选择或拖入文件即可开始</p>
           
           <el-upload
-            class="upload-area"
+            class="upload-area apple-upload"
             drag
             accept=".epub"
             :auto-upload="false"
@@ -22,8 +27,8 @@
               将文件拖到此处，或<em>点击上传</em>
             </div>
             <template #tip>
-              <div class="el-upload__tip">
-                只能上传 epub 文件
+              <div class="el-upload__tip apple-upload-tip">
+                仅支持 .epub
               </div>
             </template>
           </el-upload>
@@ -35,8 +40,8 @@
         <!-- 主要内容区域 -->
         <div class="content-area">
           <!-- 目录侧边栏 -->
-          <div v-if="showToc" class="toc-sidebar">
-            <h4>目录</h4>
+          <div v-if="showToc" class="toc-sidebar apple-sidebar">
+            <h4 class="apple-sidebar-title">目录</h4>
             <div class="toc-list">
               <div
                 v-for="(item, index) in toc"
@@ -51,8 +56,8 @@
           </div>
 
           <!-- 设置侧边栏 -->
-          <div v-if="showSettings" class="settings-sidebar">
-            <h4>阅读设置</h4>
+          <div v-if="showSettings" class="settings-sidebar apple-sidebar">
+            <h4 class="apple-sidebar-title">阅读设置</h4>
             
             <!-- 字体设置 -->
             <div class="setting-group">
@@ -92,20 +97,20 @@
           </div>
 
           <!-- 阅读区域 -->
-          <div class="reader-view" ref="readerView">
+          <div class="reader-view apple-reader-surface" ref="readerView">
             <div ref="viewerElement" class="epub-viewer"></div>
             
             <!-- 选中文字tooltip面板 -->
-            <div v-if="selectedText" class="tooltip-panel" :style="tooltipStyle">
+            <div v-if="selectedText" class="tooltip-panel apple-tooltip" :style="tooltipStyle">
               <div class="tooltip-content">
                 <div class="tooltip-actions">
-                  <el-button @click="addHighlight" type="primary" size="small">
+                  <el-button class="apple-tooltip-btn" text bg @click="addHighlight" size="small">
                     <el-icon><edit /></el-icon>
-                    添加划线
+                    划线
                   </el-button>
-                  <el-button @click="exportSelectedText" type="success" size="small">
+                  <el-button class="apple-tooltip-btn" text bg @click="exportSelectedText" size="small">
                     <el-icon><picture /></el-icon>
-                    导出图片
+                    导出图
                   </el-button>
                 </div>
               </div>
@@ -113,61 +118,72 @@
             </div>
           </div>
 
-          <!-- 右侧工具栏 -->
-          <div class="right-toolbar">
-            <!-- 书籍信息 -->
-            <div class="book-info">
-              <h3>{{ bookTitle }}</h3>
-              <p v-if="bookAuthor">作者: {{ bookAuthor }}</p>
-            </div>
-            
-            <!-- 页码信息 -->
-            <div class="page-info">
+          <!-- 右侧工具栏（整块可收起） -->
+          <div class="right-panel-host apple-right-host">
+            <button
+              type="button"
+              class="right-panel-edge-toggle apple-edge-toggle"
+              :aria-expanded="rightPanelExpanded"
+              :title="rightPanelExpanded ? '收起' : '展开'"
+              @click="rightPanelExpanded = !rightPanelExpanded"
+            >
+              <el-icon :size="14">
+                <DArrowRight v-if="rightPanelExpanded" />
+                <DArrowLeft v-else />
+              </el-icon>
+            </button>
+            <div v-show="rightPanelExpanded" class="right-toolbar apple-right-toolbar">
+              <div class="book-info apple-book-meta">
+                <h3>{{ bookTitle }}</h3>
+                <p v-if="bookAuthor">{{ bookAuthor }}</p>
+              </div>
+
+            <div class="page-info apple-page-pill">
               <span>{{ currentPage }} / {{ totalPages }}</span>
             </div>
             
-            <!-- 控制按钮 -->
-            <div class="controls">
-              <el-button @click="prevPage" :disabled="currentPage <= 1" size="small">
+            <div class="controls apple-controls">
+              <el-button class="apple-side-btn" text bg @click="prevPage" :disabled="currentPage <= 1" size="default">
                 <el-icon><arrow-left /></el-icon>
                 上一页
               </el-button>
-              
-              <el-button @click="nextPage" :disabled="currentPage >= totalPages" size="small">
+              <el-button class="apple-side-btn" text bg @click="nextPage" :disabled="currentPage >= totalPages" size="default">
                 下一页
                 <el-icon><arrow-right /></el-icon>
               </el-button>
-              
-              <el-button @click="showToc = !showToc" size="small">
+              <el-button class="apple-side-btn" text bg @click="showToc = !showToc" size="default">
                 <el-icon><menu /></el-icon>
                 目录
               </el-button>
-              
-              <el-button @click="showSettings = !showSettings" size="small">
+              <el-button class="apple-side-btn" text bg @click="showSettings = !showSettings" size="default">
                 <el-icon><setting /></el-icon>
                 设置
               </el-button>
-              
-              <el-button @click="showHighlightPanel = !showHighlightPanel" size="small">
+              <el-button class="apple-side-btn" text bg @click="showHighlightPanel = !showHighlightPanel" size="default">
                 <el-icon><edit /></el-icon>
-                划线
+                标记
               </el-button>
-              
-              <el-button @click="resetReader" size="small">
+              <el-button class="apple-side-btn apple-side-btn-muted" text @click="resetReader" size="default">
                 <el-icon><refresh /></el-icon>
-                重新上传
+                换书
               </el-button>
+            </div>
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <el-dialog v-model="showExportImageDialog" title="图片预览" width="700px" center>
-      <div style="display: flex;">
-        <!-- 图片预览区 -->
-        <div style="flex: 1; min-width: 0; display: flex; align-items: center; justify-content: center;">
-          <div style="height: 700px; overflow-y: auto; width: 100%; display: flex; align-items: center; justify-content: center;">
+    <el-dialog
+      v-model="showExportImageDialog"
+      class="epub-apple-export-dialog"
+      title="预览"
+      width="700px"
+      center
+    >
+      <div class="apple-export-layout">
+        <div class="apple-export-preview-wrap">
+          <div class="apple-export-preview-scroll">
             <div
               id="export-preview-area"
               :style="{
@@ -178,9 +194,9 @@
                 color: exportFontColor,
                 fontFamily: exportFont,
                 fontSize: exportFontSize + 'px',
-                borderRadius: '8px',
-                padding: '2.2rem 1.5rem 1.5rem 1.5rem',
-                boxShadow: '0 4px 24px 0 rgba(0,0,0,0.10), 0 1.5px 4px 0 rgba(0,0,0,0.03)',
+                borderRadius: '12px',
+                padding: '2rem 1.5rem 1.5rem 1.5rem',
+                boxShadow: '0 2px 16px rgba(0,0,0,0.08)',
                 lineHeight: 2.2,
                 textAlign: 'left',
                 overflowY: 'auto',
@@ -196,25 +212,24 @@
             </div>
           </div>
         </div>
-        <!-- 设置面板 -->
-        <div style="width: 100px; margin-left: 12px; display: flex; flex-direction: column; gap: 12px; height: 100%; box-sizing: border-box;">
-          <el-select v-model="exportFont" placeholder="字体" size="small">
+        <div class="apple-export-side">
+          <el-select v-model="exportFont" placeholder="字体" size="small" class="apple-export-select">
             <el-option v-for="font in fontOptions" :key="font.value" :label="font.label" :value="font.value" />
           </el-select>
-          <div style="display: flex; align-items: center; gap: 4px;">
-            <el-button @click="exportFontSize = Math.max(12, exportFontSize - 2); generateExportPreview();" size="small">A-</el-button>
-            <span style="min-width: 32px; text-align: center;">{{ exportFontSize }}px</span>
-            <el-button @click="exportFontSize = Math.min(36, exportFontSize + 2); generateExportPreview();" size="small">A+</el-button>
+          <div class="apple-export-font-row">
+            <el-button text bg @click="exportFontSize = Math.max(12, exportFontSize - 2); generateExportPreview();" size="small">A−</el-button>
+            <span class="apple-export-font-size">{{ exportFontSize }}</span>
+            <el-button text bg @click="exportFontSize = Math.min(36, exportFontSize + 2); generateExportPreview();" size="small">A+</el-button>
           </div>
-          <el-select v-model="exportBg" placeholder="背景" size="small">
+          <el-select v-model="exportBg" placeholder="背景" size="small" class="apple-export-select">
             <el-option v-for="bg in backgroundOptions" :key="bg.value" :label="bg.label" :value="bg.value" />
           </el-select>
-          <el-color-picker v-model="exportFontColor" size="small" />
+          <el-color-picker v-model="exportFontColor" size="small" class="apple-color-picker" />
         </div>
       </div>
       <template #footer>
-        <el-button @click="showExportImageDialog = false">关闭</el-button>
-        <el-button type="primary" @click="copyExportImage">复制图片</el-button>
+        <el-button text @click="showExportImageDialog = false">取消</el-button>
+        <el-button class="apple-dialog-primary" type="primary" round @click="copyExportImage">复制图片</el-button>
       </template>
     </el-dialog>
   </div>
@@ -222,9 +237,9 @@
 
 <script setup>
 import { ref, onUnmounted, nextTick, computed, watch, onMounted } from 'vue'
+import { RouterLink } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import { UploadFilled, ArrowLeft, ArrowRight, Refresh, Setting, Edit, Picture, Close } from '@element-plus/icons-vue'
-import TopMenu from './TopMenu.vue'
+import { UploadFilled, ArrowRight, Refresh, Setting, Edit, DArrowLeft, DArrowRight } from '@element-plus/icons-vue'
 
 // 响应式数据
 const book = ref(null)
@@ -243,6 +258,7 @@ const fontSize = ref(16)
 const fontFamily = ref('Arial')
 const backgroundColor = ref('#ffffff')
 const showSettings = ref(false)
+const rightPanelExpanded = ref(true)
 
 // 划线功能相关
 const highlights = ref([])
@@ -1128,6 +1144,47 @@ const showTooltipAtSelection = async () => {
 </script>
 
 <style scoped>
+/* Apple-like：系统字体、轻阴影、毛玻璃侧栏、文本型操作 */
+.apple-epub {
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    'SF Pro Text',
+    'Segoe UI',
+    Roboto,
+    'Helvetica Neue',
+    Arial,
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  --apple-blue: #007aff;
+  --apple-blue-soft: rgba(0, 122, 255, 0.14);
+  --apple-label: #1d1d1f;
+  --apple-secondary: #86868b;
+  --apple-separator: rgba(60, 60, 67, 0.12);
+}
+
+.apple-back-link {
+  color: var(--apple-secondary);
+}
+.apple-back-link:hover {
+  color: var(--apple-label);
+}
+
+@media (prefers-color-scheme: dark) {
+  .apple-epub {
+    --apple-label: #f5f5f7;
+    --apple-secondary: #98989d;
+    --apple-separator: rgba(235, 235, 245, 0.12);
+    --apple-blue-soft: rgba(10, 132, 255, 0.22);
+  }
+  .apple-back-link {
+    color: var(--apple-secondary);
+  }
+  .apple-back-link:hover {
+    color: var(--apple-label);
+  }
+}
+
 .epub-reader {
   height: 100vh;
   display: flex;
@@ -1136,25 +1193,6 @@ const showTooltipAtSelection = async () => {
   margin: 0;
   padding: 0;
   background: var(--site-bg);
-}
-
-/* 确保TopMenu有固定高度 */
-.epub-reader :deep(.el-menu) {
-  height: 60px;
-  line-height: 60px;
-}
-
-.epub-reader :deep(.el-menu-item) {
-  height: 60px;
-  line-height: 60px;
-}
-
-.epub-reader :deep(.el-row) {
-  height: 60px;
-}
-
-.epub-reader :deep(.el-col) {
-  height: 60px;
 }
 
 .reader-container {
@@ -1167,47 +1205,102 @@ const showTooltipAtSelection = async () => {
   padding: 0;
 }
 
-/* 上传区域样式 */
 .upload-section {
   flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
   background: var(--site-bg);
-  padding: 20px;
+  padding: 24px 20px;
   overflow: hidden;
   min-height: 0;
   margin: 0;
 }
 
-.upload-card {
-  background: var(--site-surface);
-  border: 1px solid var(--site-border);
-  backdrop-filter: blur(10px);
-  border-radius: 16px;
-  padding: 40px;
+.apple-upload-card {
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid var(--apple-separator);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  border-radius: 20px;
+  padding: 44px 36px;
   text-align: center;
-  box-shadow: var(--site-card-shadow);
-  max-width: 500px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+  max-width: 420px;
   width: 100%;
 }
 
-.upload-card h2 {
-  color: #2c3e50;
-  margin-bottom: 10px;
-  font-size: 1.8rem;
+@media (prefers-color-scheme: dark) {
+  .apple-upload-card {
+    background: rgba(30, 30, 32, 0.75);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+  }
 }
 
-.upload-card p {
-  color: #666;
-  margin-bottom: 30px;
+.apple-upload-title {
+  margin: 0 0 8px;
+  font-size: 1.5rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--apple-label);
+}
+
+.apple-upload-sub {
+  margin: 0 0 28px;
+  font-size: 0.9375rem;
+  color: var(--apple-secondary);
+  font-weight: 400;
 }
 
 .upload-area {
   width: 100%;
 }
 
-/* 阅读区域样式 */
+.apple-upload :deep(.el-upload-dragger) {
+  border: 1px dashed var(--apple-separator);
+  border-radius: 14px;
+  background: rgba(0, 0, 0, 0.02);
+  padding: 36px 20px;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.apple-upload :deep(.el-upload-dragger:hover) {
+  border-color: rgba(0, 122, 255, 0.45);
+  background: rgba(0, 122, 255, 0.04);
+}
+
+@media (prefers-color-scheme: dark) {
+  .apple-upload :deep(.el-upload-dragger) {
+    background: rgba(255, 255, 255, 0.04);
+  }
+  .apple-upload :deep(.el-upload-dragger:hover) {
+    background: rgba(10, 132, 255, 0.08);
+  }
+}
+
+.apple-upload :deep(.el-icon--upload) {
+  color: var(--apple-secondary);
+  font-size: 40px;
+  margin-bottom: 12px;
+}
+
+.apple-upload :deep(.el-upload__text) {
+  color: var(--apple-secondary);
+  font-size: 0.875rem;
+}
+
+.apple-upload :deep(.el-upload__text em) {
+  color: var(--apple-blue);
+  font-style: normal;
+  font-weight: 500;
+}
+
+.apple-upload-tip {
+  margin-top: 12px;
+  font-size: 0.75rem;
+  color: var(--apple-secondary);
+}
+
 .reading-section {
   flex: 1;
   display: flex;
@@ -1228,53 +1321,83 @@ const showTooltipAtSelection = async () => {
   padding: 0;
 }
 
-.toc-sidebar {
-  width: 250px;
-  background: white;
-  border-right: 1px solid #e0e0e0;
+.apple-sidebar {
+  width: 248px;
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: saturate(180%) blur(16px);
+  -webkit-backdrop-filter: saturate(180%) blur(16px);
+  border-right: 1px solid var(--apple-separator);
   overflow-y: auto;
-  padding: 20px;
+  padding: 20px 18px;
   flex-shrink: 0;
   margin: 0;
 }
 
-.settings-sidebar {
-  width: 250px;
-  background: white;
-  border-right: 1px solid #e0e0e0;
-  overflow-y: auto;
-  padding: 20px;
-  flex-shrink: 0;
-  margin: 0;
+@media (prefers-color-scheme: dark) {
+  .apple-sidebar {
+    background: rgba(28, 28, 30, 0.88);
+  }
 }
 
 .highlight-sidebar {
-  width: 250px;
-  background: white;
-  border-right: 1px solid #e0e0e0;
+  width: 248px;
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: saturate(180%) blur(16px);
+  border-right: 1px solid var(--apple-separator);
   overflow-y: auto;
-  padding: 20px;
+  padding: 20px 18px;
   flex-shrink: 0;
   margin: 0;
+}
+
+.apple-sidebar-title {
+  margin: 0 0 16px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--apple-secondary);
 }
 
 .settings-sidebar h4,
 .highlight-sidebar h4 {
-  margin: 0 0 20px 0;
-  color: #2c3e50;
-  font-size: 1.1rem;
+  margin: 0 0 16px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--apple-secondary);
 }
 
 .setting-group {
-  margin-bottom: 20px;
+  margin-bottom: 18px;
 }
 
 .setting-group label {
   display: block;
-  margin-bottom: 8px;
-  color: #2c3e50;
+  margin-bottom: 6px;
+  color: var(--apple-secondary);
   font-weight: 500;
-  font-size: 0.9rem;
+  font-size: 0.8125rem;
+}
+
+.apple-sidebar :deep(.el-select),
+.settings-sidebar :deep(.el-select) {
+  width: 100%;
+}
+
+.apple-sidebar :deep(.el-input__wrapper),
+.settings-sidebar :deep(.el-input__wrapper) {
+  border-radius: 10px;
+  box-shadow: none;
+  background: rgba(0, 0, 0, 0.04);
+}
+
+@media (prefers-color-scheme: dark) {
+  .apple-sidebar :deep(.el-input__wrapper),
+  .settings-sidebar :deep(.el-input__wrapper) {
+    background: rgba(255, 255, 255, 0.08);
+  }
 }
 
 .selected-text {
@@ -1294,11 +1417,18 @@ const showTooltipAtSelection = async () => {
 }
 
 .highlight-item {
-  background: #f8f9fa;
-  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.03);
+  border-radius: 10px;
   padding: 12px;
   margin-bottom: 10px;
-  border-left: 4px solid #667eea;
+  border-left: 3px solid var(--apple-blue);
+}
+
+@media (prefers-color-scheme: dark) {
+  .highlight-item {
+    background: rgba(255, 255, 255, 0.06);
+    border-left-color: #0a84ff;
+  }
 }
 
 .highlight-text {
@@ -1326,41 +1456,74 @@ const showTooltipAtSelection = async () => {
 }
 
 .font-size-display {
-  min-width: 50px;
+  min-width: 44px;
   text-align: center;
   font-weight: 500;
-  color: #2c3e50;
+  font-size: 0.875rem;
+  color: var(--apple-label);
+  font-variant-numeric: tabular-nums;
 }
 
-.toc-sidebar h4 {
-  margin: 0 0 15px 0;
-  color: #2c3e50;
-  font-size: 1.1rem;
+.apple-sidebar :deep(.el-button),
+.settings-sidebar :deep(.el-button) {
+  border-radius: 10px;
 }
 
 .toc-list {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 4px;
 }
 
 .toc-item {
-  padding: 8px 12px;
-  border-radius: 6px;
+  padding: 10px 12px;
+  border-radius: 10px;
   cursor: pointer;
-  transition: all 0.2s ease;
-  font-size: 0.9rem;
-  color: #555;
+  transition: background 0.15s ease, color 0.15s ease;
+  font-size: 0.875rem;
+  line-height: 1.35;
+  color: var(--apple-label);
 }
 
 .toc-item:hover {
-  background: #f0f0f0;
-  color: #2c3e50;
+  background: rgba(0, 0, 0, 0.04);
 }
 
 .toc-item.active {
-  background: #667eea;
-  color: white;
+  background: var(--apple-blue-soft);
+  color: var(--apple-blue);
+  font-weight: 500;
+}
+
+@media (prefers-color-scheme: dark) {
+  .toc-item:hover {
+    background: rgba(255, 255, 255, 0.06);
+  }
+  .toc-item.active {
+    color: #0a84ff;
+    background: var(--apple-blue-soft);
+  }
+}
+
+.apple-reader-surface {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+  min-height: 0;
+  margin: 0 auto;
+  padding: 0;
+  max-width: 700px;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 8px 40px rgba(0, 0, 0, 0.06);
+  border: 1px solid var(--apple-separator);
+}
+
+@media (prefers-color-scheme: dark) {
+  .apple-reader-surface {
+    background: #1c1c1e;
+    box-shadow: 0 8px 48px rgba(0, 0, 0, 0.45);
+  }
 }
 
 .reader-view {
@@ -1371,72 +1534,158 @@ const showTooltipAtSelection = async () => {
   margin: 0 auto;
   padding: 0;
   max-width: 700px;
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 4px 24px 0 rgba(0,0,0,0.08);
 }
 
 .epub-viewer {
   width: 100%;
   height: 100%;
-  background: white;
+  background: transparent;
   overflow: hidden;
   margin: 0;
   padding: 0;
 }
 
-/* 右侧工具栏样式 */
-.right-toolbar {
-  width: 200px;
-  background: white;
-  border-left: 1px solid #e0e0e0;
+.apple-right-host {
+  display: flex;
+  flex-direction: row;
+  flex-shrink: 0;
+  align-items: stretch;
+  margin-right: 20px;
+}
+
+.apple-edge-toggle {
+  width: 32px;
+  min-width: 32px;
+  flex-shrink: 0;
+  border: none;
+  border-left: 1px solid var(--apple-separator);
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  color: var(--apple-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.apple-edge-toggle:hover {
+  background: rgba(0, 0, 0, 0.04);
+  color: var(--apple-label);
+}
+
+@media (prefers-color-scheme: dark) {
+  .apple-edge-toggle {
+    background: rgba(44, 44, 46, 0.85);
+  }
+  .apple-edge-toggle:hover {
+    background: rgba(255, 255, 255, 0.08);
+  }
+}
+
+.apple-right-toolbar {
+  width: 196px;
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  align-items: center;
-  box-shadow: -2px 0 4px rgba(0,0,0,0.1);
+  align-items: stretch;
   flex-shrink: 0;
   margin: 0;
-  padding: 20px 15px;
-  gap: 20px;
-  margin-right: 32px;
+  padding: 20px 14px 24px;
+  gap: 16px;
+  border-right: 1px solid var(--apple-separator);
 }
 
-.book-info h3 {
-  margin: 0 0 5px 0;
-  color: #2c3e50;
-  font-size: 1.1rem;
-  text-align: center;
+@media (prefers-color-scheme: dark) {
+  .apple-right-toolbar {
+    background: rgba(28, 28, 30, 0.9);
+  }
 }
 
-.book-info p {
-  margin: 0;
-  color: #666;
-  font-size: 0.9rem;
-  text-align: center;
-}
-
-.page-info {
-  font-weight: 500;
-  color: #2c3e50;
-  min-width: 80px;
-  text-align: center;
-  padding: 8px 12px;
-  background: #f5f5f5;
-  border-radius: 6px;
-}
-
-.controls {
+.right-toolbar {
+  width: 196px;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 10px;
+  align-items: stretch;
+}
+
+.apple-book-meta {
+  width: 100%;
+  padding-bottom: 14px;
+  margin-bottom: 0;
+  border-bottom: 1px solid var(--apple-separator);
+  text-align: left;
+}
+
+.apple-book-meta h3 {
+  margin: 0 0 6px;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.35;
+  color: var(--apple-label);
+}
+
+.apple-book-meta p {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--apple-secondary);
+  line-height: 1.4;
+}
+
+.book-info {
   width: 100%;
 }
 
-.controls .el-button {
+.apple-page-pill {
+  align-self: center;
+  font-weight: 500;
+  font-size: 0.8125rem;
+  color: var(--apple-secondary);
+  padding: 6px 14px;
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 100px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (prefers-color-scheme: dark) {
+  .apple-page-pill {
+    background: rgba(255, 255, 255, 0.08);
+  }
+}
+
+.apple-controls {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 4px;
   width: 100%;
-  margin-bottom: 5px;
+}
+
+.apple-side-btn {
+  width: 100%;
+  margin: 0 !important;
+  justify-content: flex-start;
+  padding: 10px 12px;
+  border-radius: 10px;
+  font-weight: 500;
+  font-size: 0.875rem;
+  color: var(--apple-label);
+}
+
+.apple-side-btn-muted {
+  color: var(--apple-secondary);
+  margin-top: 8px !important;
+}
+
+.apple-controls :deep(.el-button + .el-button) {
+  margin-left: 0;
 }
 
 /* 响应式设计 */
@@ -1450,27 +1699,36 @@ const showTooltipAtSelection = async () => {
   }
 }
 
-/* tooltip面板样式 */
 .tooltip-panel {
   position: absolute;
   z-index: 10000;
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.18);
-  border: 1px solid #e0e0e0;
-  min-width: 280px;
+  min-width: auto;
   max-width: 400px;
   animation: tooltipFadeIn 0.2s ease-out;
   padding: 0;
   overflow: visible;
 }
 
+.apple-tooltip {
+  border-radius: 14px;
+  border: 1px solid var(--apple-separator);
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+@media (prefers-color-scheme: dark) {
+  .apple-tooltip {
+    background: rgba(44, 44, 46, 0.94);
+  }
+}
+
 .tooltip-content {
-  padding: 20px 18px 16px 18px;
+  padding: 12px 14px;
   position: relative;
-  border-radius: 12px;
-  background: linear-gradient(135deg, #f8fafc 0%, #f3f6fa 100%);
-  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  border-radius: 14px;
+  background: transparent;
 }
 
 .tooltip-close-btn {
@@ -1505,37 +1763,148 @@ const showTooltipAtSelection = async () => {
 
 .tooltip-actions {
   display: flex;
-  gap: 12px;
+  gap: 8px;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: center;
 }
 
-.tooltip-actions .el-button {
+.apple-tooltip-btn {
   flex: 1;
-  font-size: 0.92rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  border-radius: 10px;
 }
 
 .tooltip-arrow {
   position: absolute;
-  bottom: -8px;
+  bottom: -7px;
   left: 50%;
   transform: translateX(-50%);
   width: 0;
   height: 0;
-  border-left: 8px solid transparent;
-  border-right: 8px solid transparent;
-  border-top: 8px solid #f3f6fa;
-  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.08));
+  border-left: 7px solid transparent;
+  border-right: 7px solid transparent;
+  border-top: 7px solid rgba(255, 255, 255, 0.92);
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.06));
+}
+
+@media (prefers-color-scheme: dark) {
+  .tooltip-arrow {
+    border-top-color: rgba(44, 44, 46, 0.94);
+  }
+}
+
+.apple-export-layout {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.apple-export-preview-wrap {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.apple-export-preview-scroll {
+  height: 700px;
+  overflow-y: auto;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.apple-export-side {
+  width: 112px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-sizing: border-box;
+}
+
+.apple-export-font-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.apple-export-font-size {
+  min-width: 28px;
+  text-align: center;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--apple-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+.apple-export-select {
+  width: 100%;
+}
+
+.apple-color-picker {
+  justify-content: center;
 }
 
 @keyframes tooltipFadeIn {
   from {
     opacity: 0;
-    transform: translateY(-10px);
+    transform: translateY(-6px);
   }
   to {
     opacity: 1;
     transform: translateY(0);
   }
 }
-</style> 
+</style>
+
+<style>
+/* el-dialog 挂到 body，外壳样式单独写 */
+.el-dialog.epub-apple-export-dialog {
+  border-radius: 16px;
+  overflow: hidden;
+  padding: 0;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.15);
+}
+
+.epub-apple-export-dialog .el-dialog__header {
+  padding: 20px 24px 8px;
+  margin: 0;
+}
+
+.epub-apple-export-dialog .el-dialog__title {
+  font-size: 1.0625rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: #1d1d1f;
+}
+
+.epub-apple-export-dialog .el-dialog__body {
+  padding: 8px 24px 16px;
+}
+
+.epub-apple-export-dialog .el-dialog__footer {
+  padding: 12px 24px 20px;
+  border-top: 1px solid rgba(60, 60, 67, 0.12);
+}
+
+@media (prefers-color-scheme: dark) {
+  .epub-apple-export-dialog .el-dialog__title {
+    color: #f5f5f7;
+  }
+  .epub-apple-export-dialog .el-dialog__footer {
+    border-top-color: rgba(235, 235, 245, 0.12);
+  }
+}
+
+.epub-apple-export-dialog .apple-dialog-primary {
+  border-radius: 999px;
+  padding-left: 20px;
+  padding-right: 20px;
+  font-weight: 500;
+}
+</style>

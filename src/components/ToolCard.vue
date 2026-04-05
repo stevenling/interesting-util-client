@@ -23,6 +23,7 @@
 
 <script setup>
 import { useRouter } from 'vue-router'
+import * as demoAuth from '@/utils/demoAuth'
 
 const props = defineProps({
   title: String,
@@ -31,7 +32,14 @@ const props = defineProps({
     type: String,
     default: '',
   },
+  /** 为 true 且未登录时，不直接跳转，改为通知父级弹窗 */
+  requireLogin: {
+    type: Boolean,
+    default: false,
+  },
 })
+
+const emit = defineEmits(['require-auth'])
 
 const router = useRouter()
 
@@ -41,8 +49,12 @@ const go = () => {
   if (!props.link) return
   if (isExternal(props.link)) {
     window.open(props.link, '_blank', 'noopener,noreferrer')
-  } else {
-    router.push(props.link)
+    return
   }
+  if (props.requireLogin && !demoAuth.getToken()) {
+    emit('require-auth', props.link)
+    return
+  }
+  router.push(props.link)
 }
 </script>

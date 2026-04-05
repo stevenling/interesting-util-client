@@ -15,6 +15,8 @@
         :title="item.title"
         :desc="item.desc"
         :link="item.link"
+        :require-login="requireLogin"
+        @require-auth="$emit('require-auth', $event)"
       />
     </div>
   </section>
@@ -29,5 +31,11 @@ defineProps({
     type: Array,
     default: () => [],
   },
+  requireLogin: {
+    type: Boolean,
+    default: false,
+  },
 })
+
+defineEmits(['require-auth'])
 </script>

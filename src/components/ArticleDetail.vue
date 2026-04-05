@@ -318,7 +318,7 @@
 import { ref, computed, onMounted, watch, onBeforeUnmount, nextTick } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { ElMessage } from 'element-plus';
-import { ArrowLeft, Document, Minus, Plus, Setting, Bookmark, CopyDocument, Picture, ArrowDown, ArrowRight, View, Hide } from '@element-plus/icons-vue';
+import { ArrowLeft, Document, Minus, Plus, Setting, CopyDocument, Picture, ArrowDown, ArrowRight, View, Hide } from '@element-plus/icons-vue';
 import TopMenu from './TopMenu.vue';
 import { marked } from 'marked';
 import html2canvas from 'html2canvas';
@@ -439,9 +439,20 @@ const renderedContent = computed(() => {
 /**
  * 加载文章内容
  */
+/** 静态资源路径中的文件名编码（支持中文等） */
+function encodeArticleFilePath(file) {
+  if (!file) return ''
+  return String(file)
+    .split('/')
+    .map((seg) => encodeURIComponent(seg))
+    .join('/')
+}
+
 const loadArticle = async () => {
-  const articleId = route.query.id;
-  const source = route.query.source; // 'yunhu-essay' 表示从 yunhu-essay 文件夹加载
+  const rawId = route.query.id
+  const articleId = Array.isArray(rawId) ? rawId[0] : rawId
+  const rawSource = route.query.source
+  const source = Array.isArray(rawSource) ? rawSource[0] : rawSource // 'yunhu-essay' 表示从 yunhu-essay 加载
 
   if (!articleId) {
     error.value = '缺少文章ID';
@@ -467,22 +478,34 @@ const loadArticle = async () => {
       return '/';
     };
     const baseUrl = getBaseUrl();
-    let articlePath;
+    const fileEnc = encodeArticleFilePath(article.file)
+
+    let articlePath
+    let response
     if (source === 'yunhu-essay') {
-      articlePath = `${baseUrl}yunhu-essay/${article.file}`;
+      articlePath = `${baseUrl}yunhu-essay/${fileEnc}`
+      response = await fetch(articlePath)
     } else {
-      articlePath = `${baseUrl}云胡选集/${article.file}`;
-    }
-    let response = await fetch(articlePath);
-    if (!response.ok && source !== 'yunhu-essay') {
-      articlePath = `${baseUrl}articles/${article.file}`;
-      response = await fetch(articlePath);
+      // 藏文文章实际在 public/articles/；先请求 云胡选集 在 SPA 下易拿到 index.html 且仍为 200，导致永不回退
+      articlePath = `${baseUrl}articles/${fileEnc}`
+      response = await fetch(articlePath)
+      if (!response.ok) {
+        const legacyPath = `${baseUrl}云胡选集/${fileEnc}`
+        response = await fetch(legacyPath)
+      }
     }
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
     const text = await response.text();
+    const trimmed = text.trimStart()
+    if (
+      trimmed.startsWith('<!DOCTYPE') ||
+      trimmed.toLowerCase().startsWith('<html')
+    ) {
+      throw new Error('返回内容不是 Markdown（可能是站点首页 HTML），请检查文章路径')
+    }
     articleContent.value = text;
     loading.value = false;
     

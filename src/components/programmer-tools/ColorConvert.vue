@@ -22,12 +22,12 @@
     <div class="relative flex-1 min-h-0 flex flex-col">
       <div class="flex-1 min-h-0 px-4 sm:px-6 py-6 flex flex-col">
         <div class="max-w-4xl mx-auto w-full flex-1 flex flex-col min-h-0">
-          <router-link
+          <RouterLink
             to="/utilIndex"
-            class="mb-3 shrink-0 inline-block text-sm text-slate-500 hover:text-slate-800 dark:text-neutral-500 dark:hover:text-neutral-200 transition-colors duration-300"
+            class="mb-2 shrink-0 inline-block text-sm text-slate-500 hover:text-slate-800 dark:text-neutral-500 dark:hover:text-neutral-200 transition-colors duration-300"
           >
             ← 
-          </router-link>
+          </RouterLink>
 
           <div
             class="matrix-tool-panel flex-1 flex flex-col min-h-0 overflow-hidden"
@@ -143,10 +143,12 @@
 <script>
 import "../../styles/matrix-page.css";
 import { watch, ref } from "vue";
+import { RouterLink } from "vue-router";
 import { ElMessage } from "element-plus";
 import useClipboard from "vue-clipboard3";
 
 export default {
+  components: { RouterLink },
   setup() {
     const selectColor = ref("#FFFFFF");
     const inputHexColor = ref("");

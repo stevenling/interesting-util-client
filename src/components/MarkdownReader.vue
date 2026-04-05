@@ -1,7 +1,11 @@
 <template>
   <div class="markdown-reader">
-    <TopMenu></TopMenu>
-    
+    <el-tooltip content="返回小工具集" placement="right">
+      <RouterLink to="/utilIndex" class="md-back-fab" aria-label="返回小工具集">
+        <el-icon :size="18"><ArrowLeft /></el-icon>
+      </RouterLink>
+    </el-tooltip>
+
     <div class="reader-container">
       <!-- 文件上传区域 -->
       <div v-if="!markdownContent" class="upload-section">
@@ -34,8 +38,7 @@
       <div v-else class="reading-section">
         <div class="toolbar">
           <el-button @click="handleBack" type="info" plain>
-            <el-icon><arrow-left /></el-icon>
-            返回
+            更换文件
           </el-button>
           <el-button @click="handleExportPDF" type="primary">
             <el-icon><document /></el-icon>
@@ -58,9 +61,9 @@
 
 <script setup>
 import { ref, computed } from 'vue';
+import { RouterLink } from 'vue-router';
 import { ElMessage } from 'element-plus';
-import { UploadFilled, ArrowLeft, Document } from '@element-plus/icons-vue';
-import TopMenu from './TopMenu.vue';
+import { UploadFilled, ArrowLeft } from '@element-plus/icons-vue';
 import { marked } from 'marked';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
@@ -126,7 +129,7 @@ const handleFileChange = (file) => {
 };
 
 /**
- * 返回上传页面
+ * 清空内容，回到上传页
  */
 const handleBack = () => {
   markdownContent.value = '';
@@ -288,10 +291,44 @@ const handleExportPDF = async () => {
   background: var(--site-bg);
 }
 
+.md-back-fab {
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  z-index: 2000;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--site-surface-solid);
+  border: 1px solid var(--site-border);
+  color: var(--site-heading);
+  box-shadow: var(--site-card-shadow);
+  text-decoration: none;
+  transition:
+    color 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.15s ease;
+}
+
+.md-back-fab:hover {
+  color: var(--site-accent);
+  border-color: var(--site-accent);
+  box-shadow: 0 2px 12px rgb(15 23 42 / 0.08);
+}
+
+.md-back-fab:active {
+  transform: scale(0.96);
+}
+
 .reader-container {
   max-width: 1200px;
   margin: 0 auto;
   padding: 20px;
+  padding-top: 56px;
 }
 
 /* 上传区域样式 */
@@ -299,7 +336,7 @@ const handleExportPDF = async () => {
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: calc(100vh - 100px);
+  min-height: calc(100vh - 120px);
 }
 
 .upload-card {
