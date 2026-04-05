@@ -29,5 +29,6 @@ pnpm-debug.log*
 # FastAPI
 server/.env
 server/.venv/
+server/data/
 **/__pycache__/
 *.py[cod]
