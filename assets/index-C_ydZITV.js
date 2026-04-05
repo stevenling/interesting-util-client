@@ -1,4 +1,4 @@
-import{D as J}from"./index-wwq4Vfpb.js";var A={exports:{}};/*!
+import{D as J}from"./index-DWXhvwtk.js";var A={exports:{}};/*!
  * clipboard.js v2.0.11
  * https://clipboardjs.com/
  *
