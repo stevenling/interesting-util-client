@@ -86,6 +86,11 @@ export const constantRoutes = [
         component: () => import("@/components/VocabularyTest.vue")
     },
     {
+        name: 'PomodoroTimer',
+        path: '/pomodoroTimer',
+        component: () => import("@/components/PomodoroTimer.vue")
+    },
+    {
         name: 'JztkHome',
         path: '/jztk',
         component: () => import("@/components/JztkHome.vue")

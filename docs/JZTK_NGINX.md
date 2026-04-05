@@ -2,7 +2,7 @@
 
 > **说明**：下文中的**域名、端口、磁盘路径、内网 IP** 仅为配置**示例**，请全部换成你自己的环境（`yunhu.com:9049` 一类名字只是举例，不是固定要求）。
 
-前端打包后只发**相对路径**（常用基址 **`/api`**），由 Nginx 转发到 Spring Boot；浏览器始终只访问**同一站点**，无需在后端配 CORS。
+前端打包后只发**相对路径**（常用基址 **`/api`**），由 Nginx 转发到本仓库 FastAPI（默认 **`127.0.0.1:11219`**）或其它后端；浏览器始终只访问**同一站点**，无需在后端配 CORS。
 
 ## 前端环境变量（构建时写入）
 
@@ -16,7 +16,7 @@
 
 ## Nginx 配置思路（后端 **没有** 对外 `/api` 前缀时）
 
-Spring 真实路径例如 **`/jztk/question/random`**，对外统一走 **`/api/...`**，再用 `rewrite` 去掉 `/api` 后转发到应用端口：
+后端真实路径例如 **`/jztk/question/random`**，对外统一走 **`/api/...`**，再用 `rewrite` 去掉 `/api` 后转发到应用端口：
 
 ```nginx
 server {
@@ -32,7 +32,7 @@ server {
     # 浏览器请求 /api/xxx → 转发到后端 /xxx
     location ^~ /api/ {
         rewrite ^/api/(.*)$ /$1 break;
-        proxy_pass http://127.0.0.1:10000/;   # 示例：换成 Spring Boot 实际地址（可用内网 IP:端口）
+        proxy_pass http://127.0.0.1:11219/;   # 示例：FastAPI 默认端口；按实际服务地址修改
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -42,7 +42,7 @@ server {
 ```
 
 - `proxy_pass` 写成内网地址可减少一次 DNS，**不是必须**，按你运维习惯即可。
-- 若 Spring 已配置 **`server.servlet.context-path=/api`**，则**不要**再按上面方式 `rewrite` 掉 `/api`，需与真实路径对齐。
+- 若后端已自带 **`/api` 前缀**（例如 Spring `context-path=/api`），则**不要**再按上面方式 `rewrite` 掉 `/api`，需与真实路径对齐。
 
 ## 请求对应关系（逻辑示意）
 

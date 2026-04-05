@@ -1,17 +1,16 @@
 /**
- * 驾考题目 API + Spring Boot 同步
+ * 驾考题目 API + 可选同步 POST
  *
  * 环境变量（Vite）：
- * - VITE_JZTK_API_URL  拉题基址，推荐生产用 Nginx 同源反代时写相对路径 `/api`（见 docs/JZTK_NGINX.md）。
+ * - VITE_JZTK_API_URL  拉题基址。开发推荐 `/api`，由 Vite 代理到本机 FastAPI（默认目标
+ *   `VITE_DEV_PROXY_TARGET` 或 `http://localhost:11219`，见 vite.config.js）。生产可用 Nginx
+ *   同源反代 `/api`（见 docs/JZTK_NGINX.md）。直连 FastAPI 示例：`http://127.0.0.1:11219/api`。
  *   未包含 …/question/random 时会自动拼接 VITE_JZTK_API_RANDOM_PATH（默认 /jztk/question/random）。
- *   开发或直连也可写完整 URL：http(s)://host:port/...
  * - VITE_JZTK_SYNC_URL  同步 POST 地址；同源反代时写 `/api/jztk/sync` 等相对路径（可为空则不同步）
- *   未配置时：前端会将本次接口返回的完整 JSON 触发浏览器下载到本机（下载目录）
  * - VITE_JZTK_SYNC_TOKEN 可选，存在则请求头 Authorization: Bearer <token>
- * - VITE_JZTK_ALSO_DOWNLOAD  已配置同步时仍要本机 JSON 备份：设为 1 或 true
  *
  * 刷题页会按所选科目在请求 URL 上设置 subject：1=科目一，4=科目四（与 Juhe / 常见后端一致）。
- * 可选 batchSize：查询参数 size=<n>（Spring 常见）；若你的接口用别的名字请在后端兼容或改此处）。
+ * 可选 batchSize：查询参数 size=<n>；若你的接口用别的名字请在后端兼容或改此处）。
  */
 
 const API_URL = import.meta.env.VITE_JZTK_API_URL || ""
@@ -25,7 +24,6 @@ const BATCH_PARAM =
   (import.meta.env.VITE_JZTK_BATCH_SIZE_PARAM || "size").trim() || "size"
 const SYNC_URL = import.meta.env.VITE_JZTK_SYNC_URL || ""
 const SYNC_TOKEN = import.meta.env.VITE_JZTK_SYNC_TOKEN || ""
-const ALSO_DL = import.meta.env.VITE_JZTK_ALSO_DOWNLOAD || ""
 
 /**
  * 页面/同步使用的统一题目结构（与 Juhe result[] 单项对齐）
@@ -199,7 +197,7 @@ function toJztkFetchError(err, kind = "api") {
 }
 
 /**
- * 从第三方 Juhe、或 Spring Boot（如 /jztk/question/random）获取题目 JSON
+ * 从第三方 Juhe、或本仓库 FastAPI（如 /jztk/question/random）等获取题目 JSON
  * @param {{ subject?: string|number, batchSize?: number }} [options] subject：1=科目一，4=科目四；batchSize：本批题数（由刷题页传入，默认 10）
  * @returns {Promise<JztkApiResponse>}
  */
@@ -222,7 +220,20 @@ export async function fetchJztkQuestions(options = {}) {
     throw toJztkFetchError(e, "api")
   }
   if (!res.ok) {
-    throw new Error(`拉题失败：HTTP ${res.status}`)
+    let bodySnippet = ""
+    try {
+      bodySnippet = (await res.text()).trim().slice(0, 240)
+    } catch {
+      /* ignore */
+    }
+    const proxyHint =
+      res.status >= 502
+        ? " 常见原因：Vite 无法连接代理目标（后端未启动或地址错误）。请先在本项目执行 npm run server（默认 127.0.0.1:11219），或在 .env.local 设置 VITE_DEV_PROXY_TARGET=http://127.0.0.1:11219。"
+        : res.status === 500
+          ? " 若请求走开发代理 /api，也可能是上游未启动或 localhost/IPv6 连不上，请确认已运行 npm run server，并优先使用 127.0.0.1:11219 作为代理目标。"
+          : ""
+    const extra = bodySnippet ? ` ${bodySnippet}` : ""
+    throw new Error(`拉题失败：HTTP ${res.status}${extra}${proxyHint}`)
   }
   let data
   try {
@@ -325,34 +336,7 @@ export function isJztkApiConfigured() {
   return Boolean(API_URL)
 }
 
-/** 是否已配置 Spring Boot 同步地址 */
+/** 是否已配置同步 POST 地址 */
 export function isJztkSyncConfigured() {
   return Boolean(SYNC_URL && SYNC_URL.trim())
-}
-
-/** 已配后端时是否仍下载 JSON 备份 */
-export function shouldJztkAlsoDownloadBackup() {
-  const v = String(ALSO_DL).toLowerCase()
-  return v === "1" || v === "true" || v === "yes"
-}
-
-/**
- * 将聚合数据返回的完整对象保存为本机 JSON 文件（通过浏览器下载，无法直接写入仓库目录）
- * @param {JztkApiResponse} payload
- * @param {string} [filename]
- */
-export function downloadJztkResponseAsJsonFile(payload, filename) {
-  const json = JSON.stringify(payload, null, 2)
-  const blob = new Blob([json], { type: "application/json;charset=utf-8" })
-  const url = URL.createObjectURL(blob)
-  const a = document.createElement("a")
-  a.href = url
-  a.download =
-    filename ||
-    `jztk-response-${new Date().toISOString().replace(/[:.]/g, "-")}.json`
-  a.rel = "noopener"
-  document.body.appendChild(a)
-  a.click()
-  document.body.removeChild(a)
-  URL.revokeObjectURL(url)
 }

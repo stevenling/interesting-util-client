@@ -14,7 +14,9 @@ jobs:
         run: npm install  # 安装依赖
 
       - name: Build project
-        run: npm run build  # 执行构建，生成 dist/ 目录
+        env:
+          DEPLOY_BASE: /interesting-util-client/
+        run: npm run build  # 执行构建，生成 dist/ 目录（Pages 子路径）
 
       - name: Verify build output
         run: ls -R dist/  # 调试：确认 dist/ 目录内容

@@ -182,8 +182,12 @@ function onLogout() {
 }
 
 const toolAuthDialogVisible = ref(false)
+/** 登录成功后要回到的工具路由（由子组件 require-auth 事件传入） */
 const pendingToolPath = ref('')
 
+/**
+ * 子工具在未登录时触发：记下目标 path，弹出「需登录」对话框；用户点去登录时带上 redirect。
+ */
 function onToolRequireAuth(path) {
   pendingToolPath.value =
     typeof path === 'string' && path.startsWith('/') ? path : '/utilIndex'
@@ -215,5 +219,6 @@ const otherTools = [
   { title: '天干地支纪年', desc: '传统干支换算', link: '/heavenlyStemsAndEarthlyBranches' },
   { title: '英语词汇量测试', desc: '自测词汇量', link: '/vocabularyTest' },
   { title: '驾考刷题王', desc: '题库练习与同步', link: '/jztk' },
+  { title: '番茄时钟', desc: '专注计时与休息', link: '/pomodoroTimer' },
 ]
 </script>

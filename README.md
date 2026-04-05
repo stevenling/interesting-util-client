@@ -148,7 +148,6 @@ npm run push
 1. 复制 `.env.example` 为 `.env.local`，配置：
    - **`VITE_JZTK_API_URL`**：拉题基址。生产若用 **Nginx 反代**，写 **`/api`**（与站点同源），代码会拼 `/jztk/question/random`；开发直连可写完整 `http(s)://...`。**部署与 Nginx 示例见 [`docs/JZTK_NGINX.md`](docs/JZTK_NGINX.md)**。
    - **`VITE_JZTK_SYNC_URL`**（可选）：拉题成功后 `POST` 完整 JSON 落库；同源反代时写 **`/api/jztk/sync`**（或你后端实际路径）。
-   - `VITE_JZTK_ALSO_DOWNLOAD=true`（可选）：已配同步时仍每次下载 JSON 备份到本机
 2. 工具入口：**Nyx Tools → 驾考刷题王**：主页选科目 **`/jztk`**，刷题 **`/jztk/practice?subject=1|4`**（前端请求会带对应 `subject` 查询参数）。错题练习：`/jztk/practice?subject=1&mode=wrong`。答对/答错统计、错题本、收藏存 **localStorage**（按科目分 key）。
 3. 后端约定见：`docs/JZTK_SPRING_BOOT.md`；**Nginx 同源反代见：`docs/JZTK_NGINX.md`**
 

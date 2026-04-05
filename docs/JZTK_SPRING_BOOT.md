@@ -2,9 +2,7 @@
 
 前端每次从第三方接口成功拉取题目后，会把**完整 JSON 响应**原样 `POST` 到你配置的 `VITE_JZTK_SYNC_URL`，便于你在服务端写入数据库。
 
-若**未配置** `VITE_JZTK_SYNC_URL`，则不会请求后端，改为由浏览器**自动下载**一个 `jztk-response-*.json` 文件到用户本机「下载」目录（网页无法直接写入项目源码目录，这是浏览器安全限制）。
-
-若**已配置** `VITE_JZTK_SYNC_URL` 且仍希望每次拉题后**同时**保存本机 JSON 备份，在前端环境变量中设置 **`VITE_JZTK_ALSO_DOWNLOAD=true`**（或 `1`）。
+若**未配置** `VITE_JZTK_SYNC_URL`，则不会向后端同步，题目仅在浏览器内存中用于刷题（错题本、收藏等仍存 localStorage）。
 
 ## 请求约定
 

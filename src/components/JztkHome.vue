@@ -1,18 +1,42 @@
 <template>
-  <div class="jztk-home-page">
+  <div
+    class="matrix-root jztk-home-page relative flex min-h-screen flex-col overflow-hidden text-slate-900 dark:text-neutral-100"
+  >
+    <div
+      class="pointer-events-none fixed inset-0 -z-10 matrix-bg-base"
+      aria-hidden="true"
+    />
+    <div
+      class="pointer-events-none fixed -top-32 left-1/2 h-[42rem] w-[42rem] -translate-x-1/2 rounded-full matrix-blob matrix-blob-a blur-3xl opacity-90"
+      aria-hidden="true"
+    />
+    <div
+      class="pointer-events-none fixed top-[28%] -right-24 h-[28rem] w-[28rem] rounded-full matrix-blob matrix-blob-b blur-3xl opacity-80"
+      aria-hidden="true"
+    />
+    <div
+      class="pointer-events-none fixed bottom-0 left-0 h-[22rem] w-[22rem] rounded-full matrix-blob matrix-blob-c blur-3xl opacity-70"
+      aria-hidden="true"
+    />
+
     <el-tooltip content="返回小工具集" placement="right">
-      <RouterLink to="/utilIndex" class="jztk-back-fab" aria-label="返回小工具集">
+      <RouterLink
+        to="/utilIndex"
+        class="jztk-back-fab fixed left-5 top-5 z-[2000] sm:left-8 sm:top-7"
+        aria-label="返回小工具集"
+      >
         <el-icon :size="18"><ArrowLeft /></el-icon>
       </RouterLink>
     </el-tooltip>
 
-    <div class="main-container">
-      <div class="hero-section">
-        <div class="title">驾考刷题王</div>
-        <div class="subtitle">选择考试科目后开始练习</div>
-      </div>
+    <div class="main-container relative z-10 flex-1">
+      <div class="jztk-home-panel matrix-tool-panel mx-auto max-w-[800px]">
+        <div class="hero-section matrix-tool-panel-header">
+          <div class="title">驾考刷题王</div>
+          <div class="subtitle">选择考试科目后开始练习</div>
+        </div>
 
-      <div class="content-container">
+        <div class="content-container">
         <div class="subject-grid">
           <el-card
             class="subject-card"
@@ -24,7 +48,7 @@
             <p class="subject-desc">
               道路交通安全法律、法规和规章，交通信号，安全行车、文明驾驶等
             </p>
-            <el-button type="primary" round class="subject-btn" @click.stop="goPractice('1')">
+            <el-button round class="subject-btn" @click.stop="goPractice('1')">
               开始刷题
             </el-button>
             <div class="subject-actions" @click.stop>
@@ -48,7 +72,7 @@
             <p class="subject-desc">
               安全文明驾驶常识，复杂条件下的安全驾驶知识、紧急情况处置等
             </p>
-            <el-button type="primary" round class="subject-btn" @click.stop="goPractice('4')">
+            <el-button round class="subject-btn" @click.stop="goPractice('4')">
               开始刷题
             </el-button>
             <div class="subject-actions" @click.stop>
@@ -62,6 +86,7 @@
             </div>
           </el-card>
         </div>
+        </div>
       </div>
     </div>
   </div>
@@ -70,6 +95,7 @@
 <script setup>
 import { useRouter, RouterLink } from "vue-router";
 import { ArrowLeft } from "@element-plus/icons-vue";
+import "../styles/matrix-page.css";
 
 const router = useRouter();
 
@@ -99,57 +125,76 @@ function goFavorites(subject) {
 
 <style scoped>
 .jztk-home-page {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  background: var(--site-bg);
-  --jztk-line: var(--site-border);
+  --jztk-line: rgb(0 0 0 / 0.08);
+}
+
+@media (prefers-color-scheme: dark) {
+  .jztk-home-page {
+    --jztk-line: rgb(255 255 255 / 0.1);
+  }
 }
 
 .jztk-back-fab {
-  position: fixed;
-  top: 16px;
-  left: 16px;
-  z-index: 2000;
-  width: 40px;
-  height: 40px;
   display: flex;
+  width: 2.5rem;
+  height: 2.5rem;
   align-items: center;
   justify-content: center;
-  border-radius: 50%;
-  background: var(--site-surface-solid);
-  border: 1px solid var(--site-border);
-  color: var(--site-heading);
-  box-shadow: var(--site-card-shadow);
+  border-radius: 9999px;
+  border: 1px solid rgb(0 0 0 / 0.08);
+  background: rgb(255 255 255 / 0.8);
+  color: rgb(71 85 105);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.05);
   text-decoration: none;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   transition:
     color 0.2s ease,
     border-color 0.2s ease,
     box-shadow 0.2s ease,
-    transform 0.15s ease;
+    transform 0.15s ease,
+    background 0.2s ease;
 }
 
 .jztk-back-fab:hover {
-  color: var(--site-accent);
-  border-color: var(--site-accent);
-  box-shadow: 0 2px 12px rgb(15 23 42 / 0.08);
+  border-color: rgb(0 0 0 / 0.12);
+  background: rgb(255 255 255 / 0.95);
+  color: rgb(15 23 42);
 }
 
 .jztk-back-fab:active {
   transform: scale(0.96);
 }
 
+@media (prefers-color-scheme: dark) {
+  .jztk-back-fab {
+    border-color: rgb(255 255 255 / 0.12);
+    background: rgb(24 24 27 / 0.72);
+    color: rgb(212 212 216);
+    box-shadow: 0 1px 2px rgb(0 0 0 / 0.35);
+  }
+
+  .jztk-back-fab:hover {
+    border-color: rgb(255 255 255 / 0.18);
+    background: rgb(39 39 42 / 0.85);
+    color: rgb(250 250 250);
+  }
+}
+
 .main-container {
-  flex: 1;
-  background: transparent;
-  padding: 56px 0 48px;
+  padding: 3.5rem 0 3rem;
 }
 
 .hero-section {
   text-align: center;
-  padding: 28px 16px 24px;
-  color: var(--site-heading);
-  border-bottom: 1px solid var(--site-border);
+  padding: 1.75rem 1rem 1.25rem;
+  color: rgb(15 23 42);
+}
+
+@media (prefers-color-scheme: dark) {
+  .hero-section {
+    color: rgb(245 245 247);
+  }
 }
 
 .title {
@@ -157,22 +202,26 @@ function goFavorites(subject) {
   font-weight: 700;
   margin: 0 0 0.5rem;
   letter-spacing: 0.02em;
-  color: var(--site-heading);
+  color: inherit;
   text-shadow: none;
 }
 
 .subtitle {
   margin: 0;
   font-size: 0.9rem;
-  color: var(--site-muted);
+  color: rgb(100 116 139);
   font-weight: 400;
   text-shadow: none;
 }
 
+@media (prefers-color-scheme: dark) {
+  .subtitle {
+    color: rgb(163 163 170);
+  }
+}
+
 .content-container {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 0 16px;
+  padding: 1rem 1rem 1.5rem;
 }
 
 .subject-grid {
@@ -189,23 +238,47 @@ function goFavorites(subject) {
 
 .subject-card {
   cursor: pointer;
-  border-radius: 14px;
+  border-radius: 1.125rem;
   text-align: center;
   padding: 4px 4px 18px;
   transition:
     transform 0.2s ease,
     box-shadow 0.2s ease,
     border-color 0.2s ease;
-  border: 1px solid var(--site-border);
-  background: var(--site-surface);
-  --el-card-border-color: var(--jztk-line);
-  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+  border: 1px solid rgb(0 0 0 / 0.06);
+  background: rgb(255 255 255 / 0.55);
+  --el-card-border-color: transparent;
+  box-shadow:
+    0 0 0 1px rgb(255 255 255 / 0.65) inset,
+    0 1px 2px rgb(0 0 0 / 0.04);
+  backdrop-filter: saturate(180%) blur(16px);
+  -webkit-backdrop-filter: saturate(180%) blur(16px);
 }
 
 .subject-card:hover {
   transform: translateY(-2px);
-  border-color: var(--site-border);
-  box-shadow: var(--site-card-shadow), 0 10px 28px rgb(15 23 42 / 0.06);
+  border-color: rgb(0 0 0 / 0.1);
+  box-shadow:
+    0 0 0 1px rgb(255 255 255 / 0.85) inset,
+    0 4px 12px rgb(0 0 0 / 0.06),
+    0 16px 40px rgb(15 23 42 / 0.08);
+}
+
+@media (prefers-color-scheme: dark) {
+  .subject-card {
+    border-color: rgb(255 255 255 / 0.1);
+    background: rgb(28 28 30 / 0.5);
+    box-shadow:
+      0 0 0 1px rgb(255 255 255 / 0.05) inset,
+      0 1px 2px rgb(0 0 0 / 0.35);
+  }
+
+  .subject-card:hover {
+    border-color: rgb(255 255 255 / 0.14);
+    box-shadow:
+      0 0 0 1px rgb(255 255 255 / 0.08) inset,
+      0 8px 24px rgb(0 0 0 / 0.45);
+  }
 }
 
 .subject-icon {
@@ -239,9 +312,47 @@ function goFavorites(subject) {
   min-height: 4.5em;
 }
 
-.subject-btn {
+.subject-card :deep(.subject-btn.el-button) {
   padding-left: 28px;
   padding-right: 28px;
+  font-weight: 600;
+  border: 1px solid rgb(15 23 42 / 0.88);
+  background: rgb(15 23 42);
+  color: rgb(248 250 252);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.08);
+}
+
+.subject-card :deep(.subject-btn.el-button:hover),
+.subject-card :deep(.subject-btn.el-button:focus) {
+  border-color: rgb(30 41 59);
+  background: rgb(30 41 59);
+  color: rgb(255 255 255);
+}
+
+.subject-card :deep(.subject-btn.el-button:active) {
+  border-color: rgb(15 23 42);
+  background: rgb(15 23 42);
+}
+
+@media (prefers-color-scheme: dark) {
+  .subject-card :deep(.subject-btn.el-button) {
+    border: 1px solid rgb(255 255 255 / 0.14);
+    background: rgb(250 250 250 / 0.96);
+    color: rgb(15 23 42);
+    box-shadow: 0 1px 2px rgb(0 0 0 / 0.35);
+  }
+
+  .subject-card :deep(.subject-btn.el-button:hover),
+  .subject-card :deep(.subject-btn.el-button:focus) {
+    border-color: rgb(255 255 255 / 0.22);
+    background: rgb(255 255 255);
+    color: rgb(15 23 42);
+  }
+
+  .subject-card :deep(.subject-btn.el-button:active) {
+    border-color: rgb(255 255 255 / 0.14);
+    background: rgb(244 244 245);
+  }
 }
 
 .subject-actions {
@@ -271,7 +382,13 @@ function goFavorites(subject) {
 }
 
 .subject-card :deep(.jztk-sub-link:hover) {
-  color: var(--site-accent);
+  color: rgb(15 23 42);
+}
+
+@media (prefers-color-scheme: dark) {
+  .subject-card :deep(.jztk-sub-link:hover) {
+    color: rgb(250 250 250);
+  }
 }
 
 .hint {

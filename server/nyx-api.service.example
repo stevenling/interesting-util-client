@@ -1,0 +1,25 @@
+# 用法（在服务器上）：
+#   sudo cp nyx-api.service.example /etc/systemd/system/nyx-api.service
+#   sudo nano /etc/systemd/system/nyx-api.service   # 核对路径、User
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable --now nyx-api
+#   curl -sS http://127.0.0.1:11219/api/health
+#
+# 路径需与 clone 位置一致；若 User 非 root，须保证该用户可读 WorkingDirectory 与 .env
+
+[Unit]
+Description=interesting-util FastAPI (uvicorn)
+After=network.target
+
+[Service]
+Type=simple
+User=root
+Group=root
+WorkingDirectory=/opt/nyx-matrix/interesting-util-client/server
+EnvironmentFile=/opt/nyx-matrix/interesting-util-client/server/.env
+ExecStart=/opt/nyx-matrix/interesting-util-client/server/.venv/bin/python -m uvicorn app.main:app --host 127.0.0.1 --port 11219
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target

@@ -1,35 +1,39 @@
 <template>
-  <div class="jztk-page">
+  <div class="matrix-root jztk-page relative min-h-screen">
     <TopMenu />
-    <div class="main-container">
-      <div class="hero-section">
-        <div class="title">驾考刷题王</div>
-      </div>
+    <div
+      class="pointer-events-none fixed inset-0 -z-10 matrix-bg-base"
+      aria-hidden="true"
+    />
+    <div
+      class="pointer-events-none fixed -top-32 left-1/2 h-[42rem] w-[42rem] -translate-x-1/2 rounded-full matrix-blob matrix-blob-a blur-3xl opacity-90"
+      aria-hidden="true"
+    />
+    <div
+      class="pointer-events-none fixed top-[28%] -right-24 h-[28rem] w-[28rem] rounded-full matrix-blob matrix-blob-b blur-3xl opacity-80"
+      aria-hidden="true"
+    />
+    <div
+      class="pointer-events-none fixed bottom-0 left-0 h-[22rem] w-[22rem] rounded-full matrix-blob matrix-blob-c blur-3xl opacity-70"
+      aria-hidden="true"
+    />
 
-      <div class="content-container">
-        <el-alert
-          v-if="showConfigAlert"
-          type="warning"
-          show-icon
-          :closable="false"
-          title="未配置题目接口"
-          description="请在项目根目录复制 .env.example 为 .env.local，并设置 VITE_JZTK_API_URL（驾考 JSON 接口完整地址）。可选：VITE_JZTK_SYNC_URL 指向 Spring Boot 接收落库的 POST 地址。"
-          class="config-alert"
-        />
+    <div class="main-container relative z-10">
+      <div class="jztk-practice-shell matrix-tool-panel mx-auto max-w-[720px]">
+        <div class="hero-section matrix-tool-panel-header">
+          <div class="title">驾考刷题王</div>
+        </div>
 
-        <el-alert
-          v-if="showLocalOnlyHint"
-          type="info"
-          show-icon
-          :closable="false"
-          title="当前为仅本地模式"
-          description="未配置随机拉题接口时，仍可使用错题本、收藏（数据保存在本机浏览器 localStorage）。"
-          class="config-alert"
-        />
+        <div class="jztk-practice-body">
+        <div class="content-container">
 
-        <el-card v-if="showPracticeCard" class="jztk-card" shadow="hover">
+        <el-card
+          v-if="showPracticeCard"
+          class="jztk-card jztk-card--in-panel"
+          shadow="never"
+        >
           <template #header>
-            <div class="card-header-stack">
+            <div class="card-header-stack jztk-card-header-inner">
               <div class="card-subject-bar">
                 当前：{{ subjectLabel }}
               </div>
@@ -221,6 +225,8 @@
             </template>
           </div>
         </el-card>
+        </div>
+        </div>
       </div>
     </div>
 
@@ -289,13 +295,12 @@ import {
 } from "@element-plus/icons-vue";
 import { ElMessage } from "element-plus";
 import TopMenu from "./TopMenu.vue";
+import "../styles/matrix-page.css";
 import {
   fetchJztkQuestions,
   syncJztkToBackend,
   isJztkApiConfigured,
   isJztkSyncConfigured,
-  shouldJztkAlsoDownloadBackup,
-  downloadJztkResponseAsJsonFile,
 } from "@/api/jztk.js";
 import {
   loadJztkSubjectState,
@@ -374,10 +379,6 @@ function persistLs() {
 
 const wrongBookCount = computed(() => lsState.value.wrongBook.length);
 const favoriteCount = computed(() => lsState.value.favorites.length);
-
-const showConfigAlert = computed(() => !apiReady && !isWrongMode.value);
-
-const showLocalOnlyHint = computed(() => !apiReady && isWrongMode.value);
 
 const showPracticeCard = computed(
   () =>
@@ -602,7 +603,7 @@ function restartWrongRound() {
 }
 
 async function loadBatch(opts = {}) {
-  /** 续批（如本批最后一题点「下一题」）：不弹同步/下载类 Toast，避免打断刷题 */
+  /** 续批（如本批最后一题点「下一题」）：不弹同步类 Toast，避免打断刷题 */
   const suppressBatchToast = opts.silentToast === true;
   if (!apiReady || isWrongMode.value) return;
   const prevBatchCount = queue.value.length;
@@ -630,11 +631,6 @@ async function loadBatch(opts = {}) {
     loading.value = false;
 
     const hasSync = isJztkSyncConfigured();
-    const wantLocalJson = !hasSync || shouldJztkAlsoDownloadBackup();
-
-    if (wantLocalJson && !suppressBatchToast) {
-      downloadJztkResponseAsJsonFile(data);
-    }
 
     if (hasSync) {
       if (suppressBatchToast) {
@@ -652,14 +648,12 @@ async function loadBatch(opts = {}) {
           ElMessage.warning(
             `题目已加载，但同步后端失败（${syncRet.status || "?"}）：${
               syncRet.message || "未知错误"
-            }${wantLocalJson ? "；已下载 JSON 备份" : ""}`
+            }`
           );
-        } else if (wantLocalJson && syncRet.ok && !syncRet.skipped) {
-          ElMessage.success("已同步到后端，并已下载 JSON 备份");
+        } else if (syncRet.ok && !syncRet.skipped) {
+          ElMessage.success("已同步到后端");
         }
       }
-    } else if (!suppressBatchToast && wantLocalJson) {
-      ElMessage.success("已保存本次接口完整 JSON 到本机下载目录");
     }
   } catch (e) {
     ElMessage.error(e?.message || String(e));
@@ -855,40 +849,70 @@ function goPrev() {
 
 <style scoped>
 .jztk-page {
-  min-height: 100vh;
   display: flex;
   flex-direction: column;
 }
 
 .main-container {
   flex: 1;
-  background: transparent;
-  padding: 20px 0 40px;
+  padding: 1.25rem 0 2.5rem;
+}
+
+.jztk-practice-body {
+  padding: 0 0 1rem;
 }
 
 .hero-section {
   text-align: center;
-  padding: 28px 16px 12px;
-  color: var(--site-heading);
-  border-bottom: 1px solid var(--site-border);
+  padding: 1.5rem 1rem 0.75rem;
+  color: rgb(15 23 42);
+}
+
+@media (prefers-color-scheme: dark) {
+  .hero-section {
+    color: rgb(245 245 247);
+  }
 }
 
 .title {
   font-size: 2rem;
   font-weight: bold;
   margin-bottom: 0;
-  color: var(--site-heading);
+  color: inherit;
   text-shadow: none;
 }
 
 .content-container {
-  max-width: 720px;
   margin: 0 auto;
-  padding: 0 16px;
+  padding: 0 1rem;
 }
 
 .config-alert {
   margin-bottom: 16px;
+}
+
+.jztk-card--in-panel {
+  --el-card-bg-color: transparent;
+  border: none !important;
+  box-shadow: none !important;
+  border-radius: 0;
+  overflow: visible;
+}
+
+.jztk-card--in-panel :deep(.el-card__header) {
+  padding: 0;
+  border-bottom: 1px solid rgb(0 0 0 / 0.06);
+  background: transparent;
+}
+
+@media (prefers-color-scheme: dark) {
+  .jztk-card--in-panel :deep(.el-card__header) {
+    border-bottom-color: rgb(255 255 255 / 0.08);
+  }
+}
+
+.jztk-card-header-inner {
+  padding: 0 0.75rem 0.75rem;
 }
 
 .jztk-card {
@@ -897,6 +921,12 @@ function goPrev() {
   background: var(--site-surface);
   backdrop-filter: blur(10px);
   box-shadow: var(--site-card-shadow);
+}
+
+.jztk-card--in-panel.jztk-card {
+  border: none;
+  background: transparent;
+  backdrop-filter: none;
 }
 
 .card-header-stack {
@@ -913,10 +943,17 @@ function goPrev() {
   font-size: 0.95rem;
   font-weight: 500;
   color: #606266;
-  padding-bottom: 10px;
+  padding: 0.75rem 0.5rem 10px;
   margin-bottom: 10px;
-  border-bottom: 1px solid #ebeef5;
+  border-bottom: 1px solid rgb(0 0 0 / 0.06);
   line-height: 1.4;
+}
+
+@media (prefers-color-scheme: dark) {
+  .card-subject-bar {
+    color: rgb(163 163 170);
+    border-bottom-color: rgb(255 255 255 / 0.08);
+  }
 }
 
 .header-left {
