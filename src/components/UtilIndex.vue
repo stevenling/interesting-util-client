@@ -182,15 +182,18 @@ function onLogout() {
 }
 
 const toolAuthDialogVisible = ref(false)
-/** 登录成功后要回到的工具路由（由子组件 require-auth 事件传入） */
+/** 登录成功后要打开的目标：站内 path 或允许的外链（由子组件 require-auth 传入） */
 const pendingToolPath = ref('')
 
 /**
- * 子工具在未登录时触发：记下目标 path，弹出「需登录」对话框；用户点去登录时带上 redirect。
+ * 子工具在未登录时触发：记下目标，弹出「需登录」对话框；去登录时 query.redirect 带上。
  */
 function onToolRequireAuth(path) {
-  pendingToolPath.value =
-    typeof path === 'string' && path.startsWith('/') ? path : '/utilIndex'
+  if (typeof path === 'string' && path && (path.startsWith('/') || /^https?:\/\//i.test(path))) {
+    pendingToolPath.value = path
+  } else {
+    pendingToolPath.value = '/utilIndex'
+  }
   toolAuthDialogVisible.value = true
 }
 
@@ -217,8 +220,10 @@ const readingTools = [
 const otherTools = [
   { title: '历史年表', desc: '按国别浏览历史时间线', link: '/historyTimeline' },
   { title: '天干地支纪年', desc: '传统干支换算', link: '/heavenlyStemsAndEarthlyBranches' },
+  { title: '背单词', desc: '卡片释义 · 打乱复习', link: '/wordMemorize' },
   { title: '英语词汇量测试', desc: '自测词汇量', link: '/vocabularyTest' },
   { title: '驾考刷题王', desc: '题库练习与同步', link: '/jztk' },
   { title: '番茄时钟', desc: '专注计时与休息', link: '/pomodoroTimer' },
+  { title: '2048', desc: '数字合并益智小游戏', link: 'http://2048.yunhujiang.top/' },
 ]
 </script>

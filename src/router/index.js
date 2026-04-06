@@ -1,6 +1,6 @@
-
 import { createRouter, createWebHistory } from 'vue-router'
 import { constantRoutes } from './router'
+import { normalizePostLoginRedirect } from '@/utils/authRedirect.js'
 
 // Vite 会根据 vite.config.js 的 base 注入 import.meta.env.BASE_URL
 const baseUrl = import.meta.env.BASE_URL || '/interesting-util-client/';
@@ -19,12 +19,17 @@ router.beforeEach((to, from, next) => {
     const isPublic = to.meta.public === true;
 
     if (token && (to.path === '/login' || to.path === '/register')) {
-        const r = to.query.redirect;
-        if (typeof r === 'string' && r.startsWith('/') && !r.startsWith('/login') && !r.startsWith('/register')) {
-            next(r);
-        } else {
-            next({ path: '/utilIndex' });
+        const r = normalizePostLoginRedirect(to.query.redirect);
+        if (r.kind === 'external') {
+            window.location.replace(r.url);
+            next(false);
+            return;
         }
+        if (r.kind === 'internal') {
+            next(r.path);
+            return;
+        }
+        next({ path: '/utilIndex' });
         return;
     }
 

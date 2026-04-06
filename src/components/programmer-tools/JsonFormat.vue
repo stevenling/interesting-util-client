@@ -84,6 +84,15 @@
                   placeholder="请输入 JSON"
                   class="el-input-class"
                 />
+                <p
+                  v-if="parseError"
+                  class="json-parse-error"
+                  data-testid="json-format-parse-error"
+                  role="alert"
+                  aria-live="polite"
+                >
+                  {{ parseError }}
+                </p>
               </el-col>
 
               <el-col :xs="24" :sm="24" :md="24" :lg="12" class="el-input-content">
@@ -133,7 +142,7 @@
 </template>
 
 <script setup>
-import { watch, reactive } from 'vue'
+import { watch, reactive, ref } from 'vue'
 import { RouterLink } from 'vue-router'
 import '../../styles/matrix-page.css'
 import { ElMessage } from 'element-plus'
@@ -144,9 +153,15 @@ import useClipboard from 'vue-clipboard3'
 const JSON_FORMAT_SPACE = 4
 
 const currentJson = reactive({ oldJson: '', formatJson: '' })
+/** 解析失败时在左栏展示，避免反复 Toast */
+const parseError = ref('')
 
 const { toClipboard } = useClipboard()
 
+/**
+ * 防抖：在 delay 毫秒内若再次调用，则重置计时，只执行「最后一次」触发后的那次 fn。
+ * 用于输入框 JSON：避免每个字符都 parse，减轻主线程压力与界面抖动。
+ */
 function debounce(fn, delay) {
   let timer = null
   return function (...args) {
@@ -161,12 +176,15 @@ watch(
     if (typeof newValue === 'string' && newValue.trim() !== '') {
       try {
         const jsonObj = JSON.parse(newValue)
+        parseError.value = ''
         currentJson.formatJson = JSON.stringify(jsonObj, null, JSON_FORMAT_SPACE)
       } catch (e) {
         currentJson.formatJson = ''
-        ElMessage.error('待格式化的 Json 有误，请检查')
+        const msg = e instanceof Error ? e.message : String(e)
+        parseError.value = msg.trim() || 'JSON 解析失败'
       }
     } else {
+      parseError.value = ''
       currentJson.formatJson = ''
     }
   }, 300)
@@ -196,6 +214,7 @@ function clickClear() {
     ElMessage.info('已经清空了，没必要再次清空')
     return
   }
+  parseError.value = ''
   currentJson.formatJson = ''
   currentJson.oldJson = ''
 }
@@ -417,6 +436,27 @@ async function clickCopy() {
   border: 1px solid rgb(228 228 231);
   color: rgb(39 39 42);
   box-shadow: none;
+}
+
+.json-parse-error {
+  flex-shrink: 0;
+  margin: 0.5rem 0 0;
+  padding: 0.5rem 0.625rem;
+  border-radius: 0.5rem;
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  word-break: break-word;
+  color: rgb(185 28 28);
+  background: rgb(254 242 242);
+  border: 1px solid rgb(254 202 202);
+}
+
+@media (prefers-color-scheme: dark) {
+  .json-parse-error {
+    color: rgb(252 165 165);
+    background: rgb(69 10 10 / 0.35);
+    border-color: rgb(127 29 29 / 0.6);
+  }
 }
 
 @media (prefers-color-scheme: dark) {

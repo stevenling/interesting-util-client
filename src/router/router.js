@@ -86,6 +86,11 @@ export const constantRoutes = [
         component: () => import("@/components/VocabularyTest.vue")
     },
     {
+        name: 'WordMemorize',
+        path: '/wordMemorize',
+        component: () => import("@/components/WordMemorize.vue")
+    },
+    {
         name: 'PomodoroTimer',
         path: '/pomodoroTimer',
         component: () => import("@/components/PomodoroTimer.vue")

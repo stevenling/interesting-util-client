@@ -47,12 +47,12 @@ const isExternal = (url) => /^https?:\/\//i.test(url)
 
 const go = () => {
   if (!props.link) return
-  if (isExternal(props.link)) {
-    window.open(props.link, '_blank', 'noopener,noreferrer')
-    return
-  }
   if (props.requireLogin && !demoAuth.getToken()) {
     emit('require-auth', props.link)
+    return
+  }
+  if (isExternal(props.link)) {
+    window.open(props.link, '_blank', 'noopener,noreferrer')
     return
   }
   router.push(props.link)

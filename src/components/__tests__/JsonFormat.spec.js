@@ -82,12 +82,15 @@ describe('JsonFormat.vue', () => {
       expect(wrapper.vm.currentJson.formatJson).toBe('')
     })
 
-    it('should show error message for invalid JSON', async () => {
+    it('should show inline error for invalid JSON without toast', async () => {
       const invalidJson = '{invalid json}'
       await wrapper.find('textarea').setValue(invalidJson)
       await jest.runAllTimers();
-      expect(ElMessage.error).toHaveBeenCalledWith('待格式化的 Json 有误，请检查')
+      expect(ElMessage.error).not.toHaveBeenCalled()
       expect(wrapper.vm.currentJson.formatJson).toBe('')
+      const err = wrapper.find('[data-testid="json-format-parse-error"]')
+      expect(err.exists()).toBe(true)
+      expect(err.text().length).toBeGreaterThan(0)
     })
   })
 

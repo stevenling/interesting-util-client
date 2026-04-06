@@ -107,6 +107,7 @@ import { RouterLink, useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import '../../styles/matrix-page.css'
 import * as demoAuth from '@/utils/demoAuth'
+import { applyPostLoginRedirect } from '@/utils/authRedirect.js'
 
 const route = useRoute()
 const router = useRouter()
@@ -114,17 +115,6 @@ const router = useRouter()
 const username = ref('')
 const password = ref('')
 const loading = ref(false)
-
-function safeRedirectPath() {
-  const r = route.query.redirect
-  if (typeof r !== 'string' || !r.startsWith('/')) {
-    return '/utilIndex'
-  }
-  if (r.startsWith('/login') || r.startsWith('/register')) {
-    return '/utilIndex'
-  }
-  return r
-}
 
 async function onSubmit() {
   if (loading.value) return
@@ -136,7 +126,7 @@ async function onSubmit() {
       return
     }
     ElMessage.success('登录成功')
-    await router.replace(safeRedirectPath())
+    await applyPostLoginRedirect(route.query.redirect, router)
   } finally {
     loading.value = false
   }

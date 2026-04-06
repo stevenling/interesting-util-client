@@ -25,28 +25,28 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/164</span>
+                <span class='fraction'>0/166</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/74</span>
+                <span class='fraction'>0/76</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/53</span>
+                <span class='fraction'>0/55</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/156</span>
+                <span class='fraction'>0/158</span>
             </div>
         
             
@@ -642,7 +642,10 @@
 <a name='L577'></a><a href='#L577'>577</a>
 <a name='L578'></a><a href='#L578'>578</a>
 <a name='L579'></a><a href='#L579'>579</a>
-<a name='L580'></a><a href='#L580'>580</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L580'></a><a href='#L580'>580</a>
+<a name='L581'></a><a href='#L581'>581</a>
+<a name='L582'></a><a href='#L582'>582</a>
+<a name='L583'></a><a href='#L583'>583</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -653,7 +656,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -865,6 +867,8 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -994,8 +998,15 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1113,11 +1124,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1223,95 +1229,99 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">&lt;template&gt;
   &lt;div class="article-list"&gt;
-    &lt;TopMenu&gt;&lt;/TopMenu&gt;
-    
     &lt;div class="scrollable-content"&gt;
       &lt;div class="list-container"&gt;
+        &lt;RouterLink
+          to="/utilIndex"
+          class="mb-2 shrink-0 inline-block text-sm text-slate-500 hover:text-slate-800 dark:text-neutral-500 dark:hover:text-neutral-200 transition-colors duration-300"
+        &gt;
+<span class="fstat-no" title="function not covered" ></span>          ← 
+        &lt;/RouterLink&gt;
         &lt;!-- 标签页：左侧云胡收藏文章集，右侧云胡选集 --&gt;
-        &lt;el-tabs v-model="activeTab" class="list-tabs"&gt;
-          &lt;el-tab-pane label="藏文" name="collection"&gt;
-<span class="fstat-no" title="function not covered" ></span>            &lt;div class="header-section"&gt;
-              &lt;h1&gt;藏文&lt;/h1&gt;
-              &lt;div class="search-section"&gt;
-<span class="cstat-no" title="statement not covered" ></span>                &lt;el-input
-                  v<span class="cstat-no" title="statement not covered" >-model="sear</span>chKeyword"
-<span class="cstat-no" title="statement not covered" >                  placeholder</span>="搜索文章..."
-                  cle<span class="cstat-no" title="statement not covered" >arable</span>
-                  class="s<span class="cstat-no" title="statement not covered" >earch-in</span>put"
-                &gt;<span class="cstat-no" title="statement not covered" ></span>
-                  &lt;template <span class="cstat-no" title="statement not covered" >#prefix&gt;</span>
+<span class="cstat-no" title="statement not covered" >        &lt;el-tabs</span> v-model="activeTab" class="list-tabs"&gt;
+          &lt;el-tab-p<span class="cstat-no" title="statement not covered" >ane label="藏</span>文" name="collection"&gt;
+            &lt;div c<span class="cstat-no" title="statement not covered" >lass="heade</span>r-section"&gt;
+              &lt;h1&gt;藏文&lt;<span class="cstat-no" title="statement not covered" >/h1&gt;</span>
+              &lt;div class="<span class="cstat-no" title="statement not covered" >search-s</span>ection"&gt;
+                &lt;el-input<span class="cstat-no" title="statement not covered" ></span>
+                  v-model="s<span class="cstat-no" title="statement not covered" >earchKey</span>word"
+                  placeholder="搜索文章..."
+                  clea<span class="cstat-no" title="statement not covered" >rable</span>
+                  class="search-input"
+                &gt;
+                  &lt;template #prefix&gt;
                     &lt;el-icon&gt;&lt;search /&gt;&lt;/el-icon&gt;
-                  &lt;/te<span class="cstat-no" title="statement not covered" >mplate&gt;</span>
-                &lt;/el-input&gt;
-                &lt;span v-if="searchKeyword" class="search-result-count"&gt;
-                  找到 {{ filteredArticles.length }} 篇文章
+                  &lt;/templat<span class="cstat-no" title="statement not covered" >e&gt;<span class="fstat-no" title="function not covered" ></span></span>
+<span class="cstat-no" title="statement not covered" >                &lt;/el-input&gt;<span class="fstat-no" title="function not covered" ></span></span>
+                &lt;span <span class="cstat-no" title="statement not covered" >v-if="searchKeywo</span>rd" class="search-result-count"&gt;
+                  找到 {<span class="cstat-no" title="statement not covered" >{ filteredArticle</span>s.length }} 篇文章
                 &lt;/span&gt;
-              &lt;/div&gt;<span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" ></span></span>
-<span class="cstat-no" title="statement not covered" >            &lt;/div&gt;<span class="fstat-no" title="function not covered" ></span></span>
-            &lt;div class<span class="cstat-no" title="statement not covered" >="articles-contai</span>ner"&gt;
-              &lt;el-card <span class="cstat-no" title="statement not covered" ></span>
+<span class="cstat-no" title="statement not covered" >              &lt;/div&gt;</span>
+            &lt;/div&gt;
+            &lt;div class="articles-container"&gt;
+              &lt;el-card 
                 v-for="article in filteredArticles" 
-<span class="cstat-no" title="statement not covered" >                :key="article.</span>id"
+                :key="article.id"
                 class="article-card"
-                shadow="hover"
-                @click="goToArticle(article.id)"
-              &gt;
-                &lt;div class="article-card-content"&gt;
-                  &lt;h3 class="article-title"&gt;{{ article.title }}&lt;/h3&gt;
-                  &lt;p class="a<span class="cstat-no" title="statement not covered" >rticle-de<span class="fstat-no" title="function not covered" >sc</span>ription"&gt;{{ article.description }}&lt;/p&gt;</span>
-                  &lt;div class="a<span class="cstat-no" title="statement not covered" >rticle-meta"&gt;</span>
-<span class="cstat-no" title="statement not covered" >                    &lt;div class="meta-le<span class="cstat-no" title="statement not covered" >ft"&gt;</span></span>
-<span class="cstat-no" title="statement not covered" >                      &lt;span class="article-date"&gt;{{ article.dat</span>e }}&lt;/span&gt;
-<span class="cstat-no" title="statement not covered" >                      &lt;span class="ar<span class="fstat-no" title="function not covered" >ti</span>cle-stats<span class="cstat-no" title="statement not covered" >" v-if="articleStats[article.id]"&gt;</span></span>
+                shadow="hover<span class="cstat-no" title="statement not covered" >"<span class="fstat-no" title="function not covered" ></span></span>
+                @click="goToArt<span class="cstat-no" title="statement not covered" >icle(article.id)"</span>
+<span class="cstat-no" title="statement not covered" >              &gt;<span class="cstat-no" title="statement not covered" ></span></span>
+                &lt;div c<span class="cstat-no" title="statement not covered" >lass="article-card-content"&gt;</span>
+<span class="cstat-no" title="statement not covered" >                  &lt;h3 class="article-<span class="fstat-no" title="function not covered" >ti</span>tle"&gt;{{ a<span class="cstat-no" title="statement not covered" >rticle.title }}&lt;/h3&gt;</span></span>
+                  &lt;p class="article-description"&gt;{{ article.description }}&lt;/p&gt;
+                  &lt;div class="article-meta"&gt;
+                    &lt;div class="meta-left"&gt;
+                      &lt;span class="ar<span class="cstat-no" title="statement not covered" >ticle-dat<span class="fstat-no" title="function not covered" >e"</span>&gt;{{ article.date }}&lt;/span&gt;</span>
+<span class="cstat-no" title="statement not covered" >                      &lt;span class="article-stats" <span class="fstat-no" title="function not covered" >v-</span>if="arti<span class="cstat-no" title="statement not covered" >cleStats[article.id]"&gt;</span></span>
                         &lt;span class="word-count"&gt;
                           &lt;el-icon class="stat-icon"&gt;&lt;document /&gt;&lt;/el-icon&gt;
                           &lt;span&gt;{{ articleStats[article.id].wordCount }} 字&lt;/span&gt;
                         &lt;/span&gt;<span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" ></span></span>
-<span class="cstat-no" title="statement not covered" >                        &lt;span class="reading-time"<span class="fstat-no" title="function not covered" >&gt;<span class="cstat-no" title="statement not covered" ></span></span></span>
-                          &lt;el-icon class="stat-icon"&gt;&lt;clock /&gt;&lt;/el-icon&gt;
-                          &lt;span&gt;{{ articleStats[article.id].readingTime }} 分钟&lt;/span&gt;
-                        &lt;/span&gt;
-                      &lt;/span&gt;<span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" ></span></span>
-<span class="cstat-no" title="statement not covered" >                    &lt;/div&gt;</span>
-<span class="cstat-no" title="statement not covered" >                    &lt;span class="articl<span class="cstat-no" title="statement not covered" >e-author" v-i</span></span>f="article.author"&gt;{{ article.author }}&lt;/span&gt;
-                  &lt;/di<span class="cstat-no" title="statement not covered" >v&gt;</span>
-<span class="cstat-no" title="statement not covered" >                &lt;/div&gt;<span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" ></span></span></span>
+<span class="cstat-no" title="statement not covered" >                        &lt;span class="reading-time"</span>&gt;
+<span class="cstat-no" title="statement not covered" >                          &lt;el-icon clas<span class="cstat-no" title="statement not covered" >s="stat-icon"</span></span>&gt;&lt;clock /&gt;&lt;/el-icon&gt;
+<span class="cstat-no" title="statement not covered" >                          &lt;span&gt;{{ articleStats[article.id].rea</span>dingTime }} 分钟&lt;/span&gt;
+<span class="cstat-no" title="statement not covered" >                        &lt;<span class="fstat-no" title="function not covered" >/s</span>pan&gt;<span class="cstat-no" title="statement not covered" ></span></span>
+                      &lt;/span&gt;
+                    &lt;/div&gt;
+                    &lt;span class="article-author" v-if="article.author"&gt;{{ article.author }}&lt;/span&gt;
+                  &lt;/div&gt;
+                &lt;/div&gt;
               &lt;/el-card&gt;
               &lt;el-empty 
-                v-if="filteredArticles.length === 0 &amp;&amp; !searchKeyword" 
-                description="暂无文章"
+                v-if="fi<span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >lt</span>eredArticles.length === 0 &amp;&amp; !searchKeyword" </span>
+                desc<span class="cstat-no" title="statement not covered" >ription="暂无文章"</span>
               &gt;&lt;/el-empty&gt;
               &lt;el-empty 
-                v-if="filteredArticles.length === 0 &amp;&amp; searchKeyword" 
-                descript<span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >io</span>n="未找到相关文章"</span>
-              &gt;<span class="cstat-no" title="statement not covered" ></span>
+<span class="cstat-no" title="statement not covered" >                v-if="filteredArticl<span class="cstat-no" title="statement not covered" >es.length === 0 &amp;&amp; searchKeywo</span></span>rd" 
+<span class="cstat-no" title="statement not covered" >                description="未找到相关文章"</span>
+              &gt;
                 &lt;el-button @click="clearSearch" type="primary"&gt;清空搜索&lt;/el-button&gt;
               &lt;/el-empty&gt;
-<span class="cstat-no" title="statement not covered" >            &lt;/div&gt;<span class="cstat-no" title="statement not covered" ></span></span>
-<span class="cstat-no" title="statement not covered" >          &lt;/el-tab-pane&gt;</span>
+            &lt;/div&gt;
+          &lt;/el-tab-pane&gt;
           &lt;el-tab-pane label="云胡选集" name="anthology"&gt;
             &lt;div class="header-section"&gt;
               &lt;h1&gt;云胡选集&lt;/h1&gt;
-              &lt;div class="search-section"&gt;
-                &lt;el-input
+              &lt;div class<span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >="</span>search-section"&gt;</span>
+<span class="cstat-no" title="statement not covered" >                &lt;el-input</span>
                   v-model="searchKeyword"
                   placeholder="搜索文章..."
                   clearable
-                  class=<span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >"s</span>earch-input"</span>
-<span class="cstat-no" title="statement not covered" >                &gt;</span>
-                  &lt;template #prefix&gt;
-                    &lt;el-icon&gt;&lt;search /&gt;&lt;/el-icon&gt;
+                  class="search-input"
+                &gt;
+                  &lt;template #pr<span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >ef</span>ix&gt;</span>
+<span class="cstat-no" title="statement not covered" ><span class="cstat-no" title="statement not covered" >                    &lt;el-icon&gt;&lt;</span></span>search /&gt;&lt;/el-icon&gt;
                   &lt;/template&gt;
                 &lt;/el-input&gt;
-                &lt;span v-if="searchKeyword" class="search-result-count"&gt;
-                  找到 {{ filtere<span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >dY</span>unhuEssayArticles.length }} 篇</span>
-<span class="cstat-no" title="statement not covered" >                &lt;/sp<span class="cstat-no" title="statement not covered" >an&gt;</span></span>
-              &lt;/div&gt;
+                &lt;<span class="cstat-no" title="statement not covered" >span v-if="searchKeyword" class=</span>"search-result-count"&gt;
+                  找到 {{ filteredYunhuEssayArticles.length }} 篇
+                &lt;/span&gt;
+<span class="cstat-no" title="statement not covered" >              &lt;/div&gt;</span>
             &lt;/div&gt;
-            &lt;div <span class="cstat-no" title="statement not covered" >class="articles-container"&gt;</span>
+            &lt;div class="articles-container"&gt;
               &lt;el-card 
                 v-for="article in filteredYunhuEssayArticles" 
-<span class="cstat-no" title="statement not covered" >                :key="'anthology-' + article.id"</span>
+                :key="'anthology-' + article.id"
                 class="article-card"
                 shadow="hover"
                 @click="goToArticle(article.id, 'yunhu-essay')"
@@ -1321,91 +1331,90 @@
                   &lt;p class="article-description"&gt;{{ article.description }}&lt;/p&gt;
                   &lt;div class="article-meta"&gt;
                     &lt;div class="meta-left"&gt;
-                      &lt;span class="article-date"&gt;{{ article.date }}&lt;/span&gt;
+<span class="cstat-no" title="statement not covered" >                      &lt;spa</span>n class="article-date"&gt;{{ article.date }}&lt;/span&gt;
                       &lt;span class="article-stats" v-if="yunhuEssayStats[article.id]"&gt;
                         &lt;span class="word-count"&gt;
                           &lt;el-icon class="stat-icon"&gt;&lt;document /&gt;&lt;/el-icon&gt;
                           &lt;span&gt;{{ yunhuEssayStats[article.id].wordCount }} 字&lt;/span&gt;
-<span class="cstat-no" title="statement not covered" >                        &lt;/</span>span&gt;
-                        &lt;span class="reading-time"&gt;
-                          &lt;el-icon class="stat-icon"&gt;&lt;clock /&gt;&lt;/el-icon&gt;
-                          &lt;span&gt;{{ yunhuEssayStats[article.id].readingTime }} 分钟&lt;/span&gt;
                         &lt;/span&gt;
+                        &lt;span cl<span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >as</span>s="reading-time"&gt;</span>
+                          &lt;el<span class="cstat-no" title="statement not covered" >-ico</span>n class="stat-icon"&gt;&lt;clock /&gt;&lt;/el-icon&gt;
+<span class="cstat-no" title="statement not covered" >                          &lt;span&gt;{{ yunhuEssayStats[article.i</span>d].readingTime }} 分钟&lt;/span&gt;
+<span class="cstat-no" title="statement not covered" >                        &lt;/s</span>pan&gt;
                       &lt;/span&gt;
-                    &lt;/div&gt;<span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" ></span></span>
-                    &lt;span cla<span class="cstat-no" title="statement not covered" >ss="</span>article-author" v-if="article.author"&gt;{{ article.author }}&lt;/span&gt;
-                  &lt;/di<span class="cstat-no" title="statement not covered" >v&gt;</span>
-<span class="cstat-no" title="statement not covered" >                &lt;/div&gt;</span>
-              &lt;/el-card&gt;
-              &lt;el-empty 
+                    &lt;/div&gt;
+                    &lt;span class="article-author" v-if="article.author"&gt;{{ article.author }}&lt;/span&gt;
+                  &lt;/div&gt;
+                &lt;/div&gt;
+              &lt;/el-card&gt;<span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" ></span></span>
+              &lt;el-em<span class="cstat-no" title="statement not covered" >pty </span>
                 v-if="filteredYunhuEssayArticles.length === 0 &amp;&amp; !searchKeyword" 
                 description="暂无文章（将 .md 放入 public/yunhu-essay 后运行 npm run gen:yunhu-essay）"
               &gt;&lt;/el-empty&gt;
               &lt;el-empty <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" ></span></span>
-                v-if<span class="cstat-no" title="statement not covered" >="f</span>ilteredYunhuEssayArticles.length === 0 &amp;&amp; searchKeyword" 
-                description="未找到相关文章"
-              &gt;
+                v-if="filteredYunhuEssayArticles.length === 0 &amp;&amp; searchKeyword" 
+<span class="cstat-no" title="statement not covered" >                description="未找到相关文章"</span>
+<span class="cstat-no" title="statement not covered" >              &gt;</span>
                 &lt;el-button @click="clearSearch" type="primary"&gt;清空搜索&lt;/el-button&gt;
-              &lt;/el-empty&gt;<span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" ></span></span>
+<span class="cstat-no" title="statement not covered" >              &lt;/el-e</span>mpty&gt;
             &lt;/div&gt;
-<span class="cstat-no" title="statement not covered" >          &lt;/el-tab-pane&gt;</span>
-        &lt;/<span class="cstat-no" title="statement not covered" >el-tabs&gt;</span>
-        
-<span class="cstat-no" title="statement not covered" >        &lt;!-- 底部文字 --</span>&gt;
-        &lt;div class="footer-text"&gt;
-          &lt;p&gt;献给七纱，你是唯一<span class="cstat-no" title="statement not covered" >的月亮呀～&lt;/p&gt;</span>
-        &lt;/div&gt;<span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" ></span></span>
-      &lt;/<span class="cstat-no" title="statement not covered" >div&gt;</span>
+          &lt;/el-tab-pan<span class="cstat-no" title="statement not covered" >e&gt;</span>
+        &lt;/el-tabs&gt;<span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" ></span></span>
+        <span class="cstat-no" title="statement not covered" ></span>
+        &lt;!-- 底部文字 --&gt;<span class="cstat-no" title="statement not covered" ></span>
+        &lt;div class="footer-<span class="cstat-no" title="statement not covered" >text"&gt;</span>
+<span class="cstat-no" title="statement not covered" >          &lt;p&gt;献给七纱，你是唯一的月亮呀～&lt;/p&gt;</span>
+        &lt;/div&gt;<span class="cstat-no" title="statement not covered" ></span>
+      &lt;/div&gt;<span class="cstat-no" title="statement not covered" ></span>
     &lt;/div&gt;<span class="cstat-no" title="statement not covered" ></span>
   &lt;/div&gt;<span class="cstat-no" title="statement not covered" ></span>
-&lt;/template<span class="cstat-no" title="statement not covered" >&gt;</span>
-<span class="cstat-no" title="statement not covered" ></span>
-&lt;script setup&gt;<span class="cstat-no" title="statement not covered" ></span>
-import { ref, computed, onMounte<span class="cstat-no" title="statement not covered" >d } from 'vue';</span>
-import { use<span class="cstat-no" title="statement not covered" >Router, useRoute } from 'vue-router';</span>
-import { ElMessage } from 'element-plus';
+&lt;/template&gt;
+&nbsp;
+&lt;script setup&gt;
+import { ref, computed, onMounted } from 'vue';
+import { useRouter, useRoute, RouterLink } from 'vue-router';
+import { E<span class="cstat-no" title="statement not covered" >lMessage } from 'element-plus';</span>
 import { Search, Document, Clock } from '@element-plus/icons-vue';
-import TopMenu from './TopMenu.vue';
 import { getAllArticles } from '@/config/articles';
-import { getAllYunhuEssayArticles } from '@/config/yunhu-essay';
+import<span class="cstat-no" title="statement not covered" > { getAllYunhuEssayArticles }</span> from '@/config/yunhu-essay';
 <span class="cstat-no" title="statement not covered" ></span>
 const router = useRouter();
 const route = useRoute();
-const <span class="cstat-no" title="statement not covered" >articles = ref([]);</span>
-const <span class="cstat-no" title="statement not covered" >searchKeyword = ref('');</span>
-const articleStats = ref({}); // 藏文统计
-const yunhuEssayStats = ref({}); // 云胡选集统计（来自 yunhu-essay 文件夹）
-// 根据 URL 中的 tab 参数决定初始标签：anthology=云胡选集，默认藏文
-const activeTab = ref(route.quer<span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >y.</span>tab === 'anthology' ? 'anthology' : 'collection'); // 标签页：collection=藏文，anthology=云胡选集</span>
-<span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" ></span></span>
-/**<span class="cstat-no" title="statement not covered" ><span class="cstat-no" title="statement not covered" ></span></span>
- * 按日期倒序<span class="cstat-no" title="statement not covered" >排序的文章列表（最新的在</span>前）
- */
-const sortedArticles =<span class="cstat-no" title="statement not covered" > computed(() </span>=&gt; {
-  return [...articl<span class="cstat-no" title="statement not covered" >es.value].sort((a, b) =&gt; {</span>
-    const dateA = ne<span class="cstat-no" title="statement not covered" >w D</span>ate(a.date);
-    co<span class="cstat-no" title="statement not covered" >nst dateB = new Date(b.date<span class="fstat-no" title="function not covered" >);</span></span>
-    // 倒<span class="cstat-no" title="statement not covered" >序排序：日期越新越靠前</span>
-    return dateB - dat<span class="cstat-no" title="statement not covered" >eA;</span>
-  });<span class="cstat-no" title="statement not covered" ></span>
-});<span class="cstat-no" title="statement not covered" ></span>
+const articles = ref([]);
+const searchKeyword = ref('');<span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" ></span></span>
+const articleStats = ref(<span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >{}</span>); // 藏文统计</span>
+const yu<span class="cstat-no" title="statement not covered" >nhuEssayStats = ref({}); // 云胡选集统计（来自 yunhu-essay 文件夹）<span class="cstat-no" title="statement not covered" ></span></span>
+// 根据 UR<span class="cstat-no" title="statement not covered" >L 中的 tab 参数决</span>定初始标签：anthology=云胡选集，默认藏文
+const activeTab = ref(route.query.tab === 'anthology' ? 'anthology' : 'collection'); // 标签页：collection=藏文，anthology=云胡选集
 <span class="cstat-no" title="statement not covered" ></span>
+/**<span class="cstat-no" title="statement not covered" ></span>
+ * 按日期倒序排序的文章列表（最新的在<span class="cstat-no" title="statement not covered" >前）</span>
+ */<span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" ></span></span>
+const so<span class="cstat-no" title="statement not covered" >rtedArticles = computed(() =&gt; {</span>
+  return [...articles.<span class="cstat-no" title="statement not covered" >value].sort((a, b) =&gt; {</span>
+    const <span class="cstat-no" title="statement not covered" >dateA = new Date(a.date);</span>
+    const dateB = new Date(b<span class="cstat-no" title="statement not covered" >.date);</span>
+    // 倒序排序：<span class="cstat-no" title="statement not covered" >日期越新越靠前</span>
+    return dateB - dateA;
+  });
+});
+&nbsp;
 /**
- * 过滤后的文章列表（藏文）
+ * 过滤后的文章列<span class="cstat-no" title="statement not covered" >表（藏文）</span>
  */
 const filteredArticles = computed(() =&gt; {
-  const articlesToFilter = sortedArticles.value;
-  if (!sea<span class="cstat-no" title="statement not covered" >rchKeyword.value.trim()) return articlesToFilter;</span>
-  const keyword = searchKeyword.value.trim().toLowerCase();
-  return articlesToFilter.filter(article =&gt;
-    ar<span class="cstat-no" title="statement not covered" >ticle.title.toLowerCase().inclu</span>des(keyword) ||
-    (article.description &amp;&amp; article.description.toLowerCase().includes(keyword)) ||
-<span class="cstat-no" title="statement not covered" >    (article.a<span class="fstat-no" title="function not covered" >ut</span>hor &amp;&amp; article.author.toLowerCase().includes(keyword))</span>
+  cons<span class="cstat-no" title="statement not covered" >t articlesToFilter = sortedArti</span>cles.value;
+  if (!searchKeyword.value.trim()) return articlesToFilter;
+  co<span class="cstat-no" title="statement not covered" >nst keywor<span class="fstat-no" title="function not covered" >d </span>= searchKeyword.value.trim().toLowerCase();</span>
+  retu<span class="cstat-no" title="statement not covered" >rn articlesToFilter.filter(article </span>=&gt;
+    ar<span class="cstat-no" title="statement not covered" >ticle.title.toLowerC</span>ase().includes(keyword) ||
+    (a<span class="cstat-no" title="statement not covered" >rticle.description &amp;&amp; a</span>rticle.description.toLowerCase().includes(keyword)) ||
+    (article.author &amp;&amp; article.author.toLowerCase().includes(keyword))
   );<span class="cstat-no" title="statement not covered" ></span>
-});<span class="cstat-no" title="statement not covered" ></span>
-<span class="cstat-no" title="statement not covered" ></span>
+});
+&nbsp;
 /** 云胡选集：来自 yunhu-essay 文件夹，按日期倒序 */
-const sortedYunhuEssayArt<span class="cstat-no" title="statement not covered" >icles = computed(() =&gt; {</span>
+const sortedYunhuEssayArticles = computed(() =&gt; {
   return [...getAllYunhuEssayArticles()].sort((a, b) =&gt; new Date(b.date) - new Date(a.date));
 });
 &nbsp;
@@ -1422,191 +1431,191 @@ const filteredYunhuEssayArticles = computed(() =&gt; {
 });
 &nbsp;
 /**
- * 跳转到文章详情页
- * @param {string} articleId - 文章 id
+ * 跳转到<span class="fstat-no" title="function not covered" >文章</span>详情页
+ * @para<span class="cstat-no" title="statement not covered" >m {string} article</span>Id - 文章 id
  * @param {string} [source] - 'yunhu-essay' 表示来自云胡选集，正文从 yunhu-essay 文件夹加载
- */
-const <span class="fstat-no" title="function not covered" >go</span>ToArticle = (articleId, source) =&gt; {
-  const <span class="cstat-no" title="statement not covered" >query = { id: arti</span>cleId };
-  if (source === 'yunhu-essay') query.source = 'yunhu-essay';
-  rout<span class="fstat-no" title="function not covered" >er</span>.push({ path: '/articleDetail', query });
-};<span class="cstat-no" title="statement not covered" ></span>
-&nbsp;
-/**<span class="fstat-no" title="function not covered" ></span>
- * 清空搜索<span class="cstat-no" title="statement not covered" ></span>
- */
-const <span class="fstat-no" title="function not covered" >cl</span>earSearch = () =&gt; {
-  search<span class="cstat-no" title="statement not covered" >Keyword.value =</span> '';
+ */<span class="fstat-no" title="function not covered" ></span>
+const go<span class="cstat-no" title="statement not covered" >ToArticle = (arti</span>cleId, source) =&gt; {
+  const query = { id: articleId };
+  if (<span class="fstat-no" title="function not covered" >so</span>urce === 'yunhu-essay') query.source = 'yunhu-essay';
+  router<span class="cstat-no" title="statement not covered" >.push({ path: '/art</span>icleDetail', query });
 };
 <span class="fstat-no" title="function not covered" ></span>
 /**<span class="cstat-no" title="statement not covered" ></span>
- * 计算文章字数（去除Markdown语法和HTML标签）
+ * 清空搜索
  */<span class="fstat-no" title="function not covered" ></span>
-const ca<span class="cstat-no" title="statement not covered" >lculateWordCou</span>nt = (content) =&gt; {
-  if (!content) return 0;
-  
-  // 移<span class="fstat-no" title="function not covered" >除H</span>TML标签
-  let te<span class="cstat-no" title="statement not covered" >xt = content.replace(/&lt;</span>[^&gt;]+&gt;/g, '');
-  
-  // 移<span class="fstat-no" title="function not covered" >除M</span>arkdown语法
-  text =<span class="cstat-no" title="statement not covered" > text</span>
-    .replace(/^#+\s+/gm, '') // 标题
+const cl<span class="cstat-no" title="statement not covered" >earSearch = () </span>=&gt; {
+  searchKeyword.value = '';
+};<span class="fstat-no" title="function not covered" ></span>
+<span class="cstat-no" title="statement not covered" ></span>
+/**
+ * 计算文<span class="fstat-no" title="function not covered" >章字</span>数（去除Markdown语法和HTML标签）
+ */<span class="cstat-no" title="statement not covered" ></span>
+const calculateWordCount = (content) =&gt; {
+  if (<span class="fstat-no" title="function not covered" >!c</span>ontent) return 0;
+  <span class="cstat-no" title="statement not covered" ></span>
+  // 移除HTML标签
+  let <span class="fstat-no" title="function not covered" >te</span>xt = content.replace(/&lt;[^&gt;]+&gt;/g, '');
+  <span class="cstat-no" title="statement not covered" ></span>
+  // 移除Markdown语法
+  text = text
+<span class="cstat-no" title="statement not covered" >    .replace(/^#+\s+/gm, '') // 标题</span>
     .replace(/\*\*([^*]+)\*\*/g, '$1') // 粗体
-<span class="cstat-no" title="statement not covered" >    .replace(/\*([^*]+)\*/g, '$1') // 斜体</span>
+    .replace(/\*([^*]+)\*/g, '$1') // 斜体
     .replace(/\[([^\]]+)\]\([^(]+\)/g, '$1') // 链接
-    .replace(/!\[([^\]]*)\]\([^(]+\)/g, '') // 图片
+<span class="cstat-no" title="statement not covered" >    .replace(/!\[([^\]]*)</span>\]\([^(]+\)/g, '') // 图片
     .replace(/`([^`]+)`/g, '$1') // 行内代码
-<span class="cstat-no" title="statement not covered" >    .replace(/```[\s\S]*?</span>```/g, '') // 代码块
+    .replace(/```[\s\S]*?```/g, '') // 代码块
     .replace(/^\s*[-*+]\s+/gm, '') // 列表
     .replace(/^\s*\d+\.\s+/gm, '') // 有序列表
-    .replace(/^&gt;\s+/gm, '') // 引用
+<span class="cstat-no" title="statement not covered" >    .replace(/^&gt;\s+/gm, '') // 引用</span>
     .replace(/---+/g, '') // 分割线
-<span class="cstat-no" title="statement not covered" >    .replace(/\n+/g, ' ') // 换行符</span>
-    .trim();
-  
-<span class="cstat-no" title="statement not covered" >  // 计算中文字符数（中文字符算1个字，其他字</span>符也算1个）
-  return te<span class="cstat-no" title="statement not covered" >xt.length;</span>
-};<span class="cstat-no" title="statement not covered" ></span>
-&nbsp;
+    .replace(/\n+/g, ' ') // 换行符
+<span class="cstat-no" title="statement not covered" >    .trim();</span>
+  <span class="cstat-no" title="statement not covered" ></span>
+  // 计算中文字符数（中文字符算1<span class="cstat-no" title="statement not covered" >个字，其他字符也算1个）</span>
+  return text.length;
+};
+<span class="cstat-no" title="statement not covered" ></span>
 /**
- * 估算阅读时间（按每分钟225字计<span class="cstat-no" title="statement not covered" >算）</span>
- */
+ * 估算阅读时间（按每分钟225字计算）
+ */<span class="cstat-no" title="statement not covered" ></span>
 const estimateReadingTime = (wordCount) =&gt; {
-  const wordsPerMin<span class="cstat-no" title="statement not covered" >ute = 225;</span>
-  const minutes = Math.ceil(wordCount / wordsPerMinute);
+  const wordsPerMinute = 225;
+  const minutes = M<span class="cstat-no" title="statement not covered" >ath.ceil(wordCount / wordsPerMinute);</span>
   return minutes || 1; // 至少1分钟
-};<span class="cstat-no" title="statement not covered" ></span>
-&nbsp;
+};
+<span class="cstat-no" title="statement not covered" ></span>
 /**
- * 加载文章统计信息<span class="cstat-no" title="statement not covered" ></span>
- */
+ * 加载文章统计信息
+ */<span class="cstat-no" title="statement not covered" ></span>
 const loadArticleStats = async () =&gt; {
-  const stats = {};<span class="cstat-no" title="statement not covered" ></span>
+  const stats = {};
   
-  // 并行加载所有文章内容
+  // 并行加载所有文章内容<span class="cstat-no" title="statement not covered" ></span>
   // 动态获取 base URL 以适配 GitHub Pages 的 base path
-  const getBaseUrl <span class="cstat-no" title="statement not covered" >= () =&gt; {</span>
-    // 检查当前路径是否包含 GitHub Pages 的 base path
-    if (window.location.pathname.startsWith('/interesting-util-client/')) {
-      return '/inte<span class="cstat-no" title="statement not covered" >resting-util-client/';</span>
-    }
-    return '/';
-  };<span class="cstat-no" title="statement not covered" ></span>
-  const baseUrl = getBaseUrl();
-  const promises = articles.value.map(async (article) =&gt; {
-    try {<span class="cstat-no" title="statement not covered" ></span>
-      const articlePath = `${baseUrl}articles/${article.file}`;
-      const response = await fetch(articlePath);
-      if (response.o<span class="cstat-no" title="statement not covered" >k) {</span>
-        const content = await response.text();
-        const wordCount = calculateWordCount(content);
-        const readin<span class="cstat-no" title="statement not covered" >gTime = estimateReadingTime(wordCount);</span>
-        stats[article.id] = { wordCount, readingTime };
-      }
-    } catch (error) <span class="cstat-no" title="statement not covered" >{</span>
-      console.error(`加载文章 ${article.title} 统计信息失败:`, error);
-    }
-  });<span class="cstat-no" title="statement not covered" ></span>
-  
-  await Promise.all(promises);
-  articleStats.value = stats;
-};<span class="cstat-no" title="statement not covered" ></span>
-&nbsp;
-/** 加载云胡选集（yunhu-essay 文件夹）文章统计 */
-const loadYunhuEssay<span class="cstat-no" title="statement not covered" >Stats = async () =&gt; {</span>
   const getBaseUrl = () =&gt; {
-    if (window.location.pathname.startsWith('/interesting-util-client/')) return '/interesting-util-client/';
-    return '/';<span class="cstat-no" title="statement not covered" ></span>
-  };
-  const baseUrl = getBaseUrl();
-  const list = getAllYunhuEssayArticles();
-  const stats = {};<span class="cstat-no" title="statement not covered" ></span>
-  await Promise.all(list.map(async (article) =&gt; {
-    try {
-      const res = aw<span class="cstat-no" title="statement not covered" >ait fetch(`${baseUrl}yunhu-essay/${article.file}`);</span>
-      if (res.ok) {
-        const content = await res.text();
-        stats[articl<span class="cstat-no" title="statement not covered" >e.id] = {</span>
-          wordCount: calculateWordCount(content),
-          readingTime: estimateReadingTime(calculateWordCount(content))
-        };
-      }<span class="cstat-no" title="statement not covered" ></span>
-    } catch (e) {
-      console.error(`加载云胡选集 ${article.title} 统计失败:`, e);
+    // 检查当前路径是否包含 G<span class="cstat-no" title="statement not covered" >itHub Pages 的 base path</span>
+    if (window.location.pathname.startsWith('/interesting-util-client/')) {
+      return '/interesting-util-client/';
     }<span class="cstat-no" title="statement not covered" ></span>
-  }));
+    return '/';
+  };
+  const baseUrl = ge<span class="cstat-no" title="statement not covered" >tBaseUrl();</span>
+  const promises = articles.value.map(async (article) =&gt; {
+    try {
+      const articleP<span class="cstat-no" title="statement not covered" >ath = `${baseUrl}articles/${article.file}`;</span>
+      const response = await fetch(articlePath);
+      if (response.ok) {
+        const conten<span class="cstat-no" title="statement not covered" >t = await response.text();</span>
+        const wordCount = calculateWordCount(content);
+        const readingTime = estimateReadingTime(wordCount);
+        stats[articl<span class="cstat-no" title="statement not covered" >e.id] = { wordCount, readingTime };</span>
+      }
+    } catch (error) {
+      console.error(<span class="cstat-no" title="statement not covered" >`加载文章 ${article.title} 统计信息失败:`, error);</span>
+    }
+  });
+  
+  await Promise.all(<span class="cstat-no" title="statement not covered" >promises);</span>
+  articleStats.value = stats;
+};
+<span class="cstat-no" title="statement not covered" ></span>
+/** 加载云胡选集（yunhu-essay 文件夹）文章统计 */
+const loadYunhuEssayStats = async () =&gt; {
+  const getBaseUrl =<span class="cstat-no" title="statement not covered" > () =&gt; {</span>
+    if (window.location.pathname.startsWith('/interesting-util-client/')) return '/interesting-util-client/';
+    return '/';
+  };
+  const baseUrl = ge<span class="cstat-no" title="statement not covered" >tBaseUrl();</span>
+  const list = getAllYunhuEssayArticles();
+  const stats = {};
+  await Promise.all(<span class="cstat-no" title="statement not covered" >list.map(async (article) =&gt; {</span>
+    try {
+      const res = await fetch(`${baseUrl}yunhu-essay/${article.file}`);
+      if (res.ok) {<span class="cstat-no" title="statement not covered" ></span>
+        const content = await res.text();
+        stats[article.id] = {
+          wordCount: calculateWordCount(content),
+          readingTim<span class="cstat-no" title="statement not covered" >e: estimateReadingTime(calculateWordCount(content))</span>
+        };
+      }
+    } catch (e) {<span class="cstat-no" title="statement not covered" ></span>
+      console.error(`加载云胡选集 ${article.title} 统计失败:`, e);
+    }
+  }));<span class="cstat-no" title="statement not covered" ></span>
   yunhuEssayStats.value = stats;
-};<span class="cstat-no" title="statement not covered" ></span>
-&nbsp;
+};
+<span class="cstat-no" title="statement not covered" ></span>
 onMounted(async () =&gt; {
-  articles.value = g<span class="cstat-no" title="statement not covered" >etAllArticles();</span>
-  loadArticleStats();
+  articles.value = getAllArticles();
+  loadArticleStats()<span class="cstat-no" title="statement not covered" >;</span>
   loadYunhuEssayStats();
-});<span class="cstat-no" title="statement not covered" ></span>
-&lt;/script&gt;
+});
+&lt;/script&gt;<span class="cstat-no" title="statement not covered" ></span>
 &nbsp;
-&lt;style scoped&gt;<span class="cstat-no" title="statement not covered" ></span>
-.article-list {
+&lt;style scoped&gt;
+.article-list {<span class="cstat-no" title="statement not covered" ></span>
   width: 100%;
-  height: 100vh;<span class="cstat-no" title="statement not covered" ></span>
-  background: var(--site-bg);
+  height: 100vh;
+  background: var(--<span class="cstat-no" title="statement not covered" >site-bg);</span>
   display: flex;
-  flex-direction: co<span class="cstat-no" title="statement not covered" >lumn;</span>
+  flex-direction: column;
   overflow: hidden;
-}
+}<span class="cstat-no" title="statement not covered" ></span>
 &nbsp;
-.scrollable-content <span class="cstat-no" title="statement not covered" >{</span>
-  flex: 1;
+.scrollable-content {
+  flex: 1;<span class="cstat-no" title="statement not covered" ></span>
   overflow-y: auto;
-  overflow-x: hidden<span class="cstat-no" title="statement not covered" >;</span>
-}
+  overflow-x: hidden;
+}<span class="cstat-no" title="statement not covered" ></span>
 &nbsp;
-.list-container {<span class="cstat-no" title="statement not covered" ></span>
+.list-container {
   max-width: 1200px;
-  margin: 0 auto;
-  padding: 20px;
-  padding<span class="fstat-no" title="function not covered" >-bottom</span>: 40px;
+  margin:<span class="fstat-no" title="function not covered" > 0 auto</span>;
+  padding: 20px;<span class="cstat-no" title="statement not covered" ></span>
+  padding-bottom: 40px;<span class="cstat-no" title="statement not covered" ></span>
 }<span class="cstat-no" title="statement not covered" ></span>
 <span class="cstat-no" title="statement not covered" ></span>
 /* 列表页标签页 - 蓝白色调 */<span class="cstat-no" title="statement not covered" ></span>
 .list-tabs {<span class="cstat-no" title="statement not covered" ></span>
   margin-bottom: 0;<span class="cstat-no" title="statement not covered" ></span>
-  background: var(--site-surface)<span class="cstat-no" title="statement not covered" >;</span>
-  border: 1px solid var(--sit<span class="cstat-no" title="statement not covered" >e-border);</span>
-<span class="cstat-no" title="statement not covered" >  border-radius: 12px;</span>
+<span class="cstat-no" title="statement not covered" >  background: var(--site-surface);</span>
+  border: 1px solid var(--site-border);
+  border-radius: 12px;
   padding: 0 16px 4px;
-  box-shadow: var(--site-card-shadow);<span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" ></span></span>
+  box-shadow: var(--site-card-s<span class="fstat-no" title="function not covered" >ha</span>dow)<span class="cstat-no" title="statement not covered" >;</span>
 }
 .list-tabs :deep(.el-tabs__header) {
-  margin: 0 0 20px 0;<span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" ></span></span>
+  margin: 0 0 20px 0;
   border-bottom: 1px solid var(--site-border);
-}
+}<span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" ></span></span>
 .list-tabs :deep(.el-tabs__nav-wrap::after) {
-  display: none;<span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" ></span></span>
-}
-.list-tabs :deep(.el-tabs__item) {<span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" ></span></span>
+  display: none;
+}<span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" ></span></span>
+.list-tabs :deep(.el-tabs__item) {
   font-size: 1rem;
   font-weight: 500;
-  color: #606266;
+  color: #606266;<span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" ></span></span>
 }
-.list-tabs :deep(.el-tabs__item:ho<span class="fstat-no" title="function not covered" >ve</span>r) {<span class="cstat-no" title="statement not covered" ></span>
-  color: var(--site-accent);<span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" ></span></span>
+.list-tabs :deep(.el-tabs__item:hover) {<span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" ></span></span>
+  color: var(--site-accent);
 }
 .list-tabs :deep(.el-tabs__item.is-active) {
   color: var(--site-accent);
-  font-weight: 600;<span class="fstat-no" title="function not covered" ></span>
-}<span class="cstat-no" title="statement not covered" ></span>
+  font-weight: 600;<span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" ></span></span>
+}<span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" ></span></span>
 .list-tabs :deep(.el-tabs__active-bar) {
   background: var(--site-accent);
   height: 3px;
-  border-radius: 3p<span class="fstat-no" title="function not covered" >x </span>3px 0 0;<span class="cstat-no" title="statement not covered" ></span>
-}
-.list-tabs :deep(.el-tabs__indicator)<span class="fstat-no" title="function not covered" > {<span class="cstat-no" title="statement not covered" ></span></span>
+  border-radius: 3px 3px 0 0;<span class="fstat-no" title="function not covered" ></span>
+}<span class="cstat-no" title="statement not covered" ></span>
+.list-tabs :deep(.el-tabs__indicator) {
   background: var(--site-accent);
 }
-.list-tabs :deep(.el-tabs__ink-bar) {<span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" ></span></span>
+.list-tabs :deep(.e<span class="fstat-no" title="function not covered" >l-</span>tabs__in<span class="cstat-no" title="statement not covered" >k-bar) {</span>
   background: var(--site-accent);
-}
+}<span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" ></span></span>
 .list-tabs :deep(.el-tabs__nav) {
   border: none;
 }<span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" ></span></span>
@@ -1614,53 +1623,53 @@ onMounted(async () =&gt; {
   color: inherit;
 }
 .list-tabs :deep(.el-tabs__content) {
-  overflow: visible;
+  overflow: visible;<span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" ></span></span>
   padding-top: 4px;
 }
 .list-tabs :deep(.el-tabs__nav-wrap) {
   padding: 0 4px;
 }
 .list-tabs :deep(.el-tabs__item) {
-  padding: 0 20px;<span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" ></span></span>
+  padding: 0 20px;
   height: 44px;
   line-height: 44px;
 }
-<span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" ></span></span>
-.header-section {
+&nbsp;
+.header-section {<span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" ></span></span>
   text-align: center;
   margin-bottom: 40px;
   padding: 30px 0;
-}
+}<span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" ></span></span>
 &nbsp;
 .header-section h1 {
   font-size: 2.5rem;
   color: #2c3e50;
   margin: 0 0 30px 0;
-  font-weight: bold;<span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" ></span></span>
+  font-weight: bold;
 }
-<span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" ></span></span>
+&nbsp;
 .header-section p {
   font-size: 1.1rem;
-  color: #666;
+  color: #666;<span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" ></span></span>
   margin: 0;
 }<span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" ></span></span>
-<span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" ></span></span>
+&nbsp;
 .header-section .header-desc {
   font-size: 0.9rem;
   color: #909399;
-  margin-top: 4px;<span class="fstat-no" title="function not covered" ></span>
-}<span class="cstat-no" title="statement not covered" ></span>
+  margin-top: 4px;<span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" ></span></span>
+}<span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" ></span></span>
 &nbsp;
 .search-section {
   display: flex;
-  flex-direction: c<span class="fstat-no" title="function not covered" >ol</span>umn;<span class="cstat-no" title="statement not covered" ></span>
-  align-items: center;
-  gap: 12px;<span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" ></span></span>
+  flex-direction: column;<span class="fstat-no" title="function not covered" ></span>
+  align-<span class="cstat-no" title="statement not covered" >items: center;</span>
+  gap: 12px;
   max-width: 500px;
   margin: 15px auto 0 auto;
 }<span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" ></span></span>
 &nbsp;
-.search-input {
+.search-input {<span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" ></span></span>
   width: 100%;
 }
 <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" ></span></span>
@@ -1668,35 +1677,35 @@ onMounted(async () =&gt; {
   border-radius: 24px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
-}
+}<span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" ></span></span>
 &nbsp;
 .search-input :deep(.el-input__wrapper:hover) {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 &nbsp;
 .search-input :deep(.el-input__wrapper.is-focus) {
-  box-shadow: 0 4px 12px rgba(64, 1<span class="fstat-no" title="function not covered" >58</span>, 25<span class="cstat-no" title="statement not covered" >5, 0.2);</span>
+  box-shadow: 0 4px 12px rgba(64, 158, 255, 0.2);
 }
 &nbsp;
 .search-result-count {
-  font-size: 0.9rem;<span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" ></span></span>
-  color: #909399;
+  font-size: 0.9rem;
+  color: #909399;<span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" ></span></span>
   font-weight: 500;
 }
 &nbsp;
-.articles-container {
+.articles-container {<span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" ></span></span>
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 20px;
   margin-bottom: 40px;
 }
 &nbsp;
-.a<span class="cstat-no" title="statement not covered" >rticle-card {</span>
+.article-card {
   cursor: pointer;
   transition: all 0.3s ease;
   border-radius: 12px;
   border: 1px solid var(--site-border);
-  background: var(--site-surface);
+<span class="cstat-no" title="statement not covered" >  background: var(--site-surface);</span>
 }
 &nbsp;
 .article-card:hover {
@@ -1807,7 +1816,7 @@ onMounted(async () =&gt; {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-04-04T05:08:58.468Z
+                at 2026-04-06T05:24:07.279Z
             </div>
         <script src="../../prettify.js"></script>
         <script>
